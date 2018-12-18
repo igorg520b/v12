@@ -1,5 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.Threading.Tasks;
+using System.Linq;
 
 namespace icFlow
 {
@@ -56,7 +59,7 @@ namespace icFlow
 
         #region narrow phase
 
-        public static int NarrowPhase(double[] nds, int[] nd_idxs)
+        static int NarrowPhaseTwoElems(double[] nds, int[] nd_idxs)
         {
             Debug.Assert(nds.Length == 24);
             Debug.Assert(nd_idxs.Length == 8);
@@ -147,6 +150,77 @@ namespace icFlow
             nds[9] - x0, nds[10] - y0, nds[11] - z0);
             if (bres) result |= (128);
 
+            return result;
+        }
+
+        public static (Node,Face)[] NarrowPhase(List<Element> broadList, 
+        ModelPrms prms, ref FrameInfo cf, MeshCollection mc)
+        {
+            if (prms.CollisionScheme == ModelPrms.CollisionSchemes.None || broadList.Count == 0) 
+            { 
+                cf.nCollisions = 0; 
+                return null; 
+            }
+
+            int nTetra = broadList.Count;
+            int nPairs = nTetra / 2;
+            Debug.Assert(nTetra % 2 == 0, "broadList length is not even");
+            double[] nds = new double[24];
+            int[] nd_idxs = new int[8];
+
+            int[] resultingList = new int[nPairs];
+
+            Parallel.For(0, nPairs, item => {
+                Element tetra1 = broadList[item * 2];
+                Element tetra2 = broadList[item * 2 + 1];
+                for (int i = 0; i < 4; i++)
+                {
+                    nd_idxs[i] = tetra1.vrts[i].globalNodeId;
+                    nd_idxs[i + 4] = tetra2.vrts[i].globalNodeId;
+                    nds[i * 3 + 0] = tetra1.vrts[i].tx;
+                    nds[i * 3 + 1] = tetra1.vrts[i].ty;
+                    nds[i * 3 + 2] = tetra1.vrts[i].tz;
+
+                    nds[(i + 4) * 3 + 0] = tetra2.vrts[i].tx;
+                    nds[(i + 4) * 3 + 1] = tetra2.vrts[i].ty;
+                    nds[(i + 4) * 3 + 2] = tetra2.vrts[i].tz;
+                }
+                resultingList[item] = NarrowPhaseTwoElems(nds, nd_idxs);
+            });
+
+            // Tuple ( node# inside element, which element)
+            HashSet<(int,int)> NL2set = new HashSet<(int,int)>();
+
+            for (int i = 0; i < nPairs; i++)
+                if (resultingList[i] != 0)
+                {
+                    int bits = resultingList[i];
+                    if ((bits & 1) != 0) NL2set.Add((broadList[i * 2 + 1].vrts[0].globalNodeId, broadList[i * 2].globalElementId));
+                    if ((bits & 2) != 0) NL2set.Add((broadList[i * 2 + 1].vrts[1].globalNodeId, broadList[i * 2].globalElementId));
+                    if ((bits & 4) != 0) NL2set.Add((broadList[i * 2 + 1].vrts[2].globalNodeId, broadList[i * 2].globalElementId));
+                    if ((bits & 8) != 0) NL2set.Add((broadList[i * 2 + 1].vrts[3].globalNodeId, broadList[i * 2].globalElementId));
+
+                    if ((bits & 16) != 0) NL2set.Add((broadList[i * 2].vrts[0].globalNodeId, broadList[i * 2 + 1].globalElementId));
+                    if ((bits & 32) != 0) NL2set.Add((broadList[i * 2].vrts[1].globalNodeId, broadList[i * 2 + 1].globalElementId));
+                    if ((bits & 64) != 0) NL2set.Add((broadList[i * 2].vrts[2].globalNodeId, broadList[i * 2 + 1].globalElementId));
+                    if ((bits & 128) != 0) NL2set.Add((broadList[i * 2].vrts[3].globalNodeId, broadList[i * 2 + 1].globalElementId));
+                }
+
+            nPairs = NL2set.Count;
+            if (nPairs == 0)
+            {
+                cf.nCollisions = 0;
+                return null;
+            }
+
+            (int, int)[] arr = NL2set.ToArray();
+            (Node, Face)[] result = new (Node, Face)[arr.Length];
+            Parallel.For(0, arr.Length, i => {
+                Node nd = mc.allNodes[arr[i].Item1];
+                Element elem = mc.surfaceElements[arr[i].Item2];
+                Face fc = FindClosestFace(nd, elem);
+                result[i] = (nd, fc);
+            });
             return result;
         }
 
@@ -291,9 +365,10 @@ namespace icFlow
 
         #region closest face
 
-        public static void FindClosestFace(int nodeId, int elemId)
+        public static Face FindClosestFace(Node nd, Element elem)
         {
 
+            return null;
         }
 
         #endregion

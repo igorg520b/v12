@@ -552,7 +552,7 @@ namespace icFlow
         public int[] c_itet;
         CudaDeviceVariable<int> g_itet;
         public int tet_stride;
-        HashSet<Tuple<int, int>> NL2set = new HashSet<Tuple<int, int>>();
+        HashSet<(int, int)> NL2set = new HashSet<(int, int)>();
 
         public void NarrowPhaseCollisionDetection(List<Element> narrowList)
         {
@@ -582,15 +582,15 @@ namespace icFlow
                 if (c_itet[i * 2] != 0)
                 {
                     int bits = c_itet[i * 2];
-                    if ((bits & 1) != 0) NL2set.Add(new Tuple<int, int>(narrowList[i*2+1].vrts[0].globalNodeId, narrowList[i*2].globalElementId));
-                    if ((bits & 2) != 0) NL2set.Add(new Tuple<int, int>(narrowList[i * 2 + 1].vrts[1].globalNodeId, narrowList[i * 2].globalElementId));
-                    if ((bits & 4) != 0) NL2set.Add(new Tuple<int, int>(narrowList[i * 2 + 1].vrts[2].globalNodeId, narrowList[i * 2].globalElementId));
-                    if ((bits & 8) != 0) NL2set.Add(new Tuple<int, int>(narrowList[i * 2 + 1].vrts[3].globalNodeId, narrowList[i * 2].globalElementId));
+                    if ((bits & 1) != 0) NL2set.Add((narrowList[i*2+1].vrts[0].globalNodeId, narrowList[i*2].globalElementId));
+                    if ((bits & 2) != 0) NL2set.Add((narrowList[i * 2 + 1].vrts[1].globalNodeId, narrowList[i * 2].globalElementId));
+                    if ((bits & 4) != 0) NL2set.Add((narrowList[i * 2 + 1].vrts[2].globalNodeId, narrowList[i * 2].globalElementId));
+                    if ((bits & 8) != 0) NL2set.Add((narrowList[i * 2 + 1].vrts[3].globalNodeId, narrowList[i * 2].globalElementId));
 
-                    if ((bits & 16) != 0) NL2set.Add(new Tuple<int, int>(narrowList[i * 2 ].vrts[0].globalNodeId, narrowList[i * 2+1].globalElementId));
-                    if ((bits & 32) != 0) NL2set.Add(new Tuple<int, int>(narrowList[i * 2 ].vrts[1].globalNodeId, narrowList[i * 2+1].globalElementId));
-                    if ((bits & 64) != 0) NL2set.Add(new Tuple<int, int>(narrowList[i * 2 ].vrts[2].globalNodeId, narrowList[i * 2+1].globalElementId));
-                    if ((bits & 128) != 0) NL2set.Add(new Tuple<int, int>(narrowList[i * 2 ].vrts[3].globalNodeId, narrowList[i * 2+1].globalElementId));
+                    if ((bits & 16) != 0) NL2set.Add((narrowList[i * 2 ].vrts[0].globalNodeId, narrowList[i * 2+1].globalElementId));
+                    if ((bits & 32) != 0) NL2set.Add((narrowList[i * 2 ].vrts[1].globalNodeId, narrowList[i * 2+1].globalElementId));
+                    if ((bits & 64) != 0) NL2set.Add((narrowList[i * 2 ].vrts[2].globalNodeId, narrowList[i * 2+1].globalElementId));
+                    if ((bits & 128) != 0) NL2set.Add((narrowList[i * 2 ].vrts[3].globalNodeId, narrowList[i * 2+1].globalElementId));
                 }
 
             // identify closest face
@@ -602,7 +602,7 @@ namespace icFlow
             if (g_itet.Size < tet_stride * 4) { g_itet.Dispose(); g_itet = new CudaDeviceVariable<int>(tet_stride * 6); }
 
             int count = 0;
-            foreach(Tuple<int,int> nodeElemPair in NL2set)
+            foreach((int,int) nodeElemPair in NL2set)
             {
                 c_itet[count] = nodeElemPair.Item1;
                 c_itet[count + tet_stride] = nodeElemPair.Item2;
