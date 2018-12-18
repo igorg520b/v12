@@ -37,6 +37,10 @@ namespace icFlow
             RebuildTree();
         }
 
+        private void Form1_Load(object sender, EventArgs e)
+        {
+            parametricStudyToolStripMenuItem_Click(sender, e);
+        }
         #endregion
 
         #region treeview
@@ -704,6 +708,15 @@ namespace icFlow
 
         #region interface
 
+        private void parametricStudyToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            PS_Setup psSetup = new PS_Setup();
+            if (psSetup.ShowDialog() == DialogResult.OK)
+            {
+                Trace.WriteLine("starting parametric study");
+            }
+        }
+
         private void oneStepToolStripMenuItem_Click(object sender, EventArgs e)
         {
             model3.Step();
@@ -1057,10 +1070,10 @@ namespace icFlow
                     glControl1.Invalidate();
                     model3.mc.Prepare();
                     model3.isReady = false;
-                    if (sgf.rprm.type == IcyGrains.AllParams.BeamType.LBeam)
+                    if (sgf.rprm.type == IcyGrains.BeamParams.BeamType.LBeam)
                     {
                         model3.prms.SelectPreset(ModelPrms.ParameterPresets.LBeam);
-                    } else if(sgf.rprm.type == IcyGrains.AllParams.BeamType.Plain)
+                    } else if(sgf.rprm.type == IcyGrains.BeamParams.BeamType.Plain)
                     {
                         model3.prms.BeamLength = sgf.rprm.beamL2;
                         model3.prms.BeamThickness = sgf.rprm.beamThickness;
@@ -1077,6 +1090,9 @@ namespace icFlow
 
 
         StreamWriter swReport;
+
+
+
         double mixingCoeff, frameTime, firstFrameTime, lastFrameTime, timeSpan;
         int renderingFrame;
         private void renderSimulationToolStripMenuItem_Click(object sender, EventArgs e)

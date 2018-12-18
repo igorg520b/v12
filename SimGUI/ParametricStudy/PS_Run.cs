@@ -8,13 +8,18 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace icFlow.ParametricStudy
+namespace icFlow
 {
     public partial class PS_Run : Form
     {
         public PS_Run()
         {
             InitializeComponent();
+        }
+
+        private void PS_Run_Load(object sender, EventArgs e)
+        {
+
         }
     }
 }

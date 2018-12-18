@@ -136,6 +136,9 @@
     <EmbeddedResource Include="Analysis\PPR_relations.resx">
       <DependentUpon>PPR_relations.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="ParametricStudy\PS_Run.resx">
+      <DependentUpon>PS_Run.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="ParametricStudy\PS_Setup.resx">
       <DependentUpon>PS_Setup.cs</DependentUpon>
     </EmbeddedResource>

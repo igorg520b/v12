@@ -386,6 +386,8 @@ namespace icFlow
 
         #endregion
 
+        #region presets
+
         public enum ParameterPresets { LBeam, PlainBeam };
         public void SelectPreset(ParameterPresets pp)
         {
@@ -421,6 +423,52 @@ namespace icFlow
                 MaxSteps = 200;
             }
         }
+
+        #endregion
+
+        #region copy constructor 
+
+        public ModelPrms(ModelPrms other)
+        {
+            this.name = other.name;
+            this.Comments = other.Comments;
+            this.InitialTimeStep = other.InitialTimeStep;
+            this.MaxSteps = other.MaxSteps;
+            this.DetectFracture = other.DetectFracture;
+            this._alpha = other._alpha;
+            this._beta = other._beta;
+            this._lambda_n = other._lambda_n;
+            this._lambda_t = other._lambda_t;
+            this._phi_n = other._phi_n;
+            this._phi_t = other._phi_t;
+            this._sigma_max = other._sigma_max;
+            this._tau_max = other._tau_max;
+
+            this.Y = other.Y;
+            this.rho = other.rho;
+            this.dampingMass = other.dampingMass;
+            this.dampingStiffness = other.dampingStiffness;
+            this.nu = other.nu;
+            this.CollisionScheme = other.CollisionScheme;
+            this.penaltyK = other.penaltyK;
+            this.NewmarkBeta = other.NewmarkBeta;
+            this.NewmarkGamma = other.NewmarkGamma;
+            this.ConvergenceEpsilon = other.ConvergenceEpsilon;
+            this.ConvergenceCutoff = other.ConvergenceCutoff;
+            this.maxDamagePerStep = other.maxDamagePerStep;
+            this.maxFailPerStep = other.maxFailPerStep;
+            this.maxIterations = other.maxIterations;
+            this.minIterations = other.minIterations;
+            this.gravity = other.gravity;
+            this.NonSymmetricMatrix = other.NonSymmetricMatrix;
+            this.UseGPU = other.UseGPU;
+            this.BeamLength = other.BeamLength;
+            this.BeamWidth = other.BeamWidth;
+            this.BeamThickness = other.BeamThickness;
+            Recompute();
+        }
+
+        #endregion
     }
 
 }

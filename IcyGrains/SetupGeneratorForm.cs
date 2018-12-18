@@ -19,7 +19,7 @@ namespace IcyGrains
     {
         int lastX, lastY;   // mouse last position
         double aspectRatio = 1;
-        public AllParams rprm;
+        public BeamParams rprm;
         GrainTool2 gt = new GrainTool2();
         public MemoryStream memStr;
         public MemoryStream memStrIndenter;
@@ -28,7 +28,7 @@ namespace IcyGrains
         {
             InitializeComponent();
             glControl1.MouseWheel += GlControl1_MouseWheel;
-            rprm = AllParams.Load();
+            rprm = BeamParams.Load();
 
             propertyGrid1.SelectedObject = rprm;
         }
@@ -308,9 +308,9 @@ namespace IcyGrains
         {
             toolStripStatusLabel1.Text = "generating beam";
             GrainTool2 gt2 = new GrainTool2();
-            if (rprm.type == AllParams.BeamType.LBeam)
+            if (rprm.type == BeamParams.BeamType.LBeam)
                 await Task.Run(() => gt.LBeamGeneration(rprm));
-            else if (rprm.type == AllParams.BeamType.Plain)
+            else if (rprm.type == BeamParams.BeamType.Plain)
                 await Task.Run(() => gt2.PlainBeamGeneration(rprm));
             else throw new Exception("beam type not set");
 

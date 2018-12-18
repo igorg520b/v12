@@ -1,4 +1,4 @@
-﻿namespace icFlow.ParametricStudy
+﻿namespace icFlow
 {
     partial class PS_Run
     {
@@ -28,9 +28,18 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.components = new System.ComponentModel.Container();
+            this.SuspendLayout();
+            // 
+            // PS_Run
+            // 
+            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.ClientSize = new System.Drawing.Size(284, 261);
+            this.Name = "PS_Run";
             this.Text = "PS_Run";
+            this.Load += new System.EventHandler(this.PS_Run_Load);
+            this.ResumeLayout(false);
+
         }
 
         #endregion

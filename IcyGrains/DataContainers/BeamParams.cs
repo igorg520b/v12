@@ -11,7 +11,7 @@ using System.Diagnostics;
 
 namespace IcyGrains
 {
-    public class AllParams
+    public class BeamParams
     {
         #region beam
         public enum BeamType { Unknown, LBeam, Plain };
@@ -163,27 +163,27 @@ namespace IcyGrains
             IcebergColorHtml = ColorTranslator.ToHtml(IcebergColor);
 
             StreamWriter sw = new StreamWriter(str);
-            XmlSerializer xs = new XmlSerializer(typeof(AllParams));
+            XmlSerializer xs = new XmlSerializer(typeof(BeamParams));
             xs.Serialize(sw, this);
             sw.Close();
             Trace.WriteLine("saved RenderParams");
         }
 
-        public static AllParams Load()
+        public static BeamParams Load()
         {
             if (!File.Exists(fileName))
             {
                 Trace.WriteLine("using default RenderPrms");
-                return new AllParams(); // use defaults
+                return new BeamParams(); // use defaults
             }
 
             Stream str = File.OpenRead(fileName);
-            XmlSerializer xs = new XmlSerializer(typeof(AllParams));
+            XmlSerializer xs = new XmlSerializer(typeof(BeamParams));
             try
             {
                 Trace.WriteLine("attempting to load RenderPrms");
 
-                AllParams prms = (AllParams)xs.Deserialize(str);
+                BeamParams prms = (BeamParams)xs.Deserialize(str);
                 str.Close();
                 prms.GrainsColor = ColorTranslator.FromHtml(prms.GrainsColorHtml);
                 prms.IcebergColor = ColorTranslator.FromHtml(prms.IcebergColorHtml);
@@ -195,8 +195,30 @@ namespace IcyGrains
                 Trace.WriteLine("using default RenderPrms because exception occurred:" + e.Message);
                 str.Close();
                 File.Delete(fileName);
-                return new AllParams();
+                return new BeamParams();
             }
+        }
+
+        #endregion
+
+        #region copy constructor
+
+        public BeamParams() { }
+
+        public BeamParams(BeamParams other)
+        {
+            this.type = other.type;
+            this.name = other.name;
+            this.beamA = other.beamA;
+            this.beamB = other.beamB;
+            this.beamL1 = other.beamL1;
+            this.beamL2 = other.beamL2;
+            this.beamGap = other.beamGap;
+            this.beamMargin = other.beamMargin;
+            this.beamThickness = other.beamThickness;
+            this.CharacteristicLengthMax = other.CharacteristicLengthMax;
+            this.RefinementMultiplier = other.RefinementMultiplier;
+            this.IndenterSize = other.IndenterSize;
         }
 
         #endregion

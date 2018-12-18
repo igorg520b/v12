@@ -64,7 +64,7 @@ namespace IcyGrains
         }
 
         #region indenter
-        void GenerateIndenter2(AllParams prms)
+        void GenerateIndenter2(BeamParams prms)
         {
             // prepare .geo file
             string filename = $"tmp//indenter.geo";
@@ -121,7 +121,7 @@ Extrude {0, indsize, 0} {
 
         #region LBeam
 
-        public void LBeamGeneration(AllParams prms)
+        public void LBeamGeneration(BeamParams prms)
         {
             // prepare .geo file
             string filename = $"tmp//LBeam.geo";
@@ -228,7 +228,7 @@ Extrude {0, 0, h} {
             GenerateIndenter2(prms);
         }
 
-        void GenerateSelectedRegionLBeam(AllParams prms)
+        void GenerateSelectedRegionLBeam(BeamParams prms)
         {
             double a = prms.beamA;
             double b = prms.beamB;
@@ -252,11 +252,11 @@ Extrude {0, 0, h} {
             selectedRegion.InferExteriorPoint();
         }
 
-        public void SetLBeamType(int type, AllParams prms)
+        public void SetLBeamType(int type, BeamParams prms)
         {
             prms.beamGap = 0.1;
             prms.beamMargin = 0.35;
-            prms.type = AllParams.BeamType.LBeam;
+            prms.type = BeamParams.BeamType.LBeam;
             switch (type)
             {
                 case 1:
@@ -315,13 +315,13 @@ Extrude {0, 0, h} {
 
         #region PlainBeam
 
-        public void SetPBeamType(int type, AllParams prms)
+        public void SetPBeamType(int type, BeamParams prms)
         {
             prms.beamGap = 0.1;
             prms.beamMargin = 0.5;
             prms.CharacteristicLengthMax = 0.2;
             prms.RefinementMultiplier = 0.065;
-            prms.type = AllParams.BeamType.Plain;
+            prms.type = BeamParams.BeamType.Plain;
 
             switch (type)
             {
@@ -340,7 +340,7 @@ Extrude {0, 0, h} {
             }
         }
 
-        public void PlainBeamGeneration(AllParams prms)
+        public void PlainBeamGeneration(BeamParams prms)
         {
             // prepare .geo file
             string filename = $"tmp//PBeam.geo";
@@ -454,7 +454,7 @@ Extrude {0, 0, h} {
 
         }
 
-        void PlainBeamGenerateIndenter(AllParams prms)
+        void PlainBeamGenerateIndenter(BeamParams prms)
         {
             // prepare .geo file
             string filename = $"tmp//indenter.geo";

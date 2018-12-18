@@ -41,6 +41,8 @@
             this.takeScreenshotToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.renderSimulationToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.writeCSVToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripMenuItem5 = new System.Windows.Forms.ToolStripSeparator();
+            this.clearToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.simulationToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.continueFromLastToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.oneStepToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -88,8 +90,8 @@
             this.removeToolStripMenuItem2 = new System.Windows.Forms.ToolStripMenuItem();
             this.openFileDialogMeshes = new System.Windows.Forms.OpenFileDialog();
             this.timer1 = new System.Windows.Forms.Timer(this.components);
-            this.toolStripMenuItem5 = new System.Windows.Forms.ToolStripSeparator();
-            this.clearToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripMenuItem8 = new System.Windows.Forms.ToolStripSeparator();
+            this.parametricStudyToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             this.statusStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.trackBar1)).BeginInit();
@@ -201,6 +203,18 @@
             this.writeCSVToolStripMenuItem.Text = "Write CSV";
             this.writeCSVToolStripMenuItem.Click += new System.EventHandler(this.writeCSVToolStripMenuItem_Click);
             // 
+            // toolStripMenuItem5
+            // 
+            this.toolStripMenuItem5.Name = "toolStripMenuItem5";
+            this.toolStripMenuItem5.Size = new System.Drawing.Size(235, 6);
+            // 
+            // clearToolStripMenuItem
+            // 
+            this.clearToolStripMenuItem.Name = "clearToolStripMenuItem";
+            this.clearToolStripMenuItem.Size = new System.Drawing.Size(238, 22);
+            this.clearToolStripMenuItem.Text = "Clear";
+            this.clearToolStripMenuItem.Click += new System.EventHandler(this.clearToolStripMenuItem_Click);
+            // 
             // simulationToolStripMenuItem
             // 
             this.simulationToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
@@ -234,7 +248,9 @@
             this.toolStripMenuItem3,
             this.pPRRelationsToolStripMenuItem,
             this.toolStripMenuItem4,
-            this.setupGenerationToolStripMenuItem});
+            this.setupGenerationToolStripMenuItem,
+            this.toolStripMenuItem8,
+            this.parametricStudyToolStripMenuItem});
             this.toolsToolStripMenuItem.Name = "toolsToolStripMenuItem";
             this.toolsToolStripMenuItem.Size = new System.Drawing.Size(47, 20);
             this.toolsToolStripMenuItem.Text = "Tools";
@@ -604,17 +620,18 @@
             // 
             this.timer1.Tick += new System.EventHandler(this.timer1_Tick);
             // 
-            // toolStripMenuItem5
+            // toolStripMenuItem8
             // 
-            this.toolStripMenuItem5.Name = "toolStripMenuItem5";
-            this.toolStripMenuItem5.Size = new System.Drawing.Size(235, 6);
+            this.toolStripMenuItem8.Name = "toolStripMenuItem8";
+            this.toolStripMenuItem8.Size = new System.Drawing.Size(213, 6);
             // 
-            // clearToolStripMenuItem
+            // parametricStudyToolStripMenuItem
             // 
-            this.clearToolStripMenuItem.Name = "clearToolStripMenuItem";
-            this.clearToolStripMenuItem.Size = new System.Drawing.Size(238, 22);
-            this.clearToolStripMenuItem.Text = "Clear";
-            this.clearToolStripMenuItem.Click += new System.EventHandler(this.clearToolStripMenuItem_Click);
+            this.parametricStudyToolStripMenuItem.Name = "parametricStudyToolStripMenuItem";
+            this.parametricStudyToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.D)));
+            this.parametricStudyToolStripMenuItem.Size = new System.Drawing.Size(216, 22);
+            this.parametricStudyToolStripMenuItem.Text = "Parametric Study...";
+            this.parametricStudyToolStripMenuItem.Click += new System.EventHandler(this.parametricStudyToolStripMenuItem_Click);
             // 
             // Form1
             // 
@@ -631,6 +648,7 @@
             this.Text = "icFlow";
             this.WindowState = System.Windows.Forms.FormWindowState.Maximized;
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Form1_FormClosing);
+            this.Load += new System.EventHandler(this.Form1_Load);
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
             this.statusStrip1.ResumeLayout(false);
@@ -711,6 +729,8 @@
         private System.Windows.Forms.ToolStripMenuItem setupGenerationToolStripMenuItem;
         private System.Windows.Forms.ToolStripSeparator toolStripMenuItem5;
         private System.Windows.Forms.ToolStripMenuItem clearToolStripMenuItem;
+        private System.Windows.Forms.ToolStripSeparator toolStripMenuItem8;
+        private System.Windows.Forms.ToolStripMenuItem parametricStudyToolStripMenuItem;
     }
 }
 
