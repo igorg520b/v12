@@ -7,7 +7,7 @@ using IcyGrains;
 
 namespace icFlow
 {
-    class PS_Container
+    public class PS_Container
     {
         public BeamParams beamParams = new BeamParams();
         public ModelPrms modelParams = new ModelPrms();

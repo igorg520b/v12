@@ -12,6 +12,9 @@ namespace icFlow
 {
     public partial class PS_Run : Form
     {
+        public List<PS_Container> batch;
+
+
         public PS_Run()
         {
             InitializeComponent();

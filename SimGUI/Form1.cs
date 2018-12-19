@@ -713,8 +713,10 @@ namespace icFlow
             PS_Setup psSetup = new PS_Setup();
             if (psSetup.ShowDialog() == DialogResult.OK)
             {
+                List<PS_Container> resultingBatch = psSetup.resultingBatch;
                 Trace.WriteLine("starting parametric study");
             }
+
         }
 
         private void oneStepToolStripMenuItem_Click(object sender, EventArgs e)
@@ -1072,13 +1074,13 @@ namespace icFlow
                     model3.isReady = false;
                     if (sgf.rprm.type == IcyGrains.BeamParams.BeamType.LBeam)
                     {
-                        model3.prms.SelectPreset(ModelPrms.ParameterPresets.LBeam);
+//                        model3.prms.SelectPreset(ModelPrms.ParameterPresets.LBeam);
                     } else if(sgf.rprm.type == IcyGrains.BeamParams.BeamType.Plain)
                     {
                         model3.prms.BeamLength = sgf.rprm.beamL2;
                         model3.prms.BeamThickness = sgf.rprm.beamThickness;
                         model3.prms.BeamWidth = sgf.rprm.beamA;
-                        model3.prms.SelectPreset(ModelPrms.ParameterPresets.PlainBeam);
+//                        model3.prms.SelectPreset(ModelPrms.ParameterPresets.PlainBeam);
                     }
 
 

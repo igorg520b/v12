@@ -252,93 +252,14 @@ Extrude {0, 0, h} {
             selectedRegion.InferExteriorPoint();
         }
 
-        public void SetLBeamType(int type, BeamParams prms)
-        {
-            prms.beamGap = 0.1;
-            prms.beamMargin = 0.35;
-            prms.type = BeamParams.BeamType.LBeam;
-            switch (type)
-            {
-                case 1:
-                    prms.name = "L1";
-                    prms.beamL1 = 1.05;
-                    prms.beamL2 = 1.95;
-                    prms.beamA = 0.55;
-                    prms.beamB = 0.55;
-                    prms.beamThickness = 0.56;
-                    break;
-                case 2:
-                    prms.name = "L2";
-                    prms.beamL1 = 1.2;
-                    prms.beamL2 = 2.1;
-                    prms.beamA = 0.6;
-                    prms.beamB = 0.6;
-                    prms.beamThickness = 0.53;
-                    break;
-                case 3:
-                    prms.name = "L3";
-                    prms.beamL1 = 1.2;
-                    prms.beamL2 = 2.08;
-                    prms.beamA = 0.6;
-                    prms.beamB = 0.65;
-                    prms.beamThickness = 0.6;
-                    break;
-                case 7:
-                    prms.name = "L7";
-                    prms.beamL1 = 1.3;
-                    prms.beamL2 = 2;
-                    prms.beamA = 0.62;
-                    prms.beamB = 0.65;
-                    prms.beamThickness = 0.59;
-                    break;
-                case 8:
-                    prms.name = "L8";
-                    prms.beamL1 = 1.15;
-                    prms.beamL2 = 1.45;
-                    prms.beamA = 0.55;
-                    prms.beamB = 0.6;
-                    prms.beamThickness = 0.59;
-                    break;
-                case 9:
-                    prms.name = "L9";
-                    prms.beamL1 = 1.57;
-                    prms.beamL2 = 1.22;
-                    prms.beamA = 0.9;
-                    prms.beamB = 0.57;
-                    prms.beamThickness = 0.59;
-                    break;
-            }
-        }
+ 
 
 
         #endregion
 
         #region PlainBeam
 
-        public void SetPBeamType(int type, BeamParams prms)
-        {
-            prms.beamGap = 0.1;
-            prms.beamMargin = 0.5;
-            prms.CharacteristicLengthMax = 0.2;
-            prms.RefinementMultiplier = 0.065;
-            prms.type = BeamParams.BeamType.Plain;
 
-            switch (type)
-            {
-                case 1:
-                    prms.name = "P1";
-                    prms.beamL2 = 1.97;
-                    prms.beamA = 0.64;
-                    prms.beamThickness = 0.23;
-                    break;
-                case 2:
-                    prms.name = "P2";
-                    prms.beamL2 = 1.27;
-                    prms.beamA = 0.58;
-                    prms.beamThickness = 0.22;
-                    break;
-            }
-        }
 
         public void PlainBeamGeneration(BeamParams prms)
         {

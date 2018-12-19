@@ -264,7 +264,7 @@ namespace IcyGrains
         private void l1ToolStripMenuItem_Click(object sender, EventArgs e)
         {
             int tag = int.Parse((string)((ToolStripMenuItem)sender).Tag);
-            gt.SetLBeamType(tag, rprm);
+            rprm.PresetL(tag);
             propertyGrid1.Refresh();
         }
 
@@ -300,7 +300,7 @@ namespace IcyGrains
         private void p1ToolStripMenuItem_Click(object sender, EventArgs e)
         {
             int tag = int.Parse((string)((ToolStripMenuItem)sender).Tag);
-            gt.SetPBeamType(tag, rprm);
+            rprm.PresetPlain(tag);
             propertyGrid1.Refresh();
         }
 

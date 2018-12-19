@@ -223,5 +223,91 @@ namespace IcyGrains
 
         #endregion
 
+        #region presets
+
+        public void PresetPlain(int presetNumber)
+        {
+            type = BeamParams.BeamType.Plain;
+            beamGap = 0.1;
+            beamMargin = 0.5;
+            CharacteristicLengthMax = 0.2;
+            RefinementMultiplier = 0.065;
+
+            switch (presetNumber)
+            {
+                case 1:
+                    name = "P1";
+                    beamL2 = 1.97;
+                    beamA = 0.64;
+                    beamThickness = 0.23;
+                    break;
+                case 2:
+                    name = "P2";
+                    beamL2 = 1.27;
+                    beamA = 0.58;
+                    beamThickness = 0.22;
+                    break;
+            }
+        }
+
+        public void PresetL(int preset)
+        {
+            beamGap = 0.1;
+            beamMargin = 0.35;
+            type = BeamParams.BeamType.LBeam;
+            switch (preset)
+            {
+                case 1:
+                    name = "L1";
+                    beamL1 = 1.05;
+                    beamL2 = 1.95;
+                    beamA = 0.55;
+                    beamB = 0.55;
+                    beamThickness = 0.56;
+                    break;
+                case 2:
+                    name = "L2";
+                    beamL1 = 1.2;
+                    beamL2 = 2.1;
+                    beamA = 0.6;
+                    beamB = 0.6;
+                    beamThickness = 0.53;
+                    break;
+                case 3:
+                    name = "L3";
+                    beamL1 = 1.2;
+                    beamL2 = 2.08;
+                    beamA = 0.6;
+                    beamB = 0.65;
+                    beamThickness = 0.6;
+                    break;
+                case 7:
+                    name = "L7";
+                    beamL1 = 1.3;
+                    beamL2 = 2;
+                    beamA = 0.62;
+                    beamB = 0.65;
+                    beamThickness = 0.59;
+                    break;
+                case 8:
+                    name = "L8";
+                    beamL1 = 1.15;
+                    beamL2 = 1.45;
+                    beamA = 0.55;
+                    beamB = 0.6;
+                    beamThickness = 0.59;
+                    break;
+                case 9:
+                    name = "L9";
+                    beamL1 = 1.57;
+                    beamL2 = 1.22;
+                    beamA = 0.9;
+                    beamB = 0.57;
+                    beamThickness = 0.59;
+                    break;
+            }
+        }
+
+        #endregion
     }
 }

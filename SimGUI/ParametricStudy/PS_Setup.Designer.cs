@@ -32,27 +32,27 @@
             this.pgBeamParams = new System.Windows.Forms.PropertyGrid();
             this.pgModelParams = new System.Windows.Forms.PropertyGrid();
             this.panel2 = new System.Windows.Forms.Panel();
+            this.btnDefaultP = new System.Windows.Forms.Button();
+            this.btnDefaultL = new System.Windows.Forms.Button();
+            this.tbClassName = new System.Windows.Forms.TextBox();
+            this.btnAssignName = new System.Windows.Forms.Button();
             this.btnRemove = new System.Windows.Forms.Button();
             this.btnDuplicate = new System.Windows.Forms.Button();
             this.listBox1 = new System.Windows.Forms.ListBox();
             this.label1 = new System.Windows.Forms.Label();
-            this.listBox2 = new System.Windows.Forms.ListBox();
+            this.lbParameters = new System.Windows.Forms.ListBox();
             this.label2 = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
             this.label4 = new System.Windows.Forms.Label();
             this.btnGenerate = new System.Windows.Forms.Button();
-            this.numericUpDown1 = new System.Windows.Forms.NumericUpDown();
+            this.nudSteps = new System.Windows.Forms.NumericUpDown();
             this.tbFrom = new System.Windows.Forms.TextBox();
             this.tbTo = new System.Windows.Forms.TextBox();
-            this.btnAssignName = new System.Windows.Forms.Button();
-            this.tbClassName = new System.Windows.Forms.TextBox();
             this.tbStudyName = new System.Windows.Forms.TextBox();
             this.label5 = new System.Windows.Forms.Label();
-            this.btnDefaultL = new System.Windows.Forms.Button();
-            this.btnDefaultP = new System.Windows.Forms.Button();
             this.panel1.SuspendLayout();
             this.panel2.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.nudSteps)).BeginInit();
             this.SuspendLayout();
             // 
             // panel1
@@ -99,6 +99,43 @@
             this.panel2.Size = new System.Drawing.Size(404, 136);
             this.panel2.TabIndex = 0;
             // 
+            // btnDefaultP
+            // 
+            this.btnDefaultP.Location = new System.Drawing.Point(222, 14);
+            this.btnDefaultP.Name = "btnDefaultP";
+            this.btnDefaultP.Size = new System.Drawing.Size(75, 23);
+            this.btnDefaultP.TabIndex = 12;
+            this.btnDefaultP.Text = "Def-P";
+            this.btnDefaultP.UseVisualStyleBackColor = true;
+            this.btnDefaultP.Click += new System.EventHandler(this.btnDefaultP_Click);
+            // 
+            // btnDefaultL
+            // 
+            this.btnDefaultL.Location = new System.Drawing.Point(141, 14);
+            this.btnDefaultL.Name = "btnDefaultL";
+            this.btnDefaultL.Size = new System.Drawing.Size(75, 23);
+            this.btnDefaultL.TabIndex = 11;
+            this.btnDefaultL.Text = "Def-L";
+            this.btnDefaultL.UseVisualStyleBackColor = true;
+            this.btnDefaultL.Click += new System.EventHandler(this.btnDefaultL_Click);
+            // 
+            // tbClassName
+            // 
+            this.tbClassName.Location = new System.Drawing.Point(222, 101);
+            this.tbClassName.Name = "tbClassName";
+            this.tbClassName.Size = new System.Drawing.Size(100, 20);
+            this.tbClassName.TabIndex = 10;
+            // 
+            // btnAssignName
+            // 
+            this.btnAssignName.Location = new System.Drawing.Point(141, 98);
+            this.btnAssignName.Name = "btnAssignName";
+            this.btnAssignName.Size = new System.Drawing.Size(75, 23);
+            this.btnAssignName.TabIndex = 3;
+            this.btnAssignName.Text = "Assign name";
+            this.btnAssignName.UseVisualStyleBackColor = true;
+            this.btnAssignName.Click += new System.EventHandler(this.btnAssignName_Click);
+            // 
             // btnRemove
             // 
             this.btnRemove.Location = new System.Drawing.Point(141, 69);
@@ -138,20 +175,20 @@
             this.label1.TabIndex = 1;
             this.label1.Text = "Parameter";
             // 
-            // listBox2
+            // lbParameters
             // 
-            this.listBox2.FormattingEnabled = true;
-            this.listBox2.Items.AddRange(new object[] {
+            this.lbParameters.FormattingEnabled = true;
+            this.lbParameters.Items.AddRange(new object[] {
             "sigma",
             "ratio",
             "length",
             "width",
             "thickness",
             "resolution"});
-            this.listBox2.Location = new System.Drawing.Point(442, 77);
-            this.listBox2.Name = "listBox2";
-            this.listBox2.Size = new System.Drawing.Size(93, 108);
-            this.listBox2.TabIndex = 2;
+            this.lbParameters.Location = new System.Drawing.Point(442, 77);
+            this.lbParameters.Name = "lbParameters";
+            this.lbParameters.Size = new System.Drawing.Size(93, 108);
+            this.lbParameters.TabIndex = 2;
             // 
             // label2
             // 
@@ -190,23 +227,23 @@
             this.btnGenerate.UseVisualStyleBackColor = true;
             this.btnGenerate.Click += new System.EventHandler(this.btnGenerate_Click);
             // 
-            // numericUpDown1
+            // nudSteps
             // 
-            this.numericUpDown1.Location = new System.Drawing.Point(488, 276);
-            this.numericUpDown1.Maximum = new decimal(new int[] {
+            this.nudSteps.Location = new System.Drawing.Point(479, 276);
+            this.nudSteps.Maximum = new decimal(new int[] {
             1000,
             0,
             0,
             0});
-            this.numericUpDown1.Minimum = new decimal(new int[] {
+            this.nudSteps.Minimum = new decimal(new int[] {
             2,
             0,
             0,
             0});
-            this.numericUpDown1.Name = "numericUpDown1";
-            this.numericUpDown1.Size = new System.Drawing.Size(81, 20);
-            this.numericUpDown1.TabIndex = 8;
-            this.numericUpDown1.Value = new decimal(new int[] {
+            this.nudSteps.Name = "nudSteps";
+            this.nudSteps.Size = new System.Drawing.Size(81, 20);
+            this.nudSteps.TabIndex = 8;
+            this.nudSteps.Value = new decimal(new int[] {
             3,
             0,
             0,
@@ -214,34 +251,19 @@
             // 
             // tbFrom
             // 
-            this.tbFrom.Location = new System.Drawing.Point(488, 207);
+            this.tbFrom.Location = new System.Drawing.Point(479, 207);
             this.tbFrom.Name = "tbFrom";
             this.tbFrom.Size = new System.Drawing.Size(100, 20);
             this.tbFrom.TabIndex = 9;
+            this.tbFrom.Text = "100000";
             // 
             // tbTo
             // 
-            this.tbTo.Location = new System.Drawing.Point(488, 239);
+            this.tbTo.Location = new System.Drawing.Point(479, 242);
             this.tbTo.Name = "tbTo";
             this.tbTo.Size = new System.Drawing.Size(100, 20);
             this.tbTo.TabIndex = 10;
-            // 
-            // btnAssignName
-            // 
-            this.btnAssignName.Location = new System.Drawing.Point(141, 98);
-            this.btnAssignName.Name = "btnAssignName";
-            this.btnAssignName.Size = new System.Drawing.Size(75, 23);
-            this.btnAssignName.TabIndex = 3;
-            this.btnAssignName.Text = "Assign name";
-            this.btnAssignName.UseVisualStyleBackColor = true;
-            this.btnAssignName.Click += new System.EventHandler(this.btnAssignName_Click);
-            // 
-            // tbClassName
-            // 
-            this.tbClassName.Location = new System.Drawing.Point(222, 101);
-            this.tbClassName.Name = "tbClassName";
-            this.tbClassName.Size = new System.Drawing.Size(100, 20);
-            this.tbClassName.TabIndex = 10;
+            this.tbTo.Text = "150000";
             // 
             // tbStudyName
             // 
@@ -260,24 +282,6 @@
             this.label5.TabIndex = 11;
             this.label5.Text = "Study name:";
             // 
-            // btnDefaultL
-            // 
-            this.btnDefaultL.Location = new System.Drawing.Point(141, 14);
-            this.btnDefaultL.Name = "btnDefaultL";
-            this.btnDefaultL.Size = new System.Drawing.Size(75, 23);
-            this.btnDefaultL.TabIndex = 11;
-            this.btnDefaultL.Text = "Def-L";
-            this.btnDefaultL.UseVisualStyleBackColor = true;
-            // 
-            // btnDefaultP
-            // 
-            this.btnDefaultP.Location = new System.Drawing.Point(222, 14);
-            this.btnDefaultP.Name = "btnDefaultP";
-            this.btnDefaultP.Size = new System.Drawing.Size(75, 23);
-            this.btnDefaultP.TabIndex = 12;
-            this.btnDefaultP.Text = "Def-P";
-            this.btnDefaultP.UseVisualStyleBackColor = true;
-            // 
             // PS_Setup
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -287,12 +291,12 @@
             this.Controls.Add(this.label5);
             this.Controls.Add(this.tbTo);
             this.Controls.Add(this.tbFrom);
-            this.Controls.Add(this.numericUpDown1);
+            this.Controls.Add(this.nudSteps);
             this.Controls.Add(this.btnGenerate);
             this.Controls.Add(this.label4);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.label2);
-            this.Controls.Add(this.listBox2);
+            this.Controls.Add(this.lbParameters);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.panel1);
             this.Name = "PS_Setup";
@@ -302,7 +306,7 @@
             this.panel1.ResumeLayout(false);
             this.panel2.ResumeLayout(false);
             this.panel2.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.nudSteps)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -318,12 +322,12 @@
         private System.Windows.Forms.Button btnDuplicate;
         private System.Windows.Forms.ListBox listBox1;
         private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.ListBox listBox2;
+        private System.Windows.Forms.ListBox lbParameters;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.Button btnGenerate;
-        private System.Windows.Forms.NumericUpDown numericUpDown1;
+        private System.Windows.Forms.NumericUpDown nudSteps;
         private System.Windows.Forms.TextBox tbFrom;
         private System.Windows.Forms.TextBox tbTo;
         private System.Windows.Forms.TextBox tbClassName;
