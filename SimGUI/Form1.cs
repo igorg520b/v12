@@ -39,7 +39,12 @@ namespace icFlow
 
         private void Form1_Load(object sender, EventArgs e)
         {
+        }
+
+        private void Form1_Shown(object sender, EventArgs e)
+        {
             parametricStudyToolStripMenuItem_Click(sender, e);
+
         }
         #endregion
 
@@ -710,13 +715,11 @@ namespace icFlow
 
         private void parametricStudyToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            PS_Setup psSetup = new PS_Setup();
-            if (psSetup.ShowDialog() == DialogResult.OK)
-            {
-                List<PS_Container> resultingBatch = psSetup.resultingBatch;
-                Trace.WriteLine("starting parametric study");
-            }
-
+            if (running) return;
+            ParametricStudyForm psf = new ParametricStudyForm();
+            psf.mainWindow = this;
+            psf.Show();
+//            psf.TopMost = true;
         }
 
         private void oneStepToolStripMenuItem_Click(object sender, EventArgs e)

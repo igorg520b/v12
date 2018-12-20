@@ -1,6 +1,6 @@
 ﻿namespace icFlow
 {
-    partial class PS_Setup
+    partial class ParametricStudyForm
     {
         /// <summary>
         /// Required designer variable.
@@ -28,6 +28,10 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea2 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.Legend legend2 = new System.Windows.Forms.DataVisualization.Charting.Legend();
+            System.Windows.Forms.DataVisualization.Charting.Series series2 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ParametricStudyForm));
             this.panel1 = new System.Windows.Forms.Panel();
             this.pgBeamParams = new System.Windows.Forms.PropertyGrid();
             this.pgModelParams = new System.Windows.Forms.PropertyGrid();
@@ -50,9 +54,22 @@
             this.tbTo = new System.Windows.Forms.TextBox();
             this.tbStudyName = new System.Windows.Forms.TextBox();
             this.label5 = new System.Windows.Forms.Label();
+            this.panel3 = new System.Windows.Forms.Panel();
+            this.panelSetup = new System.Windows.Forms.Panel();
+            this.panelRun = new System.Windows.Forms.Panel();
+            this.chart1 = new System.Windows.Forms.DataVisualization.Charting.Chart();
+            this.lbSimulations = new System.Windows.Forms.ListBox();
+            this.toolStrip1 = new System.Windows.Forms.ToolStrip();
+            this.tsbRun = new System.Windows.Forms.ToolStripButton();
+            this.tsbExport = new System.Windows.Forms.ToolStripButton();
             this.panel1.SuspendLayout();
             this.panel2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.nudSteps)).BeginInit();
+            this.panel3.SuspendLayout();
+            this.panelSetup.SuspendLayout();
+            this.panelRun.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.chart1)).BeginInit();
+            this.toolStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
             // panel1
@@ -62,9 +79,9 @@
             this.panel1.Controls.Add(this.pgModelParams);
             this.panel1.Controls.Add(this.panel2);
             this.panel1.Dock = System.Windows.Forms.DockStyle.Left;
-            this.panel1.Location = new System.Drawing.Point(0, 0);
+            this.panel1.Location = new System.Drawing.Point(211, 0);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(404, 476);
+            this.panel1.Size = new System.Drawing.Size(404, 376);
             this.panel1.TabIndex = 0;
             // 
             // pgBeamParams
@@ -72,7 +89,7 @@
             this.pgBeamParams.Dock = System.Windows.Forms.DockStyle.Fill;
             this.pgBeamParams.Location = new System.Drawing.Point(190, 136);
             this.pgBeamParams.Name = "pgBeamParams";
-            this.pgBeamParams.Size = new System.Drawing.Size(214, 340);
+            this.pgBeamParams.Size = new System.Drawing.Size(214, 240);
             this.pgBeamParams.TabIndex = 2;
             // 
             // pgModelParams
@@ -80,7 +97,7 @@
             this.pgModelParams.Dock = System.Windows.Forms.DockStyle.Left;
             this.pgModelParams.Location = new System.Drawing.Point(0, 136);
             this.pgModelParams.Name = "pgModelParams";
-            this.pgModelParams.Size = new System.Drawing.Size(190, 340);
+            this.pgModelParams.Size = new System.Drawing.Size(190, 240);
             this.pgModelParams.TabIndex = 1;
             // 
             // panel2
@@ -169,7 +186,7 @@
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(439, 53);
+            this.label1.Location = new System.Drawing.Point(13, 48);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(55, 13);
             this.label1.TabIndex = 1;
@@ -185,7 +202,7 @@
             "width",
             "thickness",
             "resolution"});
-            this.lbParameters.Location = new System.Drawing.Point(442, 77);
+            this.lbParameters.Location = new System.Drawing.Point(16, 72);
             this.lbParameters.Name = "lbParameters";
             this.lbParameters.Size = new System.Drawing.Size(93, 108);
             this.lbParameters.TabIndex = 2;
@@ -193,7 +210,7 @@
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(439, 207);
+            this.label2.Location = new System.Drawing.Point(13, 202);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(30, 13);
             this.label2.TabIndex = 3;
@@ -202,7 +219,7 @@
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(439, 242);
+            this.label3.Location = new System.Drawing.Point(13, 237);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(20, 13);
             this.label3.TabIndex = 4;
@@ -211,7 +228,7 @@
             // label4
             // 
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(439, 278);
+            this.label4.Location = new System.Drawing.Point(13, 273);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(34, 13);
             this.label4.TabIndex = 5;
@@ -219,7 +236,7 @@
             // 
             // btnGenerate
             // 
-            this.btnGenerate.Location = new System.Drawing.Point(479, 333);
+            this.btnGenerate.Location = new System.Drawing.Point(53, 328);
             this.btnGenerate.Name = "btnGenerate";
             this.btnGenerate.Size = new System.Drawing.Size(75, 23);
             this.btnGenerate.TabIndex = 7;
@@ -229,7 +246,7 @@
             // 
             // nudSteps
             // 
-            this.nudSteps.Location = new System.Drawing.Point(479, 276);
+            this.nudSteps.Location = new System.Drawing.Point(53, 271);
             this.nudSteps.Maximum = new decimal(new int[] {
             1000,
             0,
@@ -251,7 +268,7 @@
             // 
             // tbFrom
             // 
-            this.tbFrom.Location = new System.Drawing.Point(479, 207);
+            this.tbFrom.Location = new System.Drawing.Point(53, 202);
             this.tbFrom.Name = "tbFrom";
             this.tbFrom.Size = new System.Drawing.Size(100, 20);
             this.tbFrom.TabIndex = 9;
@@ -259,7 +276,7 @@
             // 
             // tbTo
             // 
-            this.tbTo.Location = new System.Drawing.Point(479, 242);
+            this.tbTo.Location = new System.Drawing.Point(53, 237);
             this.tbTo.Name = "tbTo";
             this.tbTo.Size = new System.Drawing.Size(100, 20);
             this.tbTo.TabIndex = 10;
@@ -267,7 +284,7 @@
             // 
             // tbStudyName
             // 
-            this.tbStudyName.Location = new System.Drawing.Point(515, 16);
+            this.tbStudyName.Location = new System.Drawing.Point(89, 11);
             this.tbStudyName.Name = "tbStudyName";
             this.tbStudyName.Size = new System.Drawing.Size(100, 20);
             this.tbStudyName.TabIndex = 12;
@@ -276,30 +293,120 @@
             // label5
             // 
             this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(443, 19);
+            this.label5.Location = new System.Drawing.Point(17, 14);
             this.label5.Name = "label5";
             this.label5.Size = new System.Drawing.Size(66, 13);
             this.label5.TabIndex = 11;
             this.label5.Text = "Study name:";
             // 
-            // PS_Setup
+            // panel3
+            // 
+            this.panel3.BackColor = System.Drawing.Color.Moccasin;
+            this.panel3.Controls.Add(this.label5);
+            this.panel3.Controls.Add(this.tbStudyName);
+            this.panel3.Controls.Add(this.label1);
+            this.panel3.Controls.Add(this.lbParameters);
+            this.panel3.Controls.Add(this.tbTo);
+            this.panel3.Controls.Add(this.label2);
+            this.panel3.Controls.Add(this.tbFrom);
+            this.panel3.Controls.Add(this.label3);
+            this.panel3.Controls.Add(this.nudSteps);
+            this.panel3.Controls.Add(this.label4);
+            this.panel3.Controls.Add(this.btnGenerate);
+            this.panel3.Dock = System.Windows.Forms.DockStyle.Left;
+            this.panel3.Location = new System.Drawing.Point(0, 0);
+            this.panel3.Name = "panel3";
+            this.panel3.Size = new System.Drawing.Size(211, 376);
+            this.panel3.TabIndex = 13;
+            // 
+            // panelSetup
+            // 
+            this.panelSetup.BackColor = System.Drawing.Color.LightBlue;
+            this.panelSetup.Controls.Add(this.panel1);
+            this.panelSetup.Controls.Add(this.panel3);
+            this.panelSetup.Location = new System.Drawing.Point(12, 12);
+            this.panelSetup.Name = "panelSetup";
+            this.panelSetup.Size = new System.Drawing.Size(645, 376);
+            this.panelSetup.TabIndex = 14;
+            // 
+            // panelRun
+            // 
+            this.panelRun.BackColor = System.Drawing.Color.PowderBlue;
+            this.panelRun.Controls.Add(this.chart1);
+            this.panelRun.Controls.Add(this.lbSimulations);
+            this.panelRun.Controls.Add(this.toolStrip1);
+            this.panelRun.Location = new System.Drawing.Point(383, 428);
+            this.panelRun.Name = "panelRun";
+            this.panelRun.Size = new System.Drawing.Size(554, 305);
+            this.panelRun.TabIndex = 15;
+            // 
+            // chart1
+            // 
+            chartArea2.Name = "ChartArea1";
+            this.chart1.ChartAreas.Add(chartArea2);
+            this.chart1.Dock = System.Windows.Forms.DockStyle.Fill;
+            legend2.Name = "Legend1";
+            this.chart1.Legends.Add(legend2);
+            this.chart1.Location = new System.Drawing.Point(160, 25);
+            this.chart1.Name = "chart1";
+            series2.BorderWidth = 3;
+            series2.ChartArea = "ChartArea1";
+            series2.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Point;
+            series2.Legend = "Legend1";
+            series2.MarkerSize = 7;
+            series2.MarkerStyle = System.Windows.Forms.DataVisualization.Charting.MarkerStyle.Circle;
+            series2.Name = "Series11";
+            this.chart1.Series.Add(series2);
+            this.chart1.Size = new System.Drawing.Size(394, 280);
+            this.chart1.TabIndex = 5;
+            this.chart1.Text = "chart1";
+            // 
+            // lbSimulations
+            // 
+            this.lbSimulations.Dock = System.Windows.Forms.DockStyle.Left;
+            this.lbSimulations.FormattingEnabled = true;
+            this.lbSimulations.Location = new System.Drawing.Point(0, 25);
+            this.lbSimulations.Name = "lbSimulations";
+            this.lbSimulations.Size = new System.Drawing.Size(160, 280);
+            this.lbSimulations.TabIndex = 2;
+            // 
+            // toolStrip1
+            // 
+            this.toolStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.tsbRun,
+            this.tsbExport});
+            this.toolStrip1.Location = new System.Drawing.Point(0, 0);
+            this.toolStrip1.Name = "toolStrip1";
+            this.toolStrip1.Size = new System.Drawing.Size(554, 25);
+            this.toolStrip1.TabIndex = 1;
+            this.toolStrip1.Text = "toolStrip1";
+            // 
+            // tsbRun
+            // 
+            this.tsbRun.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.tsbRun.Image = ((System.Drawing.Image)(resources.GetObject("tsbRun.Image")));
+            this.tsbRun.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.tsbRun.Name = "tsbRun";
+            this.tsbRun.Size = new System.Drawing.Size(68, 22);
+            this.tsbRun.Text = "Run/Pause";
+            // 
+            // tsbExport
+            // 
+            this.tsbExport.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.tsbExport.Image = ((System.Drawing.Image)(resources.GetObject("tsbExport.Image")));
+            this.tsbExport.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.tsbExport.Name = "tsbExport";
+            this.tsbExport.Size = new System.Drawing.Size(44, 22);
+            this.tsbExport.Text = "Export";
+            // 
+            // ParametricStudyForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(754, 476);
-            this.Controls.Add(this.tbStudyName);
-            this.Controls.Add(this.label5);
-            this.Controls.Add(this.tbTo);
-            this.Controls.Add(this.tbFrom);
-            this.Controls.Add(this.nudSteps);
-            this.Controls.Add(this.btnGenerate);
-            this.Controls.Add(this.label4);
-            this.Controls.Add(this.label3);
-            this.Controls.Add(this.label2);
-            this.Controls.Add(this.lbParameters);
-            this.Controls.Add(this.label1);
-            this.Controls.Add(this.panel1);
-            this.Name = "PS_Setup";
+            this.ClientSize = new System.Drawing.Size(1165, 745);
+            this.Controls.Add(this.panelRun);
+            this.Controls.Add(this.panelSetup);
+            this.Name = "ParametricStudyForm";
             this.Text = "PS_Setup";
             this.WindowState = System.Windows.Forms.FormWindowState.Maximized;
             this.Load += new System.EventHandler(this.PS_Setup_Load);
@@ -307,8 +414,15 @@
             this.panel2.ResumeLayout(false);
             this.panel2.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.nudSteps)).EndInit();
+            this.panel3.ResumeLayout(false);
+            this.panel3.PerformLayout();
+            this.panelSetup.ResumeLayout(false);
+            this.panelRun.ResumeLayout(false);
+            this.panelRun.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.chart1)).EndInit();
+            this.toolStrip1.ResumeLayout(false);
+            this.toolStrip1.PerformLayout();
             this.ResumeLayout(false);
-            this.PerformLayout();
 
         }
 
@@ -336,5 +450,13 @@
         private System.Windows.Forms.Label label5;
         private System.Windows.Forms.Button btnDefaultP;
         private System.Windows.Forms.Button btnDefaultL;
+        private System.Windows.Forms.Panel panel3;
+        private System.Windows.Forms.Panel panelSetup;
+        private System.Windows.Forms.Panel panelRun;
+        private System.Windows.Forms.ToolStrip toolStrip1;
+        private System.Windows.Forms.ToolStripButton tsbRun;
+        private System.Windows.Forms.ToolStripButton tsbExport;
+        private System.Windows.Forms.ListBox lbSimulations;
+        public System.Windows.Forms.DataVisualization.Charting.Chart chart1;
     }
 }

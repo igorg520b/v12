@@ -109,18 +109,12 @@
     <Compile Include="Analysis\PPR_relations.Designer.cs">
       <DependentUpon>PPR_relations.cs</DependentUpon>
     </Compile>
-    <Compile Include="ParametricStudy\PS_Container.cs" />
-    <Compile Include="ParametricStudy\PS_Run.cs">
+    <Compile Include="ParametricStudy\PSPoint.cs" />
+    <Compile Include="ParametricStudy\ParametricStudyForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="ParametricStudy\PS_Run.Designer.cs">
-      <DependentUpon>PS_Run.cs</DependentUpon>
-    </Compile>
-    <Compile Include="ParametricStudy\PS_Setup.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="ParametricStudy\PS_Setup.Designer.cs">
-      <DependentUpon>PS_Setup.cs</DependentUpon>
+    <Compile Include="ParametricStudy\ParametricStudyForm.Designer.cs">
+      <DependentUpon>ParametricStudyForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Rendering\RenderingExtensions.cs" />
     <Compile Include="Program.cs" />
@@ -136,11 +130,8 @@
     <EmbeddedResource Include="Analysis\PPR_relations.resx">
       <DependentUpon>PPR_relations.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="ParametricStudy\PS_Run.resx">
-      <DependentUpon>PS_Run.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="ParametricStudy\PS_Setup.resx">
-      <DependentUpon>PS_Setup.cs</DependentUpon>
+    <EmbeddedResource Include="ParametricStudy\ParametricStudyForm.resx">
+      <DependentUpon>ParametricStudyForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>

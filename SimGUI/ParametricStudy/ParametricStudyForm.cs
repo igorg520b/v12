@@ -10,22 +10,25 @@ using System.Windows.Forms;
 
 namespace icFlow
 {
-    public partial class PS_Setup : Form
+    public partial class ParametricStudyForm : Form
     {
-        List<PS_Container> classes = new List<PS_Container>();
-        public List<PS_Container> resultingBatch;
+        List<PSPoint> classes = new List<PSPoint>();
+        public List<PSPoint> resultingBatch;
+        public Form1 mainWindow;
 
 
-        public PS_Setup()
+        public ParametricStudyForm()
         {
             InitializeComponent();
 
-            classes.Add(new PS_Container());
+            classes.Add(new PSPoint());
             UpdateClassList();
         }
 
         private void PS_Setup_Load(object sender, EventArgs e)
         {
+            panelRun.Visible = false;
+            panelSetup.Dock = DockStyle.Fill;
             listBox1.SelectedIndex = 0;
             lbParameters.SelectedIndex = 0;
             btnDefaultP_Click(sender, e);
@@ -34,7 +37,7 @@ namespace icFlow
         void UpdateClassList()
         {
             listBox1.Items.Clear();
-            foreach(PS_Container ps in classes)
+            foreach(PSPoint ps in classes)
             {
                 listBox1.Items.Add(ps);
             }
@@ -42,8 +45,8 @@ namespace icFlow
 
         private void btnGenerate_Click(object sender, EventArgs e)
         {
-            resultingBatch = new List<PS_Container>();
-            PS_Container firstPsc = (PS_Container)listBox1.Items[0];
+            resultingBatch = new List<PSPoint>();
+            PSPoint firstPsc = (PSPoint)listBox1.Items[0];
 
             string parameter = (string)lbParameters.SelectedItem;
             if (!double.TryParse(tbFrom.Text, out double fromValue)) return;
@@ -58,9 +61,9 @@ namespace icFlow
                     {
                         double mix = (double)i / (steps - 1);
                         double sigma = fromValue * (1 - mix) + toValue * mix;
-                        foreach(PS_Container psc in classes)
+                        foreach(PSPoint psc in classes)
                         {
-                            PS_Container current = new PS_Container(psc);
+                            PSPoint current = new PSPoint(psc);
                             resultingBatch.Add(current);
                             current.modelParams.sigma_max = sigma;
                             current.modelParams.tau_max = sigma * ratio;
@@ -83,13 +86,18 @@ namespace icFlow
                 default:
                     return;
             }
-            DialogResult = DialogResult.OK;
-            this.Close();
+
+            panelSetup.Visible = false;
+            panelRun.Visible = true;
+            panelRun.Dock = DockStyle.Fill;
+
+            // populate listbox
+            foreach (PSPoint psp in resultingBatch) lbSimulations.Items.Add(psp);
         }
 
         private void btnAssignName_Click(object sender, EventArgs e)
         {
-            PS_Container psc = (PS_Container)listBox1.SelectedItem;
+            PSPoint psc = (PSPoint)listBox1.SelectedItem;
             if (psc == null) return;
             psc.className = tbClassName.Text;
             UpdateClassList();
@@ -97,16 +105,18 @@ namespace icFlow
 
         private void btnDuplicate_Click(object sender, EventArgs e)
         {
-            PS_Container psc = (PS_Container)listBox1.SelectedItem;
+            PSPoint psc = (PSPoint)listBox1.SelectedItem;
             if (psc == null) return;
-            classes.Add(new PS_Container(psc));
+            PSPoint newpt = new PSPoint(psc);
+            classes.Add(newpt);
+            newpt.className = $"c{classes.Count}";
             UpdateClassList();
-
+            listBox1.SelectedIndex = 0;
         }
 
         private void btnRemove_Click(object sender, EventArgs e)
         {
-            PS_Container psc = (PS_Container)listBox1.SelectedItem;
+            PSPoint psc = (PSPoint)listBox1.SelectedItem;
             if (psc == null) return;
             if (listBox1.Items.Count == 1) return;
             classes.Remove(psc);
@@ -116,7 +126,7 @@ namespace icFlow
 
         private void listBox1_SelectedIndexChanged(object sender, EventArgs e)
         {
-            PS_Container psc = (PS_Container)listBox1.SelectedItem;
+            PSPoint psc = (PSPoint)listBox1.SelectedItem;
             if (psc == null)
             {
                 pgModelParams.SelectedObject = null;
@@ -131,7 +141,7 @@ namespace icFlow
 
         private void btnDefaultL_Click(object sender, EventArgs e)
         {
-            PS_Container psc = (PS_Container)listBox1.SelectedItem;
+            PSPoint psc = (PSPoint)listBox1.SelectedItem;
             if (psc == null) return;
             psc.beamParams.PresetL(1);
             psc.modelParams.SelectPreset(ModelPrms.ParameterPresets.LBeam);
@@ -141,7 +151,7 @@ namespace icFlow
 
         private void btnDefaultP_Click(object sender, EventArgs e)
         {
-            PS_Container psc = (PS_Container)listBox1.SelectedItem;
+            PSPoint psc = (PSPoint)listBox1.SelectedItem;
             if (psc == null) return;
             psc.beamParams.PresetPlain(1);
             psc.modelParams.SelectPreset(ModelPrms.ParameterPresets.PlainBeam);

@@ -7,11 +7,11 @@ using IcyGrains;
 
 namespace icFlow
 {
-    public class PS_Container
+    public class PSPoint
     {
         public BeamParams beamParams = new BeamParams();
         public ModelPrms modelParams = new ModelPrms();
-        public string className = "default";
+        public string className = "c1";
         public string parameterName;
         public double parameterValue;
 
@@ -20,9 +20,9 @@ namespace icFlow
         public enum Status { Ready, Running, Paused, Success, Failed };
         public Status status = Status.Ready;
 
-        public PS_Container() { }
+        public PSPoint() { }
 
-        public PS_Container(PS_Container other)
+        public PSPoint(PSPoint other)
         {
             this.beamParams = new BeamParams(other.beamParams);
             this.modelParams = new ModelPrms(other.modelParams);
@@ -30,7 +30,8 @@ namespace icFlow
 
         public override string ToString()
         {
-            return className;
+            string formatted = parameterValue.ToString("0.00e0");
+            return $"{className} {formatted} {status}";
         }
     }
 }

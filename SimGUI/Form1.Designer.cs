@@ -53,6 +53,8 @@
             this.pPRRelationsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItem4 = new System.Windows.Forms.ToolStripSeparator();
             this.setupGenerationToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripMenuItem8 = new System.Windows.Forms.ToolStripSeparator();
+            this.parametricStudyToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.tssStatus = new System.Windows.Forms.ToolStripStatusLabel();
             this.tssCurrentFrame = new System.Windows.Forms.ToolStripStatusLabel();
@@ -90,8 +92,6 @@
             this.removeToolStripMenuItem2 = new System.Windows.Forms.ToolStripMenuItem();
             this.openFileDialogMeshes = new System.Windows.Forms.OpenFileDialog();
             this.timer1 = new System.Windows.Forms.Timer(this.components);
-            this.toolStripMenuItem8 = new System.Windows.Forms.ToolStripSeparator();
-            this.parametricStudyToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             this.statusStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.trackBar1)).BeginInit();
@@ -294,6 +294,19 @@
             this.setupGenerationToolStripMenuItem.Size = new System.Drawing.Size(216, 22);
             this.setupGenerationToolStripMenuItem.Text = "Beam Generation...";
             this.setupGenerationToolStripMenuItem.Click += new System.EventHandler(this.setupGenerationToolStripMenuItem_Click);
+            // 
+            // toolStripMenuItem8
+            // 
+            this.toolStripMenuItem8.Name = "toolStripMenuItem8";
+            this.toolStripMenuItem8.Size = new System.Drawing.Size(213, 6);
+            // 
+            // parametricStudyToolStripMenuItem
+            // 
+            this.parametricStudyToolStripMenuItem.Name = "parametricStudyToolStripMenuItem";
+            this.parametricStudyToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.D)));
+            this.parametricStudyToolStripMenuItem.Size = new System.Drawing.Size(216, 22);
+            this.parametricStudyToolStripMenuItem.Text = "Parametric Study...";
+            this.parametricStudyToolStripMenuItem.Click += new System.EventHandler(this.parametricStudyToolStripMenuItem_Click);
             // 
             // statusStrip1
             // 
@@ -620,19 +633,6 @@
             // 
             this.timer1.Tick += new System.EventHandler(this.timer1_Tick);
             // 
-            // toolStripMenuItem8
-            // 
-            this.toolStripMenuItem8.Name = "toolStripMenuItem8";
-            this.toolStripMenuItem8.Size = new System.Drawing.Size(213, 6);
-            // 
-            // parametricStudyToolStripMenuItem
-            // 
-            this.parametricStudyToolStripMenuItem.Name = "parametricStudyToolStripMenuItem";
-            this.parametricStudyToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.D)));
-            this.parametricStudyToolStripMenuItem.Size = new System.Drawing.Size(216, 22);
-            this.parametricStudyToolStripMenuItem.Text = "Parametric Study...";
-            this.parametricStudyToolStripMenuItem.Click += new System.EventHandler(this.parametricStudyToolStripMenuItem_Click);
-            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -649,6 +649,7 @@
             this.WindowState = System.Windows.Forms.FormWindowState.Maximized;
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Form1_FormClosing);
             this.Load += new System.EventHandler(this.Form1_Load);
+            this.Shown += new System.EventHandler(this.Form1_Shown);
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
             this.statusStrip1.ResumeLayout(false);
