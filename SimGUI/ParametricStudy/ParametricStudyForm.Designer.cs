@@ -30,7 +30,6 @@
         {
             System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea2 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
             System.Windows.Forms.DataVisualization.Charting.Legend legend2 = new System.Windows.Forms.DataVisualization.Charting.Legend();
-            System.Windows.Forms.DataVisualization.Charting.Series series2 = new System.Windows.Forms.DataVisualization.Charting.Series();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ParametricStudyForm));
             this.panel1 = new System.Windows.Forms.Panel();
             this.pgBeamParams = new System.Windows.Forms.PropertyGrid();
@@ -349,14 +348,6 @@
             this.chart1.Legends.Add(legend2);
             this.chart1.Location = new System.Drawing.Point(160, 25);
             this.chart1.Name = "chart1";
-            series2.BorderWidth = 3;
-            series2.ChartArea = "ChartArea1";
-            series2.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Point;
-            series2.Legend = "Legend1";
-            series2.MarkerSize = 7;
-            series2.MarkerStyle = System.Windows.Forms.DataVisualization.Charting.MarkerStyle.Circle;
-            series2.Name = "Series11";
-            this.chart1.Series.Add(series2);
             this.chart1.Size = new System.Drawing.Size(394, 280);
             this.chart1.TabIndex = 5;
             this.chart1.Text = "chart1";
@@ -389,6 +380,7 @@
             this.tsbRun.Name = "tsbRun";
             this.tsbRun.Size = new System.Drawing.Size(68, 22);
             this.tsbRun.Text = "Run/Pause";
+            this.tsbRun.Click += new System.EventHandler(this.tsbRun_Click);
             // 
             // tsbExport
             // 
@@ -398,6 +390,7 @@
             this.tsbExport.Name = "tsbExport";
             this.tsbExport.Size = new System.Drawing.Size(44, 22);
             this.tsbExport.Text = "Export";
+            this.tsbExport.Click += new System.EventHandler(this.tsbExport_Click);
             // 
             // ParametricStudyForm
             // 

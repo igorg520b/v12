@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Windows.Forms.DataVisualization.Charting;
 
 namespace icFlow
 {
@@ -93,6 +94,19 @@ namespace icFlow
 
             // populate listbox
             foreach (PSPoint psp in resultingBatch) lbSimulations.Items.Add(psp);
+
+            // prepare series
+            foreach (PSPoint psp in classes)
+            {
+                Series s = new Series();
+                s.ChartArea = "ChartArea1";
+                s.ChartType = SeriesChartType.Point;
+                s.Legend = "Legend1";
+                s.MarkerSize = 7;
+                s.MarkerStyle = System.Windows.Forms.DataVisualization.Charting.MarkerStyle.Circle;
+                s.Name = psp.className;
+                chart1.Series.Add(s);
+            }
         }
 
         private void btnAssignName_Click(object sender, EventArgs e)
@@ -157,6 +171,54 @@ namespace icFlow
             psc.modelParams.SelectPreset(ModelPrms.ParameterPresets.PlainBeam);
             pgBeamParams.Refresh();
             pgModelParams.Refresh();
+        }
+
+        bool running = false;
+        bool requestToPause = false;
+        private async void tsbRun_Click(object sender, EventArgs e)
+        {
+            if(running == true)
+            {
+                tsbRun.Enabled = false;
+                tsbRun.Text = "Pausing";
+                requestToPause = true;
+                return;
+            }
+
+            tsbRun.Text = "Pause";
+
+            foreach(PSPoint psc in resultingBatch)
+            {
+                // check the state
+
+                // if "Success, Failed" then skip
+
+                // if "Ready", then set up (using mainWindow)
+
+                // if "Paused", then load from existing file
+
+                // run until completion 
+                
+                bool completed = false;
+                do
+                {
+
+                } while (!(requestToPause || completed));
+
+                if(requestToPause)
+                {
+                    running = false;
+                    requestToPause = false;
+                    tsbRun.Text = "Run";
+                    tsbRun.Enabled = true;
+                }
+
+            }
+        }
+
+        private void tsbExport_Click(object sender, EventArgs e)
+        {
+
         }
     }
 }
