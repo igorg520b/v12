@@ -672,15 +672,10 @@
         #endregion
         private System.Windows.Forms.MenuStrip menuStrip1;
         private System.Windows.Forms.StatusStrip statusStrip1;
-        private System.Windows.Forms.ToolStripStatusLabel tssStatus;
         private System.Windows.Forms.OpenFileDialog openFileDialog1;
-        private OpenTK.GLControl glControl1;
         private System.Windows.Forms.ToolStripMenuItem simulationToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem continueFromLastToolStripMenuItem;
-        private System.Windows.Forms.ToolStripStatusLabel tssCurrentFrame;
-        private System.Windows.Forms.TrackBar trackBar1;
         private System.Windows.Forms.ToolStripMenuItem oneStepToolStripMenuItem;
-        private System.Windows.Forms.PropertyGrid pg;
         private System.Windows.Forms.ToolStripMenuItem toolsToolStripMenuItem;
         private System.Windows.Forms.ToolStrip tsDisplayOptions;
         private System.Windows.Forms.ToolStripMenuItem fileToolStripMenuItem;
@@ -694,7 +689,6 @@
         private System.Windows.Forms.ToolStripSeparator toolStripMenuItem1;
         private System.Windows.Forms.ToolStripMenuItem takeScreenshotToolStripMenuItem;
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
-        private System.Windows.Forms.TreeView treeView1;
         private System.Windows.Forms.Panel panel1;
         private System.Windows.Forms.ContextMenuStrip cmsTranslations;
         private System.Windows.Forms.ToolStripMenuItem addToolStripMenuItem1;
@@ -710,7 +704,6 @@
         private System.Windows.Forms.ToolStripSeparator toolStripMenuItem7;
         private System.Windows.Forms.ToolStripMenuItem removeToolStripMenuItem2;
         private System.Windows.Forms.ToolStripMenuItem refreshToolStripMenuItem;
-        private System.Windows.Forms.ToolStripButton tsbPreviewMode;
         private System.Windows.Forms.ToolStripMenuItem openClearSimToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem renderSimulationToolStripMenuItem;
         private System.Windows.Forms.OpenFileDialog openFileDialogMeshes;
@@ -732,6 +725,13 @@
         private System.Windows.Forms.ToolStripMenuItem clearToolStripMenuItem;
         private System.Windows.Forms.ToolStripSeparator toolStripMenuItem8;
         private System.Windows.Forms.ToolStripMenuItem parametricStudyToolStripMenuItem;
+        public System.Windows.Forms.ToolStripStatusLabel tssStatus;
+        public System.Windows.Forms.TrackBar trackBar1;
+        public System.Windows.Forms.ToolStripButton tsbPreviewMode;
+        public OpenTK.GLControl glControl1;
+        public System.Windows.Forms.ToolStripStatusLabel tssCurrentFrame;
+        public System.Windows.Forms.TreeView treeView1;
+        public System.Windows.Forms.PropertyGrid pg;
     }
 }
 

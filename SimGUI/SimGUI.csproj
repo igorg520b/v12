@@ -109,6 +109,16 @@
     <Compile Include="Analysis\PPR_relations.Designer.cs">
       <DependentUpon>PPR_relations.cs</DependentUpon>
     </Compile>
+    <Compile Include="IcyGrains\BeamParams.cs" />
+    <Compile Include="IcyGrains\GrainCollection.cs" />
+    <Compile Include="IcyGrains\GrainTool.cs" />
+    <Compile Include="IcyGrains\SetupGeneratorForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="IcyGrains\SetupGeneratorForm.designer.cs">
+      <DependentUpon>SetupGeneratorForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="IcyGrains\TetraMesh.cs" />
     <Compile Include="ParametricStudy\PSPoint.cs" />
     <Compile Include="ParametricStudy\ParametricStudyForm.cs">
       <SubType>Form</SubType>
@@ -129,6 +139,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Analysis\PPR_relations.resx">
       <DependentUpon>PPR_relations.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="IcyGrains\SetupGeneratorForm.resx">
+      <DependentUpon>SetupGeneratorForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="ParametricStudy\ParametricStudyForm.resx">
       <DependentUpon>ParametricStudyForm.cs</DependentUpon>
@@ -176,10 +189,6 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\IcyGrains\IcyGrains.csproj">
-      <Project>{c12dc8dd-b5e6-4e68-99ab-f1aa500daca3}</Project>
-      <Name>IcyGrains</Name>
-    </ProjectReference>
     <ProjectReference Include="..\v3Library\icFlowLibrary.csproj">
       <Project>{75b64315-d1b3-4fee-8316-3d8d1de8c4a5}</Project>
       <Name>icFlowLibrary</Name>

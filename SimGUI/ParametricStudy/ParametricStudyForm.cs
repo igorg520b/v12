@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Data;
-using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Windows.Forms.DataVisualization.Charting;
+using System.IO;
+using IcyGrains;
 
 namespace icFlow
 {
@@ -186,33 +186,135 @@ namespace icFlow
             }
 
             tsbRun.Text = "Pause";
+            requestToPause = false;
+            running = true;
 
             foreach(PSPoint psc in resultingBatch)
             {
                 // check the state
 
                 // if "Success, Failed" then skip
+                if (psc.status == PSPoint.Status.Success ||
+                    psc.status == PSPoint.Status.Failed) continue;
 
                 // if "Ready", then set up (using mainWindow)
+                if (psc.status == PSPoint.Status.Ready)
+                {
+                    GrainTool2 gt2 = new GrainTool2();
+                    if (psc.beamParams.type == BeamParams.BeamType.LBeam)
+                        await Task.Run(() => gt2.LBeamGeneration(psc.beamParams));
+                    else if (psc.beamParams.type == BeamParams.BeamType.Plain)
+                        await Task.Run(() => gt2.PlainBeamGeneration(psc.beamParams));
+                    else throw new Exception("beam type not set");
 
-                // if "Paused", then load from existing file
+                    // save to memory stream
+                    Stream strBeam = new MemoryStream(5000000);
+                    Stream strIndenter = new MemoryStream(5000000);
+                    gt2.tmesh.SaveMsh2(strBeam);
+                    strBeam.Seek(0, SeekOrigin.Begin);
+
+                    gt2.indenter_mesh.SaveMsh2(strIndenter);
+                    strIndenter.Seek(0, SeekOrigin.Begin);
+
+                    mainWindow.SetUpBeamSimulation(strBeam, strIndenter, psc.beamParams, psc.modelParams);
+                }
+                else if (psc.status == PSPoint.Status.Paused)
+                {
+                    // if "Paused", then load from existing file
+                    throw new NotImplementedException();
+
+                }
+                else throw new Exception("incorrect psc status");
+
 
                 // run until completion 
-                
+                psc.status = PSPoint.Status.Running;
+                lbSimulations.Items.Clear();
+                foreach (PSPoint psp in this.resultingBatch) lbSimulations.Items.Add(psp);
+
+                //=============
+                mainWindow.tsbPreviewMode.Checked = false;
+                mainWindow.tssStatus.Text = "Running";
+                mainWindow.trackBar1.Enabled = false;
+
                 bool completed = false;
                 do
                 {
+                    await Task.Run(() => mainWindow.model3.Step());
+                    if (mainWindow.model3.cf.StepNumber >= mainWindow.model3.prms.MaxSteps ||
+                        mainWindow.model3.prms.DetectFracture && mainWindow.model3.cf.fractureDetected)
+                        completed = true;
+
+                    // report progress
+                    mainWindow.glControl1.Invalidate();
+                    mainWindow.tnCurrentFrame.Tag = mainWindow.model3.cf;
+                    if (mainWindow.treeView1.SelectedNode == mainWindow.tnCurrentFrame)
+                    {
+                        mainWindow.pg.SelectedObject = mainWindow.model3.cf;
+                        mainWindow.pg.Refresh();
+                    }
+                    if (mainWindow.model3.cf != null) mainWindow.tssCurrentFrame.Text = $"{mainWindow.model3.cf.StepNumber}-{mainWindow.model3.cf.IterationsPerformed}-{mainWindow.model3.cf.TimeScaleFactor}";
 
                 } while (!(requestToPause || completed));
 
-                if(requestToPause)
-                {
-                    running = false;
-                    requestToPause = false;
-                    tsbRun.Text = "Run";
-                    tsbRun.Enabled = true;
-                }
+                //=============
 
+
+                if (requestToPause)
+                {
+                    psc.status = PSPoint.Status.Paused;
+                    requestToPause = false;
+                    break;
+                } else if(completed)
+                {
+                    psc.status = PSPoint.Status.Success;
+
+                    // generate frame summary
+                    FrameInfo.FrameSummary smr = new FrameInfo.FrameSummary(mainWindow.model3.allFrames, mainWindow.model3.prms);
+                    psc.resultFlexuralStrength = smr.FlexuralStrength;
+                    psc.resultForce = smr.MaxForce;
+
+                    // update chart (!)
+                    UpdateChart();
+                }
+                lbSimulations.Items.Clear();
+                foreach (PSPoint psp in this.resultingBatch) lbSimulations.Items.Add(psp);
+
+            }
+            running = false;
+            tsbRun.Text = "Run";
+            tsbRun.Enabled = true;
+            mainWindow.tssCurrentFrame.Text = "-";
+            mainWindow.tssStatus.Text = "done";
+
+        }
+
+        void UpdateChart()
+        {
+            Dictionary<string, List<(double, double)>> pointData = new Dictionary<string, List<(double, double)>>();
+            foreach (PSPoint psp in classes) pointData.Add(psp.className, new List<(double, double)>());
+
+            foreach(PSPoint psp in resultingBatch)
+            {
+                if(psp.status == PSPoint.Status.Success)
+                {
+                    double X = psp.parameterValue;
+                    double Y = psp.beamParams.type == BeamParams.BeamType.LBeam ? psp.resultForce : psp.resultFlexuralStrength;
+                    pointData[psp.className].Add((X, Y));
+                }
+            }
+
+            foreach (PSPoint psp in classes)
+            {
+                List<(double, double)> lst = pointData[psp.className];
+                double[] xValues = new double[lst.Count];
+                double[] yValues = new double[lst.Count];
+                for(int i = 0; i < lst.Count; i++)
+                {
+                    xValues[i] = lst[i].Item1;
+                    yValues[i] = lst[i].Item2;
+                }
+                chart1.Series[psp.className].Points.DataBindXY(xValues, yValues);
             }
         }
 
