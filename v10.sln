@@ -15,8 +15,6 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PardisoLoader2", "PardisoLo
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimGUI", "SimGUI\SimGUI.csproj", "{52144695-5B84-406C-977A-D3F62F78BB78}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IcyGrains", "IcyGrains\IcyGrains.csproj", "{C12DC8DD-B5E6-4E68-99AB-F1AA500DACA3}"
-EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "GeometricTools", "GeometricTools\GeometricTools.vcxproj", "{F6E3E054-0E90-4A49-B925-5BC675D9806D}"
 EndProject
 Global
@@ -100,18 +98,6 @@ Global
 		{52144695-5B84-406C-977A-D3F62F78BB78}.Release|x64.Build.0 = Release|Any CPU
 		{52144695-5B84-406C-977A-D3F62F78BB78}.Release|x86.ActiveCfg = Release|Any CPU
 		{52144695-5B84-406C-977A-D3F62F78BB78}.Release|x86.Build.0 = Release|Any CPU
-		{C12DC8DD-B5E6-4E68-99AB-F1AA500DACA3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{C12DC8DD-B5E6-4E68-99AB-F1AA500DACA3}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{C12DC8DD-B5E6-4E68-99AB-F1AA500DACA3}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{C12DC8DD-B5E6-4E68-99AB-F1AA500DACA3}.Debug|x64.Build.0 = Debug|Any CPU
-		{C12DC8DD-B5E6-4E68-99AB-F1AA500DACA3}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{C12DC8DD-B5E6-4E68-99AB-F1AA500DACA3}.Debug|x86.Build.0 = Debug|Any CPU
-		{C12DC8DD-B5E6-4E68-99AB-F1AA500DACA3}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{C12DC8DD-B5E6-4E68-99AB-F1AA500DACA3}.Release|Any CPU.Build.0 = Release|Any CPU
-		{C12DC8DD-B5E6-4E68-99AB-F1AA500DACA3}.Release|x64.ActiveCfg = Release|Any CPU
-		{C12DC8DD-B5E6-4E68-99AB-F1AA500DACA3}.Release|x64.Build.0 = Release|Any CPU
-		{C12DC8DD-B5E6-4E68-99AB-F1AA500DACA3}.Release|x86.ActiveCfg = Release|Any CPU
-		{C12DC8DD-B5E6-4E68-99AB-F1AA500DACA3}.Release|x86.Build.0 = Release|Any CPU
 		{F6E3E054-0E90-4A49-B925-5BC675D9806D}.Debug|Any CPU.ActiveCfg = Debug|x64
 		{F6E3E054-0E90-4A49-B925-5BC675D9806D}.Debug|x64.ActiveCfg = Debug|x64
 		{F6E3E054-0E90-4A49-B925-5BC675D9806D}.Debug|x64.Build.0 = Debug|x64
@@ -126,35 +112,5 @@ Global
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {285997BB-F7B7-4DE8-9FFE-7EB7D0B1C253}
-	EndGlobalSection
-	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccNumberOfProjects = 9
-		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
-		SccTeamFoundationServer = https://gribanov1.visualstudio.com/
-		SccLocalPath0 = .
-		SccProjectUniqueName1 = v3Library\\icFlowLibrary.csproj
-		SccProjectName1 = v3Library
-		SccLocalPath1 = v3Library
-		SccProjectUniqueName2 = collision_kernels9\\collision_kernels9.vcxproj
-		SccProjectName2 = collision_kernels9
-		SccLocalPath2 = collision_kernels9
-		SccProjectUniqueName3 = cz_kernels9\\cz_kernels9.vcxproj
-		SccProjectName3 = cz_kernels9
-		SccLocalPath3 = cz_kernels9
-		SccProjectUniqueName4 = elem_kernels9\\elem_kernels9.vcxproj
-		SccProjectName4 = elem_kernels9
-		SccLocalPath4 = elem_kernels9
-		SccProjectUniqueName5 = PardisoLoader2\\PardisoLoader2.vcxproj
-		SccProjectName5 = PardisoLoader2
-		SccLocalPath5 = PardisoLoader2
-		SccProjectUniqueName6 = SimGUI\\SimGUI.csproj
-		SccProjectName6 = SimGUI
-		SccLocalPath6 = SimGUI
-		SccProjectUniqueName7 = IcyGrains\\IcyGrains.csproj
-		SccProjectName7 = IcyGrains
-		SccLocalPath7 = IcyGrains
-		SccProjectUniqueName8 = GeometricTools\\GeometricTools.vcxproj
-		SccProjectName8 = GeometricTools
-		SccLocalPath8 = GeometricTools
 	EndGlobalSection
 EndGlobal
