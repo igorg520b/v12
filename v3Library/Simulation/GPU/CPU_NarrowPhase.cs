@@ -365,64 +365,28 @@ namespace icFlow
 
         #region closest face
 
-        public static Face FindClosestFace(Node nd, Element elem)
+        static Face FindClosestFace(Node nd, Element elem)
         {
+            double smallestDistance = double.MaxValue;
+            Face closestFace = null;
 
-            return null;
+            foreach(Face f in elem.adjFaces)
+            {
+                double dist = dtn(f.vrts[0].tx, f.vrts[0].ty, f.vrts[0].tz,
+                f.vrts[1].tx, f.vrts[1].ty, f.vrts[1].tz,
+                    f.vrts[2].tx, f.vrts[2].ty, f.vrts[2].tz,
+                nd.tx, nd.ty, nd.tz);
+                if (smallestDistance > dist)
+                {
+                    smallestDistance = dist;
+                    closestFace = f;
+                }
+            }
+            return closestFace;
         }
 
         #endregion
 
-        /*
-
-// input: node-element tuples
-// output: node-face tuples or -1
-extern "C" __global__ void kFindClosestFace(int nPairs, int tet_stride, int *narrowList2, 
-const double* dn, const int *ie,
-const int *faces,
-const int nd_stride, const int el_all_stride, const int fc_stride) {
-
-int idx = threadIdx.x + blockIdx.x * blockDim.x;
-if (idx >= nPairs) return;
-
-int nodeId = narrowList2[idx];
-int elemId = narrowList2[idx+tet_stride];
-double nodeCoords[3];
-for (int i = 0; i < 3; i++) nodeCoords[i] = dn[nodeId + nd_stride * (X_CURRENT_OFFSET + i)];
-
-int nFaces = ie[elemId + el_all_stride * 4];
-int closestFace = -1;
-double closestDistance;
-for (int idx_face = 0; idx_face < nFaces; idx_face++) {
-int faceId = ie[elemId + el_all_stride * (5 + idx_face)];
-double faceCoords[9];
-for (int nd = 0; nd < 3; nd++) {
-    int faceNdId = faces[faceId + fc_stride * nd];
-    for (int idx_coord = 0; idx_coord < 3; idx_coord++) {
-        faceCoords[idx_coord + nd * 3] = dn[faceNdId + nd_stride * (X_CURRENT_OFFSET + idx_coord)];
-    }
-}
-
-double distance = dtn(faceCoords[0], faceCoords[1], faceCoords[2],
-    faceCoords[3], faceCoords[4], faceCoords[5],
-    faceCoords[6], faceCoords[7], faceCoords[8],
-    nodeCoords[0], nodeCoords[1], nodeCoords[2]);
-
-if (idx_face == 0 || distance < closestDistance) {
-    closestFace = faceId;
-    closestDistance = distance;
-}
-}
-//  if (closestDistance == 0) closestFace = -1;
-
-// write closest face vertices into results
-narrowList2[idx + tet_stride] = faces[closestFace + fc_stride * 0];
-narrowList2[idx  + tet_stride*2] = faces[closestFace + fc_stride * 1];
-narrowList2[idx  + tet_stride*3] = faces[closestFace + fc_stride * 2];
-}
-
-
-*/
     }
 }
 

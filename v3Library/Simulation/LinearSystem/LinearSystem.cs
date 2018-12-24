@@ -38,6 +38,9 @@ namespace icFlow
                 rhs = new double[dxSize];
                 dx = new double[dxSize];
             }
+            // clear values and rhs, even though these arrays may be overwritten
+            Array.Clear(vals, 0, vals.Length);
+            Array.Clear(rhs, 0, rhs.Length);
             sw.Stop();
             cf.CSRStructure += sw.ElapsedMilliseconds;
         }
@@ -76,15 +79,6 @@ namespace icFlow
 
 
         #region working with values directly
-
-        /// <summary>
-        /// Clears the value arrays of RHS and LHS. Does not clear structure.
-        /// </summary>
-        public void ClearValues()
-        {
-            Array.Clear(vals, 0, vals.Length);
-            Array.Clear(rhs, 0, rhs.Length);
-        }
 
         /// <summary>
         /// Add vector of length 3 to RHS at a specified index

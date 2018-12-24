@@ -298,7 +298,7 @@ namespace icFlow
 
         #region element forces
 
-        public static ElementResult ElementElasticity(ElementParams prms, IntegrationParams iprms,
+        static ElementResult ElementElasticity(ElementParams prms, IntegrationParams iprms,
             double[] x0, double[] un, double[] vn, double[] an, double h)
         {
             // compute E
@@ -344,6 +344,59 @@ namespace icFlow
         }
 
         #endregion
+
+        public static void AssembleElems(LinearSystem ls, ref FrameInfo cf, MeshCollection mc)
+        {
+            int nElems = mc.elasticElements.Length;
+            cf.nElems = nElems;
+            ElementResult[] elemResults = new ElementResult[nElems];
+
+            // parallel
+            foreach(Element elem in mc.elasticElements) 
+            {
+
+            }
+
+        }
+
+        /*
+                public void AssembleElemsAndCZs()
+        {
+
+            // set kernel configurations
+            kelElementElasticityForce.GridDimensions = new dim3(grid(mc.elasticElements.Length), 1, 1);
+
+            // run kernels
+            kelElementElasticityForce.RunAsync(CUstream.NullStream, 
+                g_ie_pcsr.DevicePointer, g_dn.DevicePointer, cf.TimeStep, 
+                g_dvals.DevicePointer, g_drhs.DevicePointer,
+                mc.elasticElements.Length, el_elastic_stride, nd_stride,
+                g_de.DevicePointer);
+
+            ctx.Synchronize(); // this is for benchmarkng only - does not affect functionality
+
+
+            if (cz_stride != 0)
+            {
+                kczCZForce.GridDimensions = new dim3(grid(mc.nonFailedCZs.Length), 1, 1);
+                kczCZForce.RunAsync(CUstream.NullStream, g_dcz.DevicePointer, g_icz.DevicePointer, 
+                    g_dn.DevicePointer,
+                    g_dvals.DevicePointer, g_drhs.DevicePointer, 
+                    cf.TimeStep,
+                    mc.nonFailedCZs.Length, cz_stride, nd_stride);
+
+                // pointers to specific portions of the arrays
+                CUdeviceptr ptr_failed = g_icz.DevicePointer + sizeof(int) * cz_stride * TENTATIVE_FAILED_OFFSET_CZ;
+                CUdeviceptr ptr_damaged = g_icz.DevicePointer + sizeof(int) * cz_stride * TENTATIVE_DAMAGED_OFFSET_CZ;
+
+                cf.nCZDamaged = Sum(ptr_damaged, mc.nonFailedCZs.Length);
+                cf.nCZFailedThisStep = Sum(ptr_failed, mc.nonFailedCZs.Length);
+            }
+
+            sw.Stop();
+            cf.KerElemForce += sw.ElapsedMilliseconds;
+        }
+        */
 
     }
 }

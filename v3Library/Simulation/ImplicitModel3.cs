@@ -405,6 +405,7 @@ namespace icFlow
 
         #region one simulation step
 
+        (Node, Face)[] collisions;
         bool explodes, diverges;
         public void Step()
         {
@@ -423,15 +424,23 @@ namespace icFlow
                 if(prms.UseGPU) gf.TransferNodesToGPU();
                 bvh.ConstructAndTraverse(tcf0); // broad phase of collision detection
                 if (prms.UseGPU) gf.NarrowPhaseCollisionDetection(bvh.broad_list);
-                else throw new NotImplementedException();
+                else collisions = CPU_NarrowPhase.NarrowPhase(bvh.broad_list, prms, ref tcf0, mc);
+
                 _addCollidingNodesToStructure(); // account for impacts in matrix structure
 
                 // create CSR, accounting for collision Nodes
                 linearSystem.CreateStructure(tcf0);
 
                 // transfer all values to GPU, including tentative UVA
-                gf.TransferPCSR(prms.NonSymmetricMatrix);
-                gf.AssembleElemsAndCZs();
+                if (prms.UseGPU)
+                {
+                    gf.TransferPCSR(prms.NonSymmetricMatrix);
+                    gf.AssembleElemsAndCZs();
+                }
+                else
+                {
+                    throw new NotImplementedException();
+                }
                 explodes = _checkDamage(); // discard frame if threshold is exceeded
 
                 // add collision response to the matrix
