@@ -1,4 +1,6 @@
-﻿using static System.Math;
+﻿using System.Threading.Tasks;
+using System.Diagnostics;
+using static System.Math;
 
 namespace icFlow
 {
@@ -388,10 +390,27 @@ namespace icFlow
         #endregion
 
         // not to be invoked on failed CZ
-        public static CZResult CZForce(double[] x0, double[] un, double h, double[] pmax, double[] tmax, CZParams prms)
+        static CZResult CZForce(CZ cz, double h, CZParams prms)
         {
+            double[] x0 = new double[18];
+            double[] un = new double[18];
             double[] xc = new double[18]; // current node positions
-            for (int i = 0; i < 18; i++) xc[i] = x0[i] + un[i];
+
+            for (int i=0;i<6;i++)
+            {
+                Node nd = cz.vrts[i];
+                x0[i * 3 + 0] = nd.x0;
+                x0[i * 3 + 1] = nd.y0;
+                x0[i * 3 + 2] = nd.z0;
+
+                un[i * 3 + 0] = nd.unx;
+                un[i * 3 + 1] = nd.uny;
+                un[i * 3 + 2] = nd.unz;
+
+                xc[i * 3 + 0] = nd.tx;
+                xc[i * 3 + 1] = nd.ty;
+                xc[i * 3 + 2] = nd.tz;
+            }
 
             double[] mpc = new double[9]; // midplane
             for (int i = 0; i < 9; i++) mpc[i] = (xc[i] + xc[i + 9]) * 0.5;
@@ -426,7 +445,7 @@ namespace icFlow
             double avgDn, avgDt, avgTn, avgTt; // preserve average traction-separations for analysis
             avgDn = avgDt = avgTn = avgTt = 0;
 
-            CZResult r = new CZResult(pmax, tmax);
+            CZResult r = new CZResult(cz.pmax, cz.tmax);
 
             // loop over 3 Gauss points
             for (int gpt = 0; gpt < 3; gpt++)
@@ -592,6 +611,59 @@ namespace icFlow
             return r;
         }
 
+        public static CZResult[] AssembleCZs(LinearSystem ls, ref FrameInfo cf, MeshCollection mc, ModelPrms prms)
+        {
+            int nCZs = cf.nCZ = mc.nonFailedCZs.Length;
+            CZResult[] czResults = new CZResult[nCZs];
+
+            CZParams czp = new CZParams();
+            czp.G_fn = prms.G_fn;
+            czp.G_ft = prms.G_ft;
+            czp.f_tn = prms.f_tn;
+            czp.f_tt = prms.f_tt;
+            czp.alpha = prms.alpha;
+            czp.beta = prms.beta;
+            czp.rn = prms.rn;
+            czp.rt = prms.rt;
+            czp.p_m = prms.p_m;
+            czp.p_n = prms.p_n;
+            czp.deln = prms.deln;
+            czp.delt = prms.delt;
+            czp.pMtn = prms.pMtn;
+            czp.pMnt = prms.pMnt;
+            czp.gam_n = prms.gam_n;
+            czp.gam_t = prms.gam_t;
+
+            double h = cf.TimeStep;
+            Parallel.For(0, nCZs, i => {
+                CZ cz = mc.nonFailedCZs[i];
+                Debug.Assert(!cz.failed);
+                czResults[i] = CZForce(cz, h, czp);
+                });
+
+            // distribute results into linear system
+            for (int idx = 0; idx < nCZs; idx++)
+            {
+                CZResult czr = czResults[idx];
+                double[,] lhs = czr.Keff;
+                Element elem = mc.elasticElements[idx];
+                for (int r = 0; r < 6; r++)
+                {
+                    int ni = elem.vrts[r].altId;
+                    ls.AddToRHS(ni, czr.rhs[r * 3 + 0], czr.rhs[r * 3 + 1], czr.rhs[r * 3 + 2]);
+                    for (int c = 0; c < 6; c++)
+                    {
+                        int nj = elem.vrts[c].altId;
+                        ls.AddToLHS_Symmetric(ni, nj,
+                        lhs[r * 3 + 0, c * 3 + 0], lhs[r * 3 + 0, c * 3 + 1], lhs[r * 3 + 0, c * 3 + 2],
+                        lhs[r * 3 + 1, c * 3 + 0], lhs[r * 3 + 1, c * 3 + 1], lhs[r * 3 + 1, c * 3 + 2],
+                        lhs[r * 3 + 2, c * 3 + 0], lhs[r * 3 + 2, c * 3 + 1], lhs[r * 3 + 2, c * 3 + 2]);
+                    }
+                }
+            }
+
+            return czResults;
+        }
 
     }
 }

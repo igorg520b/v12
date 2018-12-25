@@ -53,11 +53,6 @@
     <Compile Include="Geometry\Mesh\SurfaceFragment.cs" />
     <Compile Include="Geometry\Mesh\Translation.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Simulation\GPU\CPU_Distance_Derivatives.cs" />
-    <Compile Include="Simulation\GPU\CPU_Functionality.cs" />
-    <Compile Include="Simulation\GPU\CPU_Linear_Tetrahedron.cs" />
-    <Compile Include="Simulation\GPU\CPU_NarrowPhase.cs" />
-    <Compile Include="Simulation\GPU\CPU_PPR_CZ.cs" />
     <Compile Include="Simulation\LinearSystem\CSRDictionary.cs" />
     <Compile Include="Simulation\LinearSystem\LinearSystem.cs" />
     <Compile Include="Collisions\BVH\BVHN.cs" />
@@ -74,6 +69,11 @@
     <Compile Include="Simulation\ImplicitModel3.cs" />
     <Compile Include="Simulation\DataSheets\ModelPrms.cs" />
     <Compile Include="Geometry\Tools\CZInsertionTool.cs" />
+    <Compile Include="Simulation\CPU\CPU_Collision_Response.cs" />
+    <Compile Include="Simulation\CPU\CPU_Distance_Derivatives.cs" />
+    <Compile Include="Simulation\CPU\CPU_Linear_Tetrahedron.cs" />
+    <Compile Include="Simulation\CPU\CPU_NarrowPhase.cs" />
+    <Compile Include="Simulation\CPU\CPU_PPR_CZ.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -85,6 +85,9 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Simulation\CPU\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

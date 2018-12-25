@@ -432,6 +432,7 @@ namespace icFlow
                 linearSystem.CreateStructure(tcf0);
 
                 // transfer all values to GPU, including tentative UVA
+                CPU_PPR_CZ.CZResult[] czResults;
                 if (prms.UseGPU)
                 {
                     gf.TransferPCSR(prms.NonSymmetricMatrix);
@@ -440,8 +441,7 @@ namespace icFlow
                 else
                 {
                     CPU_Linear_Tetrahedron.AssembleElems(linearSystem, ref tcf0, mc, prms);
-
-                    throw new NotImplementedException();
+                    czResults = CPU_PPR_CZ.AssembleCZs(linearSystem, ref tcf0, mc, prms);
                 }
                 explodes = _checkDamage(); // discard frame if threshold is exceeded
 
@@ -479,7 +479,7 @@ namespace icFlow
                 (!explodes && !diverges && tcf0.ConvergenceReached))
             {
                 // tentative values -> current values
-                Parallel.ForEach(mc.allNodes, nd => nd.AcceptTentativeValues(tcf0.TimeStep));
+                foreach (Node nd in mc.allNodes) nd.AcceptTentativeValues(tcf0.TimeStep);
 
                 // tentative CZ states (from GPU) -> current CZ states
                 gf.TransferUpdatedStateToHost();
