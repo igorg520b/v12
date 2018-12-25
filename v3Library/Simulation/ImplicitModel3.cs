@@ -439,13 +439,22 @@ namespace icFlow
                 }
                 else
                 {
+                    CPU_Linear_Tetrahedron.AssembleElems(linearSystem, ref tcf0, mc, prms);
+
                     throw new NotImplementedException();
                 }
                 explodes = _checkDamage(); // discard frame if threshold is exceeded
 
                 // add collision response to the matrix
-                gf.collisionResponse(prms.NonSymmetricMatrix);
-                gf.TransferLinearSystemToHost();
+                if (prms.UseGPU)
+                {
+                    gf.collisionResponse(prms.NonSymmetricMatrix);
+                    gf.TransferLinearSystemToHost();
+                }
+                else
+                {
+
+                }
 
                 // solve with MKL
                 linearSystem.Solve(tcf0, prms.NonSymmetricMatrix);

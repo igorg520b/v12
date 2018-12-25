@@ -399,24 +399,25 @@ namespace icFlow
                 });
 
             // distribute results into linear system
-            double[,] m = new double[3, 3];
             for(int idx=0;idx<nElems;idx++)
             {
                 ElementResult eres = elemResults[idx];
+                double[,] lhs = eres.LHS;
                 Element elem = mc.elasticElements[idx];
-                for(int row=0;row<4;row++)
+                for(int r=0;r<4;r++)
                 {
-                    for(int col=0;col<4;col++)
+                    int ni = elem.vrts[r].altId;
+                    ls.AddToRHS(ni, eres.rhs[r * 3 + 0], eres.rhs[r * 3 + 1], eres.rhs[r * 3 + 2]);
+                    for (int c=0;c<4;c++)
                     {
-
+                        int nj = elem.vrts[c].altId;
+                        ls.AddToLHS_Symmetric(ni, nj,
+                        lhs[r * 3 + 0, c * 3 + 0], lhs[r * 3 + 0, c * 3 + 1], lhs[r * 3 + 0, c * 3 + 2],
+                        lhs[r * 3 + 1, c * 3 + 0], lhs[r * 3 + 1, c * 3 + 1], lhs[r * 3 + 1, c * 3 + 2],
+                        lhs[r * 3 + 2, c * 3 + 0], lhs[r * 3 + 2, c * 3 + 1], lhs[r * 3 + 2, c * 3 + 2]);
                     }
                 }
-
             }
-
-
         }
-
-
     }
 }

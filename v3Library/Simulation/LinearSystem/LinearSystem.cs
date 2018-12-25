@@ -80,31 +80,32 @@ namespace icFlow
 
         #region working with values directly
 
-        /// <summary>
-        /// Add vector of length 3 to RHS at a specified index
-        /// </summary>
-        /// <param name="values">values to add, must have the length of 3</param>
-        /// <param name="atWhichIndex">index at which to add, will be multiplied by 3</param>
-        public void AddToRHS(double[] values, int atWhichIndex)
+        public void AddToRHS(int atWhichIndex, double d0, double d1, double d2)
         {
-            Debug.Assert(values.Length == 3);
-            for (int i = 0; i < 3; i++) rhs[atWhichIndex * 3 + i] += values[i];
+            if (atWhichIndex < 0) return;
+            int i3 = atWhichIndex * 3;
+            rhs[i3] += d0;
+            rhs[i3 + 1] += d1;
+            rhs[i3 + 2] += d2;
         }
 
-        /// <summary>
-        /// Add 3x3 submatrix to matrix at specified row and column
-        /// </summary>
-        /// <param name="values">3x3 submatrix to add, row-major</param>
-        /// <param name="row">Row.</param>
-        /// <param name="column">Column.</param>
-        public void AddToLHS(double[,] values, int row, int column)
+
+        public void AddToLHS_Symmetric(int row, int column, 
+        double a00, double a01, double a02,
+        double a10, double a11, double a12,
+        double a20, double a21, double a22)
         {
-            Debug.Assert(values.GetLength(0) == 3);
-            Debug.Assert(values.GetLength(1) == 3);
+            if (row > column || row < 0 || column < 0) return;
             int offset = csrd[row, column];
-            for (int r = 0; r < 3; r++)
-                for (int c = 0; c < 3; c++)
-                    vals[offset + c * 3 + r] += values[r, c];
+            vals[offset + 0] += a00;
+            vals[offset + 1] += a01;
+            vals[offset + 2] += a02;
+            vals[offset + 3] += a10;
+            vals[offset + 4] += a11;
+            vals[offset + 5] += a12;
+            vals[offset + 6] += a20;
+            vals[offset + 7] += a21;
+            vals[offset + 8] += a22;
         }
 
         #endregion
