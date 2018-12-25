@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using System.Threading.Tasks;
 using static System.Math;
 
 namespace icFlow
@@ -298,9 +299,35 @@ namespace icFlow
 
         #region element forces
 
-        static ElementResult ElementElasticity(ElementParams prms, IntegrationParams iprms,
-            double[] x0, double[] un, double[] vn, double[] an, double h)
+        static ElementResult ElementElasticity(Element elem, ElementParams prms, IntegrationParams iprms, double h)
         {
+
+            double[] x0, un, vn, an;
+            x0 = new double[12];
+            un = new double[12];
+            vn = new double[12];
+            an = new double[12];
+
+            for (int ndidx = 0; ndidx < 4; ndidx++)
+            {
+                Node nd = elem.vrts[ndidx];
+                x0[0 + ndidx * 3] = nd.x0;
+                x0[1 + ndidx * 3] = nd.y0;
+                x0[2 + ndidx * 3] = nd.z0;
+
+                un[0 + ndidx * 3] = nd.unx;
+                un[1 + ndidx * 3] = nd.uny;
+                un[2 + ndidx * 3] = nd.unz;
+
+                vn[0 + ndidx * 3] = nd.vnx;
+                vn[1 + ndidx * 3] = nd.vny;
+                vn[2 + ndidx * 3] = nd.vnz;
+
+                an[0 + ndidx * 3] = nd.anx;
+                an[1 + ndidx * 3] = nd.any;
+                an[2 + ndidx * 3] = nd.anz;
+            }
+
             // compute E
 
             double[,] E = new double[6, 6];
@@ -345,58 +372,51 @@ namespace icFlow
 
         #endregion
 
-        public static void AssembleElems(LinearSystem ls, ref FrameInfo cf, MeshCollection mc)
+        public static void AssembleElems(LinearSystem ls, ref FrameInfo cf, MeshCollection mc, ModelPrms prms)
         {
             int nElems = mc.elasticElements.Length;
             cf.nElems = nElems;
             ElementResult[] elemResults = new ElementResult[nElems];
 
-            // parallel
-            foreach(Element elem in mc.elasticElements) 
+            ElementParams ep = new ElementParams();
+            ep.nu = prms.nu;
+            ep.rho = prms.rho;
+            ep.Y = prms.Y;
+
+            IntegrationParams ip = new IntegrationParams();
+            ip.dampingMass = prms.dampingMass;
+            ip.dampingStiffness = prms.dampingStiffness;
+            ip.gravity = prms.gravity;
+            ip.NewmarkBeta = prms.NewmarkBeta;
+            ip.NewmarkGamma = prms.NewmarkGamma;
+
+            double h = cf.TimeStep;
+
+            // compute results per element in parallel
+            Parallel.For(0, nElems, i => {
+                Element elem = mc.elasticElements[i];
+                elemResults[i] = ElementElasticity(elem, ep, ip, h);
+                });
+
+            // distribute results into linear system
+            double[,] m = new double[3, 3];
+            for(int idx=0;idx<nElems;idx++)
             {
+                ElementResult eres = elemResults[idx];
+                Element elem = mc.elasticElements[idx];
+                for(int row=0;row<4;row++)
+                {
+                    for(int col=0;col<4;col++)
+                    {
+
+                    }
+                }
 
             }
 
+
         }
 
-        /*
-                public void AssembleElemsAndCZs()
-        {
-
-            // set kernel configurations
-            kelElementElasticityForce.GridDimensions = new dim3(grid(mc.elasticElements.Length), 1, 1);
-
-            // run kernels
-            kelElementElasticityForce.RunAsync(CUstream.NullStream, 
-                g_ie_pcsr.DevicePointer, g_dn.DevicePointer, cf.TimeStep, 
-                g_dvals.DevicePointer, g_drhs.DevicePointer,
-                mc.elasticElements.Length, el_elastic_stride, nd_stride,
-                g_de.DevicePointer);
-
-            ctx.Synchronize(); // this is for benchmarkng only - does not affect functionality
-
-
-            if (cz_stride != 0)
-            {
-                kczCZForce.GridDimensions = new dim3(grid(mc.nonFailedCZs.Length), 1, 1);
-                kczCZForce.RunAsync(CUstream.NullStream, g_dcz.DevicePointer, g_icz.DevicePointer, 
-                    g_dn.DevicePointer,
-                    g_dvals.DevicePointer, g_drhs.DevicePointer, 
-                    cf.TimeStep,
-                    mc.nonFailedCZs.Length, cz_stride, nd_stride);
-
-                // pointers to specific portions of the arrays
-                CUdeviceptr ptr_failed = g_icz.DevicePointer + sizeof(int) * cz_stride * TENTATIVE_FAILED_OFFSET_CZ;
-                CUdeviceptr ptr_damaged = g_icz.DevicePointer + sizeof(int) * cz_stride * TENTATIVE_DAMAGED_OFFSET_CZ;
-
-                cf.nCZDamaged = Sum(ptr_damaged, mc.nonFailedCZs.Length);
-                cf.nCZFailedThisStep = Sum(ptr_failed, mc.nonFailedCZs.Length);
-            }
-
-            sw.Stop();
-            cf.KerElemForce += sw.ElapsedMilliseconds;
-        }
-        */
 
     }
 }
