@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Diagnostics;
 using System.Threading.Tasks;
 using static System.Math;
 
@@ -418,6 +419,14 @@ namespace icFlow
                     }
                 }
             }
+        }
+
+        public static void TransferUpdatedStateToHost()
+        {
+            // compute principal stresses
+            // update forces per node
+
+            throw new NotImplementedException();
         }
     }
 }

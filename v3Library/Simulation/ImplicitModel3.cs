@@ -78,7 +78,7 @@ namespace icFlow
 
             foreach (Mesh nondeformable in mc.nonDeformables)
                 foreach (Node nd in nondeformable.nodes)
-                    nd.anchored = true;
+                { nd.anchored = true; nd.altId = -1; }
 
             // identify and mark anchored nodes
             foreach (Mesh deformableMesh in mc.deformables)
@@ -453,7 +453,7 @@ namespace icFlow
                 }
                 else
                 {
-
+                    CPU_Collision_Response.CollisionResponse(collisions, linearSystem, ref tcf0, mc, prms);
                 }
 
                 // solve with MKL
@@ -481,8 +481,15 @@ namespace icFlow
                 // tentative values -> current values
                 foreach (Node nd in mc.allNodes) nd.AcceptTentativeValues(tcf0.TimeStep);
 
-                // tentative CZ states (from GPU) -> current CZ states
-                gf.TransferUpdatedStateToHost();
+                if (prms.UseGPU)
+                {
+                    // tentative CZ states (from GPU) -> current CZ states
+                    gf.TransferUpdatedStateToHost();
+                }
+                else
+                {
+
+                }
 
                 tcf0.Total = sw.ElapsedMilliseconds;
                 _acceptFrame();
