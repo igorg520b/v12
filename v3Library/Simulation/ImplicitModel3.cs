@@ -415,6 +415,8 @@ namespace icFlow
             _beginStep(); // timestep, indenter position and parameters of GPU
 
             // Perform Newton Raphson iterations
+            CPU_PPR_CZ.CZResult[] czResults = null;
+            CPU_Linear_Tetrahedron.ElementResult[] elemResults = null;
             do
             {
                 // infer tentative UVA from dU
@@ -432,7 +434,6 @@ namespace icFlow
                 linearSystem.CreateStructure(tcf0);
 
                 // transfer all values to GPU, including tentative UVA
-                CPU_PPR_CZ.CZResult[] czResults;
                 if (prms.UseGPU)
                 {
                     gf.TransferPCSR(prms.NonSymmetricMatrix);
@@ -440,7 +441,7 @@ namespace icFlow
                 }
                 else
                 {
-                    CPU_Linear_Tetrahedron.AssembleElems(linearSystem, ref tcf0, mc, prms);
+                    elemResults = CPU_Linear_Tetrahedron.AssembleElems(linearSystem, ref tcf0, mc, prms);
                     czResults = CPU_PPR_CZ.AssembleCZs(linearSystem, ref tcf0, mc, prms);
                 }
                 explodes = _checkDamage(); // discard frame if threshold is exceeded
@@ -488,7 +489,8 @@ namespace icFlow
                 }
                 else
                 {
-
+                    CPU_Linear_Tetrahedron.TransferUpdatedState(elemResults, mc);
+                    CPU_PPR_CZ.TransferUpdatedState(czResults)
                 }
 
                 tcf0.Total = sw.ElapsedMilliseconds;

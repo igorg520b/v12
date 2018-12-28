@@ -21,6 +21,7 @@ namespace icFlow
 
         public class CZResult
         {
+            public CZ cz;
             public bool contact, failed, damaged;
             public double avgDn, avgDt, avgTn, avgTt;
             public double pmax_, tmax_;
@@ -446,6 +447,7 @@ namespace icFlow
             avgDn = avgDt = avgTn = avgTt = 0;
 
             CZResult r = new CZResult(cz.pmax, cz.tmax);
+            r.cz = cz;
 
             // loop over 3 Gauss points
             for (int gpt = 0; gpt < 3; gpt++)
@@ -664,6 +666,29 @@ namespace icFlow
 
             return czResults;
         }
+
+        public static void TransferUpdatedState(CZResult[] czResults)
+        {
+
+            foreach (CZResult czr in czResults)
+            {
+                CZ cz = czr.cz;
+                if (czr.failed)
+                {
+                    cz.failed = true;
+                    continue;
+                }
+                cz.tmax = czr.tmax;
+                cz.pmax = czr.pmax;
+                cz.avgDn = czr.avgDn;
+                cz.avgDt = czr.avgDt;
+                cz.avgTn = czr.avgTn;
+                cz.avgTt = czr.avgTt;
+                if (cz.maxAvgDn < cz.avgDn) cz.maxAvgDn = cz.avgDn;
+                if (cz.maxAvgDt < cz.avgDt) cz.maxAvgDt = cz.avgDt;
+            }
+        }
+
 
     }
 }

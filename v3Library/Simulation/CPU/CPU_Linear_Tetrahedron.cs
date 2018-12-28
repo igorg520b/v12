@@ -19,6 +19,7 @@ namespace icFlow
         }
         public class ElementResult
         {
+            public Element elem;
             public double[] rhs = new double[12];
             public double[,] LHS = new double[12,12];
             public double[] stress;
@@ -339,6 +340,7 @@ namespace icFlow
 
 
             ElementResult result = new ElementResult();
+            result.elem = elem;
             double[] f;
             double[,] Df;
             double V;
@@ -373,7 +375,7 @@ namespace icFlow
 
         #endregion
 
-        public static void AssembleElems(LinearSystem ls, ref FrameInfo cf, MeshCollection mc, ModelPrms prms)
+        public static ElementResult[] AssembleElems(LinearSystem ls, ref FrameInfo cf, MeshCollection mc, ModelPrms prms)
         {
             int nElems = mc.elasticElements.Length;
             cf.nElems = nElems;
@@ -419,14 +421,31 @@ namespace icFlow
                     }
                 }
             }
+            return elemResults;
         }
 
-        public static void TransferUpdatedStateToHost()
+        public static void TransferUpdatedState(ElementResult[] eresults, MeshCollection mc)
         {
-            // compute principal stresses
-            // update forces per node
+            // compute principal stresses (not implemented)
 
-            throw new NotImplementedException();
+
+
+            // update forces per node
+            foreach(Node nd in mc.activeNodes) nd.fx = nd.fy = nd.fz = 0;
+
+            foreach (ElementResult eres in eresults)
+            {
+                Node[] vrts = eres.elem.vrts;
+                for (int r = 0; r < 4; r++)
+                {
+                    Node nd = vrts[r];
+                    int ni = nd.altId;
+                    nd.fx += eres.rhs[r * 3 + 0];
+                    nd.fy += eres.rhs[r * 3 + 1];
+                    nd.fz += eres.rhs[r * 3 + 2];
+                }
+            }
+
         }
     }
 }
