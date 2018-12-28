@@ -338,7 +338,7 @@ namespace icFlow
             cf.KForcePrepare += sw.ElapsedMilliseconds;
         }
 
-        public void TransferPCSR(bool nonSymmetric)
+        public void TransferPCSR()
         {
             CSRDictionary csrd = linearSystem.csrd;
             // tranfer elastic elems and CZs along with offsets in sparse matrix (where to write the result)
@@ -355,7 +355,7 @@ namespace icFlow
                     {
                         int pcsr_ij;
                         Node nj = elem.vrts[j];
-                    if (!ni.anchored && !nj.anchored && (nonSymmetric || nj.altId >= ni.altId))
+                    if (!ni.anchored && !nj.anchored && (nj.altId >= ni.altId))
                         pcsr_ij = csrd[ni.altId,nj.altId]; 
                         else pcsr_ij = -1; // ignore anchored nodes
                         c_ie_pcsr[i_elem + el_elastic_stride * (PCSR_OFFSET_ELEM + (i * 4 + j))] = pcsr_ij;
@@ -388,7 +388,7 @@ namespace icFlow
                         {
                             Node nj = cz.vrts[j];
                             int pcsr_ij;
-                            if (!ni.anchored && !nj.anchored && (nonSymmetric || nj.altId >= ni.altId))
+                            if (!ni.anchored && !nj.anchored && (nj.altId >= ni.altId))
                                 pcsr_ij = csrd[ni.altId, nj.altId];
                             else pcsr_ij = -1; // ni is anchored => ignore
                             c_icz[i_cz + cz_stride * (PCSR_OFFSET_CZ + (i * 6 + j))] = pcsr_ij;
@@ -634,7 +634,7 @@ namespace icFlow
         int[] c_icr; // integer data for impacts, i.e. pcsr 
         CudaDeviceVariable<int> g_icr;
 
-        public void collisionResponse(bool nonSymmetric)
+        public void collisionResponse()
         {
             if (nImpacts == 0) return;
             sw.Restart();
@@ -665,7 +665,7 @@ namespace icFlow
                     {
                         int pcsr_ij;
                         Node nj = mc.allNodes[c_itet[i_im + j * tet_stride]];
-                        if (!ni.anchored && !nj.anchored && (nonSymmetric || nj.altId >= ni.altId))
+                        if (!ni.anchored && !nj.anchored && (nj.altId >= ni.altId))
                             pcsr_ij = csrd[ni.altId, nj.altId];
                         else pcsr_ij = -1; // ni is anchored => ignore
                         c_icr[i_im + cr_stride * (pcsr_offset + (i * 4 + j))] = pcsr_ij;

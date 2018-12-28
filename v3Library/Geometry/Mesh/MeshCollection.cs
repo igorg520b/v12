@@ -98,7 +98,7 @@ namespace icFlow
             for (int i = 0; i < surfaceElements.Length; i++) surfaceElements[i].globalElementId = i;
         }
 
-        public void UpdateStaticStructureData(CSRDictionary csrd, bool nonSymmetric)
+        public void UpdateStaticStructureData(CSRDictionary csrd)
         {
             csrd.ClearDynamic();
             // update node interaction information for creating CSR later
@@ -110,13 +110,13 @@ namespace icFlow
                 if (!cz.failed)
                 foreach (Node nd1 in cz.vrts)
                     foreach (Node nd2 in cz.vrts)
-                        if (!nd1.anchored && !nd2.anchored && (nonSymmetric || nd2.altId >= nd1.altId))
+                        if (!nd1.anchored && !nd2.anchored && (nd2.altId >= nd1.altId))
                                 csrd.AddStatic(nd1.altId, nd2.altId);
 
             foreach (Element elem in elasticElements)
                 foreach (Node nd1 in elem.vrts)
                     foreach (Node nd2 in elem.vrts)
-                        if (!nd1.anchored && !nd2.anchored && (nonSymmetric || nd2.altId >= nd1.altId))
+                        if (!nd1.anchored && !nd2.anchored && (nd2.altId >= nd1.altId))
                             csrd.AddStatic(nd1.altId, nd2.altId);
         }
 

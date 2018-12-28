@@ -281,6 +281,7 @@ namespace icFlow
                     Df[i, j] = RKRt[i, j];
                 }
 
+
             // calculation of strain (rotation excluded) e = B.xr
             // B[6][12]
             double[] e = new double[6];
@@ -364,6 +365,8 @@ namespace icFlow
             for (int i = 0; i < 12; i++)
             {
                 result.rhs[i] -= f[i];
+
+
                 for (int j = 0; j < 12; j++)
                 {
                     result.rhs[i] -= (M[i,j] * prms.rho * V * iprms.dampingMass + Df[i,j] * iprms.dampingStiffness) * vn[j] + (M[i,j] * prms.rho * V * an[j]);
@@ -411,6 +414,7 @@ namespace icFlow
                 {
                     int ni = elem.vrts[r].altId;
                     ls.AddToRHS(ni, eres.rhs[r * 3 + 0], eres.rhs[r * 3 + 1], eres.rhs[r * 3 + 2]);
+
                     for (int c=0;c<4;c++)
                     {
                         int nj = elem.vrts[c].altId;

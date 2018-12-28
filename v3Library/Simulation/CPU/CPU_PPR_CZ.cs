@@ -648,14 +648,14 @@ namespace icFlow
             {
                 CZResult czr = czResults[idx];
                 double[,] lhs = czr.Keff;
-                Element elem = mc.elasticElements[idx];
+                CZ cz = czr.cz;
                 for (int r = 0; r < 6; r++)
                 {
-                    int ni = elem.vrts[r].altId;
+                    int ni = cz.vrts[r].altId;
                     ls.AddToRHS(ni, czr.rhs[r * 3 + 0], czr.rhs[r * 3 + 1], czr.rhs[r * 3 + 2]);
                     for (int c = 0; c < 6; c++)
                     {
-                        int nj = elem.vrts[c].altId;
+                        int nj = cz.vrts[c].altId;
                         ls.AddToLHS_Symmetric(ni, nj,
                         lhs[r * 3 + 0, c * 3 + 0], lhs[r * 3 + 0, c * 3 + 1], lhs[r * 3 + 0, c * 3 + 2],
                         lhs[r * 3 + 1, c * 3 + 0], lhs[r * 3 + 1, c * 3 + 1], lhs[r * 3 + 1, c * 3 + 2],

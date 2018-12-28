@@ -120,7 +120,7 @@ namespace icFlow
                 }
             }
             mc.PrepareSurfaceElements();
-            mc.UpdateStaticStructureData(linearSystem.csrd, prms.NonSymmetricMatrix);
+            mc.UpdateStaticStructureData(linearSystem.csrd);
 
             if (prms.UseGPU)
             {
@@ -198,7 +198,7 @@ namespace icFlow
             }
         }
 
-        void _addCollidingNodesToStructure()
+        void _addCollidingNodesToStructure((Node, Face)[] collisions = null)
         {
             linearSystem.csrd.ClearDynamic();
             if (prms.UseGPU)
@@ -213,7 +213,7 @@ namespace icFlow
                             for (int n2idx = 0; n2idx < 4; n2idx++)
                             {
                                 Node n2 = mc.allNodes[gf.c_itet[i_im + n2idx * gf.tet_stride]];
-                                if (!n1.anchored && !n2.anchored && (prms.NonSymmetricMatrix || n2.altId > n1.altId))
+                                if (!n1.anchored && !n2.anchored && (n2.altId > n1.altId))
                                     linearSystem.csrd.AddDynamic(n1.altId, n2.altId);
                             }
                         }
@@ -223,7 +223,26 @@ namespace icFlow
             else
             {
                 // use CPU
-                throw new NotImplementedException();
+                if (collisions == null) return;
+                foreach((Node,Face) tuple in collisions)
+                {
+                    Node nd = tuple.Item1;
+                    Face fc = tuple.Item2;
+                    Node[] nds = { nd, fc.vrts[0], fc.vrts[1], fc.vrts[2] };
+                    //                    double[] idxs = { nd.altId, fc.vrts[0].altId, fc.vrts[1].altId, fc.vrts[2].altId };
+                    for (int i = 0; i < 4; i++)
+                    {
+                        Node n1 = nds[i];
+                        for (int j = 0; j < 4; j++)
+                        {
+                            Node n2 = nds[j];
+                            if (!n1.anchored && !n2.anchored && (n2.altId > n1.altId))
+                                linearSystem.csrd.AddDynamic(n1.altId, n2.altId);
+                        }
+                    }
+
+                }
+
             }
         }
 
@@ -329,7 +348,7 @@ namespace icFlow
                 CZ[] fczs = Array.FindAll(mc.nonFailedCZs, cz => cz.failed);
                 // mark corresponding faces are "exposed"
                 foreach (CZ cz in fczs) foreach (Face fc in cz.faces) fc.created = fc.exposed = true;
-                mc.UpdateStaticStructureData(linearSystem.csrd, prms.NonSymmetricMatrix);    // active CZ count has changed
+                mc.UpdateStaticStructureData(linearSystem.csrd);    // active CZ count has changed
                 bvh.ForceReconstruct(); // this is not necessary if between-grain collisions are enabled
             }
 
@@ -390,7 +409,7 @@ namespace icFlow
             cf.IndenterForce = Math.Sqrt(indFrcX * indFrcX + indFrcY * indFrcY + indFrcZ * indFrcZ);
 
             // detect fracture
-            if (prms.DetectFracture)
+            if (prms.DetectFracture && cf.StepNumber % 10 == 0)
             {
                 cf.fractureDetected = false;
                 foreach (Mesh m in mc.deformables)
@@ -428,7 +447,7 @@ namespace icFlow
                 if (prms.UseGPU) gf.NarrowPhaseCollisionDetection(bvh.broad_list);
                 else collisions = CPU_NarrowPhase.NarrowPhase(bvh.broad_list, prms, ref tcf0, mc);
 
-                _addCollidingNodesToStructure(); // account for impacts in matrix structure
+                _addCollidingNodesToStructure(collisions); // account for impacts in matrix structure
 
                 // create CSR, accounting for collision Nodes
                 linearSystem.CreateStructure(tcf0);
@@ -436,7 +455,7 @@ namespace icFlow
                 // transfer all values to GPU, including tentative UVA
                 if (prms.UseGPU)
                 {
-                    gf.TransferPCSR(prms.NonSymmetricMatrix);
+                    gf.TransferPCSR();
                     gf.AssembleElemsAndCZs();
                 }
                 else
@@ -449,7 +468,7 @@ namespace icFlow
                 // add collision response to the matrix
                 if (prms.UseGPU)
                 {
-                    gf.collisionResponse(prms.NonSymmetricMatrix);
+                    gf.collisionResponse();
                     gf.TransferLinearSystemToHost();
                 }
                 else
@@ -458,7 +477,7 @@ namespace icFlow
                 }
 
                 // solve with MKL
-                linearSystem.Solve(tcf0, prms.NonSymmetricMatrix);
+                linearSystem.Solve(tcf0);
 
                 // convergence analysis
                 diverges = _checkDivergence();
@@ -490,7 +509,7 @@ namespace icFlow
                 else
                 {
                     CPU_Linear_Tetrahedron.TransferUpdatedState(elemResults, mc);
-                    CPU_PPR_CZ.TransferUpdatedState(czResults)
+                    CPU_PPR_CZ.TransferUpdatedState(czResults);
                 }
 
                 tcf0.Total = sw.ElapsedMilliseconds;

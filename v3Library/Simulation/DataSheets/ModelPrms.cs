@@ -359,9 +359,6 @@ namespace icFlow
         #region Matrix
 
         [Category("Matrix")]
-        public bool NonSymmetricMatrix { get; set; } = false;
-
-        [Category("Matrix")]
         public bool UseGPU { get; set; } = true;
 
         #endregion
@@ -460,7 +457,6 @@ namespace icFlow
             this.maxIterations = other.maxIterations;
             this.minIterations = other.minIterations;
             this.gravity = other.gravity;
-            this.NonSymmetricMatrix = other.NonSymmetricMatrix;
             this.UseGPU = other.UseGPU;
             this.BeamLength = other.BeamLength;
             this.BeamWidth = other.BeamWidth;

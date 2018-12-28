@@ -48,10 +48,10 @@ namespace icFlow
         [DllImport("PardisoLoader2.dll", CallingConvention = CallingConvention.Cdecl)]
         static extern int SolveDouble3(int[] ja, int[] ia, double[] a, int n, double[] b, double[] x, int matrixType, int iparam4, int dim, int msglvl, int check);
 
-        public void Solve(FrameInfo cf, bool nonSymmetric)
+        public void Solve(FrameInfo cf)
         {
-            bool symmetric = !nonSymmetric;
-            Assert(nonSymmetric);   // comment this out 
+            bool symmetric = true;
+            Assert(false);   
             sw.Restart();
 
             const int check = 0;
@@ -83,7 +83,8 @@ namespace icFlow
         public void AddToRHS(int atWhichIndex, double d0, double d1, double d2)
         {
             if (atWhichIndex < 0) return;
-            int i3 = atWhichIndex * 3;
+            int i3 = atWhichIndex;
+            Debug.Assert(i3 + 2 < csrd.N * 3);
             rhs[i3] += d0;
             rhs[i3 + 1] += d1;
             rhs[i3 + 2] += d2;

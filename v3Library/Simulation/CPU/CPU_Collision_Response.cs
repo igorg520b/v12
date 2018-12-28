@@ -75,6 +75,7 @@ namespace icFlow
 
         public static void CollisionResponse((Node, Face)[] cp, LinearSystem ls, ref FrameInfo cf, MeshCollection mc, ModelPrms prms)
         {
+            if (cp == null) return;
             int nCollisions = cp.Length;
             cf.nCollisions = nCollisions;
             CPResult[] cpr = new CPResult[nCollisions];
