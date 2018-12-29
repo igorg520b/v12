@@ -83,7 +83,7 @@ namespace icFlow
         public void AddToRHS(int atWhichIndex, double d0, double d1, double d2)
         {
             if (atWhichIndex < 0) return;
-            int i3 = atWhichIndex;
+            int i3 = atWhichIndex*3;
             Debug.Assert(i3 + 2 < csrd.N * 3);
             rhs[i3] += d0;
             rhs[i3 + 1] += d1;
@@ -98,6 +98,8 @@ namespace icFlow
         {
             if (row > column || row < 0 || column < 0) return;
             int offset = csrd[row, column];
+            Debug.Assert(offset < csrd.nnz);
+            offset *= 9;
             vals[offset + 0] += a00;
             vals[offset + 1] += a01;
             vals[offset + 2] += a02;
