@@ -15,7 +15,7 @@ namespace icFlow
         public static double NewmarkBeta, NewmarkGamma, dampingMass, dampingStiffness, gravity;
         static double h; // timestep
 
-        readonly static double[,] E = new double[6,6];
+        readonly static double[,] E = new double[6, 6];
         readonly static double[,] M = new double[6,6]; // mass matrix (rho=1)
 
         public class ElementExtension
@@ -42,6 +42,14 @@ namespace icFlow
                         int row = j * 3 + m;
                         M[col,row] = (col == row) ? 2 * coeff : coeff;
                     }
+        }
+
+        static void InitializeElasticityTensor()
+        {
+            double coeff1 = Y / ((1D + nu) * (1D - 2D * nu));
+            E[0, 0] = E[1, 1] = E[2, 2] = (1D - nu) * coeff1;
+            E[0, 1] = E[0, 2] = E[1, 2] = E[1, 0] = E[2, 0] = E[2, 1] = nu * coeff1;
+            E[3, 3] = E[4, 4] = E[5, 5] = (0.5 - nu) * coeff1;
         }
 
         #endregion
@@ -145,7 +153,7 @@ int row2, int col2, double* m2,
 
         #region corotational model
 
-        unsafe static void F_and_Df_Corotational2(double *x0, double* xc, double* ElT,
+        unsafe static void F_and_Df_Corotational2(double *x0, double* xc,
     double* f, double* Df, double[] sigma, out double V)
         {
             // Colorational formulation:
@@ -184,8 +192,10 @@ int row2, int col2, double* m2,
 
             // [12,6] result of multiplication (Bt x E)
             double* BtE = stackalloc double[72];
-            matrixTransposeMult(6, 12, B, 6, 6, ElT, BtE);
-
+            fixed (double* ElT = E)
+            {
+                matrixTransposeMult(6, 12, B, 6, 6, ElT, BtE);
+            }
             // [12,12]; K = Bt x E x B x V
             double* K = stackalloc double[144];
             matrixMult(12, 6, BtE, 6, 12, B, K);
@@ -248,14 +258,14 @@ int row2, int col2, double* m2,
             Array.Clear(sigma, 0, sigma.Length);
             for (int j = 0; j < 6; j++)
                 for (int i = 0; i < 6; i++)
-                    sigma[j] += ElT[i*6 + j] * e[i];
+                    sigma[j] += E[i, j] * e[i];
         }
         #endregion
 
         #region element forces
 
         // one element
-        unsafe static void ElementElasticity(Element elem, double* ElT)
+        unsafe static void ElementElasticity(Element elem)
         {
             double* vn = stackalloc double[12];
             double* an = stackalloc double[12];
@@ -281,7 +291,7 @@ int row2, int col2, double* m2,
             // out params
             double* f = stackalloc double[12];
             double* Df = stackalloc double[144];
-            F_and_Df_Corotational2(x0, xc, ElT, f, Df, elem.stress, out double V);
+            F_and_Df_Corotational2(x0, xc, f, Df, elem.stress, out double V);
 
             ElementExtension ex = (ElementExtension)elem.extension;
             ex.Clear();
@@ -314,24 +324,17 @@ int row2, int col2, double* m2,
         }
 
         #endregion
-        // this should be done in "Prepare"
-        public static void InitializeElasticityTensor(double Y, double nu)
-        {
-            double coeff1 = Y / ((1D + nu) * (1D - 2D * nu));
-            E[0, 0] = E[1, 1] = E[2, 2] = (1D - nu) * coeff1;
-            E[0, 1] = E[0, 2] = E[1, 2] = E[1, 0] = E[2, 0] = E[2, 1] = nu * coeff1;
-            E[3, 3] = E[4, 4] = E[5, 5] = (0.5 - nu) * coeff1;
-        }
+ 
 
 
-        public static void AssembleElems(LinearSystem ls, ref FrameInfo cf, MeshCollection mc, ModelPrms prms)
+        public unsafe static void AssembleElems(LinearSystem ls, ref FrameInfo cf, MeshCollection mc, ModelPrms prms)
         {
             // update static variables
             h = cf.TimeStep;
             Y = prms.Y;
             nu = prms.nu;
             rho = prms.rho;
-            InitializeElasticityTensor(Y, nu);
+            InitializeElasticityTensor();
             NewmarkBeta = prms.NewmarkBeta;
             NewmarkGamma = prms.NewmarkGamma;
             dampingMass = prms.dampingMass;
@@ -343,37 +346,23 @@ int row2, int col2, double* m2,
 
             foreach (Element elem in mc.elasticElements) if (elem.extension == null) elem.extension = new ElementExtension();
 
-
-
-            ElementParams ep = new ElementParams();
-            ep.nu = prms.nu;
-            ep.rho = prms.rho;
-            ep.Y = prms.Y;
-
-            IntegrationParams ip = new IntegrationParams();
-            ip.dampingMass = prms.dampingMass;
-            ip.dampingStiffness = prms.dampingStiffness;
-            ip.gravity = prms.gravity;
-            ip.NewmarkBeta = prms.NewmarkBeta;
-            ip.NewmarkGamma = prms.NewmarkGamma;
-
-
             // compute results per element in parallel
-            Parallel.For(0, nElems, i => {
-                Element elem = mc.elasticElements[i];
-                elemResults[i] = ElementElasticity(elem, ep, ip, h);
-                });
+                Parallel.For(0, nElems, i => {
+                    Element elem = mc.elasticElements[i];
+                    ElementElasticity(elem);
+                    });
 
             // distribute results into linear system
             for(int idx=0;idx<nElems;idx++)
             {
-                ElementResult eres = elemResults[idx];
-                double[,] lhs = eres.LHS;
                 Element elem = mc.elasticElements[idx];
+                ElementExtension ex = (ElementExtension)elem.extension;
+                double[,] lhs = ex.lhs;
+                double[] rhs = ex.rhs;
                 for(int r=0;r<4;r++)
                 {
                     int ni = elem.vrts[r].altId;
-                    ls.AddToRHS(ni, eres.rhs[r * 3 + 0], eres.rhs[r * 3 + 1], eres.rhs[r * 3 + 2]);
+                    ls.AddToRHS(ni, rhs[r * 3 + 0], rhs[r * 3 + 1], rhs[r * 3 + 2]);
 
                     for (int c=0;c<4;c++)
                     {
@@ -385,10 +374,9 @@ int row2, int col2, double* m2,
                     }
                 }
             }
-            return elemResults;
         }
 
-        public static void TransferUpdatedState(ElementResult[] eresults, MeshCollection mc)
+        public static void TransferUpdatedState(MeshCollection mc)
         {
             // compute principal stresses (not implemented)
 
@@ -397,19 +385,19 @@ int row2, int col2, double* m2,
             // update forces per node
             foreach(Node nd in mc.activeNodes) nd.fx = nd.fy = nd.fz = 0;
 
-            foreach (ElementResult eres in eresults)
+
+            foreach (Element elem in mc.elasticElements)
             {
-                Node[] vrts = eres.elem.vrts;
+                ElementExtension ex = (ElementExtension)elem.extension;
+                Node[] vrts = elem.vrts;
                 for (int r = 0; r < 4; r++)
                 {
                     Node nd = vrts[r];
-                    int ni = nd.altId;
-                    nd.fx += eres.rhs[r * 3 + 0];
-                    nd.fy += eres.rhs[r * 3 + 1];
-                    nd.fz += eres.rhs[r * 3 + 2];
+                    nd.fx += ex.rhs[r * 3 + 0];
+                    nd.fy += ex.rhs[r * 3 + 1];
+                    nd.fz += ex.rhs[r * 3 + 2];
                 }
             }
-
         }
     }
 }
