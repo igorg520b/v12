@@ -16,7 +16,7 @@ namespace icFlow
         static double h; // timestep
 
         readonly static double[,] E = new double[6, 6];
-        readonly static double[,] M = new double[6,6]; // mass matrix (rho=1)
+        readonly static double[,] M = new double[12,12]; // mass matrix (rho=1)
 
         public class ElementExtension
         {
