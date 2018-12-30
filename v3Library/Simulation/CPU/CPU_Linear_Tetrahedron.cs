@@ -180,19 +180,16 @@ int row2, int col2, double* m2,
             a1 /= Jdet; a2 /= Jdet; a3 /= Jdet; a4 /= Jdet;
             b1 /= Jdet; b2 /= Jdet; b3 /= Jdet; b4 /= Jdet;
             c1 /= Jdet; c2 /= Jdet; c3 /= Jdet; c4 /= Jdet;
-            /*
+
+            double z = 0;
             // [6,12]
             double* B = stackalloc double[] {
-         a1, 0, 0, a2, 0, 0, a3, 0, 0, a4, 0, 0 ,
-         0, b1, 0, 0, b2, 0, 0, b3, 0, 0, b4, 0 ,
-         0, 0, c1, 0, 0, c2, 0, 0, c3, 0, 0, c4 ,
-         b1, a1, 0, b2, a2, 0, b3, a3, 0, b4, a4, 0 ,
-         0, c1, b1, 0, c2, b2, 0, c3, b3, 0, c4, b4 ,
-         c1, 0, a1, c2, 0, a2, c3, 0, a3, c4, 0, a4 };
-         */
-            double* B = stackalloc double[] {a1,0,0, a2, 0, 0, a3, 0, 0, a4, 0, 0, 0, b1, 0, 0, b2, 0, 0, b3, 0, 0, b4,0,0,0,c1,0,0,c2,0,0,c3,0,0,c4,b1,a1,0,b2,a2,0,b3,a3, 0,b4,a4,0,0,c1,b1,0,c2,b2,0,c3,b3,0,c4,b4,c1,0,a1,c2,0,a2,c3,0,a3, c4, 0, a4};
-            double[] B_debug = new double[12 * 6];
-            for (int i = 0; i < 12 * 6; i++) B_debug[i] = B[i];
+         a1, z, z, a2, z, z, a3, z, z, a4, z, z ,
+         z, b1, z, z, b2, z, z, b3, z, z, b4, z ,
+         z, z, c1, z, z, c2, z, z, c3, z, z, c4 ,
+         b1, a1, z, b2, a2, z, b3, a3, z, b4, a4, z ,
+         z, c1, b1, z, c2, b2, z, c3, b3, z, c4, b4 ,
+         c1, z, a1, c2, z, a2, c3, z, a3, c4, z, a4 };
 
             // [12,6] result of multiplication (Bt x E)
             double* BtE = stackalloc double[72];
@@ -249,8 +246,6 @@ int row2, int col2, double* m2,
             for (int i = 0; i < 12; i++)
                 for (int j = 0; j < 12; j++)
                     f[i] += RK[i*12 + j] * xr[j];
-
-//            double[] f_debug = { f[0], f[1], f[2], f[3], f[4], f[5], f[6], f[7], f[8], f[9], f[10], f[11] };
 
             // calculation of strain (rotation excluded) e = B.xr
             // B[6][12]
