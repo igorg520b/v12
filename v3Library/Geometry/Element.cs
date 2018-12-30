@@ -13,6 +13,7 @@ namespace icFlow
         public HashSet<Face> adjFaces;      // Collection of adjacent faces for collision detection (only on surface elements)
         public double[] stress = new double[6];
         public double[] principal_stresses = new double[3];
+        public object extension; // any additional data
 
         public void FindAdjFaces()
         {
