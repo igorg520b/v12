@@ -221,6 +221,8 @@ int row2, int col2, double* m2,
             double* R = stackalloc double[9]; // R = R1 x R0^T
             matrixMultByTranspose(3, 3, R1, 3, 3, R0, R);
 
+                        fastRotationMatrixI(xc, R);
+
             // both are 12x12
             double* RK = stackalloc double[144];
             double* RKRt = stackalloc double[144];
@@ -243,6 +245,9 @@ int row2, int col2, double* m2,
                                 Df[(3 * i + k)*12 +(3 * j + l)] += RK[(3 * i + k)*12 +(3 * j + m)] * R[l*3+ m];
                 }
 
+
+            for (int i = 0; i < 144; i++) Df[i] = K[i];
+
             // xr = Rt xc
             double* xr = stackalloc double[12];
             transposeAndMultiplyByVector3(R, xc[0], xc[1], xc[2], out xr[0], out xr[1], out xr[2]);
@@ -256,6 +261,12 @@ int row2, int col2, double* m2,
             for (int i = 0; i < 12; i++)
                 for (int j = 0; j < 12; j++)
                     f[i] += RK[i*12 + j] * xr[j];
+
+            for (int i = 0; i < 12; i++) f[i] = 0;
+            // f = RK(Rt pm - mx)
+            for (int i = 0; i < 12; i++)
+                for (int j = 0; j < 12; j++)
+                    f[i] += K[i * 12 + j] * (xc[j]-x0[j]);
 
             // calculation of strain (rotation excluded) e = B.xr
             // B[6][12]
