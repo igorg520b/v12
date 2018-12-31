@@ -1,4 +1,5 @@
 ﻿using System.Threading.Tasks;
+using System;
 using System.Diagnostics;
 using static System.Math;
 
@@ -26,6 +27,12 @@ namespace icFlow
             public double pmax_, tmax_;
             public double[] pmax = new double[3], tmax = new double[3], rhs = new double[18];
             public double[,] Keff = new double[18, 18];
+
+            public void Clear()
+            {
+                Array.Clear(Keff, 0, Keff.Length);
+                Array.Clear(rhs, 0, rhs.Length);
+            }
         }
 
         static double[,,] B;
@@ -443,6 +450,7 @@ out double y1, out double y2, out double y3)
             avgDn = avgDt = avgTn = avgTt = 0;
 
             CZResult r = cz.extension;
+            r.Clear();
             for(int i=0;i<3;i++) { r.pmax[i] = cz.pmax[i];  r.tmax[i] = cz.tmax[i]; }
 
             // loop over 3 Gauss points
