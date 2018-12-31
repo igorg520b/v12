@@ -252,8 +252,9 @@ int row2, int col2, double* m2,
             */
             // calculate K
             double x1, x2, x3, x4, y1, y2, y3, y4, z1, z2, z3, z4;
-            double x12, x13, x14, x23, x24, x34, x21, x31, x32, x42, x43, y12, y13, y14, y23, y24, y34;
-            double y21, y31, y32, y42, y43, z12, z13, z14, z23, z24, z34, z21, z31, z32, z42, z43;
+            double x12, x13, x14, x23, x24, x34;
+            double y12, y13, y14, y23, y24, y34;
+            double z12, z13, z14, z23, z24, z34;
             double a1, a2, a3, a4, b1, b2, b3, b4, c1, c2, c3, c4;
             double Jdet;
             x1 = x0[0]; y1 = x0[1]; z1 = x0[2];
@@ -261,19 +262,26 @@ int row2, int col2, double* m2,
             x3 = x0[6]; y3 = x0[7]; z3 = x0[8];
             x4 = x0[9]; y4 = x0[10]; z4 = x0[11];
 
-            x12 = x1 - x2; x13 = x1 - x3; x14 = x1 - x4; x23 = x2 - x3; x24 = x2 - x4; x34 = x3 - x4;
-            x21 = -x12; x31 = -x13; x32 = -x23; x42 = -x24; x43 = -x34;
-            y12 = y1 - y2; y13 = y1 - y3; y14 = y1 - y4; y23 = y2 - y3; y24 = y2 - y4; y34 = y3 - y4;
-            y21 = -y12; y31 = -y13; y32 = -y23; y42 = -y24; y43 = -y34;
-            z12 = z1 - z2; z13 = z1 - z3; z14 = z1 - z4; z23 = z2 - z3; z24 = z2 - z4; z34 = z3 - z4;
-            z21 = -z12; z31 = -z13; z32 = -z23; z42 = -z24; z43 = -z34;
-            Jdet = x21 * (y23 * z34 - y34 * z23) + x32 * (y34 * z12 - y12 * z34) + x43 * (y12 * z23 - y23 * z12);
+            x12 = x0[0] - x0[3]; x13 = x0[0] - x0[6]; x14 = x0[0] - x0[9]; x23 = x0[3] - x0[6]; x24 = x0[3] - x0[9]; x34 = x0[6] - x0[9];
+            y12 = x0[1] - x0[4]; y13 = x0[1] - x0[7]; y14 = x0[1] - x0[10]; y23 = x0[4] - x0[7]; y24 = x0[4] - x0[10]; y34 = x0[7] - x0[10];
+            z12 = x0[2] - x0[5]; z13 = x0[2] - x0[8]; z14 = x0[2] - x0[11]; z23 = x0[5] - x0[8]; z24 = x0[5] - x0[11]; z34 = x0[8] - x0[11];
+
+            Jdet = -(x12 * (y23 * z34 - y34 * z23) + x23 * (y34 * z12 - y12 * z34) + x34 * (y12 * z23 - y23 * z12));
             V = Jdet / 6.0;
 
-            a1 = y42 * z32 - y32 * z42; b1 = x32 * z42 - x42 * z32; c1 = x42 * y32 - x32 * y42;
-            a2 = y31 * z43 - y34 * z13; b2 = x43 * z31 - x13 * z34; c2 = x31 * y43 - x34 * y13;
+//            double y31 = -y13;
+//            double z43 = -z34;
+//            double x43 = -x34;
+//            double z31 = -z13;
+//            double y43 = -y34;
+//            double z21 = -z12;
+//            double x21 = -x12;
+ //           double x31 = -x13;
+  //          double y21 = -y12;
+            a1 = y24 * z23 - y23 * z24; b1 = x23 * z24 - x24 * z23; c1 = x24 * y23 - x23 * y24;
+            a2 = y13 * z34 - y34 * z13; b2 = x34 * z13 - x13 * z34; c2 = x13 * y34 - x34 * y13;
             a3 = y24 * z14 - y14 * z24; b3 = x14 * z24 - x24 * z14; c3 = x24 * y14 - x14 * y24;
-            a4 = y13 * z21 - y12 * z31; b4 = x21 * z13 - x31 * z12; c4 = x13 * y21 - x12 * y31;
+            a4 = -y13 * z12 + y12 * z13; b4 = -x12 * z13 + x13 * z12; c4 = -x13 * y12 + x12 * y13;
 
 
             a1 /= Jdet; a2 /= Jdet; a3 /= Jdet; a4 /= Jdet;
@@ -305,18 +313,19 @@ int row2, int col2, double* m2,
             */
             // [12,12]; K = Bt x E x B x V
             double* K = stackalloc double[144];
-            for (int r = 0; r < 12; r++)
+/*            for (int r = 0; r < 12; r++)
                 for (int c = 0; c < 12; c++)
                     for (int i = 0; i < 6; i++) K[r*12+c] += BtE[r*6+i] * B[i*12+c] * V;
-
-            /*
+                    */
+            
             matrixMult(12, 6, BtE, 6, 12, B, K);
             matrixScalarMult(12, 12, K, V);
-            */
+            
 
             // rotation matrices
             double* R0 = stackalloc double[9];
             double* R1 = stackalloc double[9];
+            /*
             fastRotationMatrix(
     x0[0], x0[1], x0[2],
     x0[3], x0[4], x0[5],
@@ -332,13 +341,14 @@ int row2, int col2, double* m2,
                 out R1[0], out R1[1], out R1[2],
                 out R1[3], out R1[4], out R1[5],
                 out R1[6], out R1[7], out R1[8]);
-
-            /*
+*/
+            
             fastRotationMatrix(x0, R0);
             fastRotationMatrix(xc, R1);
-            */
+            
 
             double* R = stackalloc double[9]; // R = R1 x R0^T
+            /*
             multABd(
     R1[0], R1[1], R1[2],
     R1[3], R1[4], R1[5],
@@ -349,9 +359,10 @@ int row2, int col2, double* m2,
     out R[0], out R[1], out R[2],
     out R[3], out R[4], out R[5],
     out R[6], out R[7], out R[8]);
-            /*
+    */
+            
             matrixMultByTranspose(3, 3, R1, 3, 3, R0, R);
-            */
+            
             // both are 12x12
             double* RK = stackalloc double[144];
             double* RKRt = stackalloc double[144];
