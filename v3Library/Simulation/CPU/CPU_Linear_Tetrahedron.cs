@@ -203,10 +203,17 @@ int row2, int col2, double* m2,
 
             // [12,6] result of multiplication (Bt x E)
             double* BtE = stackalloc double[72];
+
+                        for (int r = 0; r < 12; r++)
+                for (int c = 0; c < 6; c++)
+                    for (int i = 0; i < 6; i++) BtE[r*6+c] += B[i*12+r] * E[i,c];
+            
+            /*
             fixed (double* ElT = E)
             {
                 matrixTransposeMult(6, 12, B, 6, 6, ElT, BtE);
             }
+            */
             // [12,12]; K = Bt x E x B x V
             double* K = stackalloc double[144];
             matrixMult(12, 6, BtE, 6, 12, B, K);
@@ -215,13 +222,11 @@ int row2, int col2, double* m2,
             // rotation matrices
             double* R0 = stackalloc double[9];
             double* R1 = stackalloc double[9];
-            fastRotationMatrixI(x0, R0);
-            fastRotationMatrixI(xc, R1);
+            fastRotationMatrix(x0, R0);
+            fastRotationMatrix(xc, R1);
 
             double* R = stackalloc double[9]; // R = R1 x R0^T
             matrixMultByTranspose(3, 3, R1, 3, 3, R0, R);
-
-                        fastRotationMatrixI(xc, R);
 
             // both are 12x12
             double* RK = stackalloc double[144];
@@ -246,8 +251,6 @@ int row2, int col2, double* m2,
                 }
 
 
-            for (int i = 0; i < 144; i++) Df[i] = K[i];
-
             // xr = Rt xc
             double* xr = stackalloc double[12];
             transposeAndMultiplyByVector3(R, xc[0], xc[1], xc[2], out xr[0], out xr[1], out xr[2]);
@@ -261,12 +264,6 @@ int row2, int col2, double* m2,
             for (int i = 0; i < 12; i++)
                 for (int j = 0; j < 12; j++)
                     f[i] += RK[i*12 + j] * xr[j];
-
-            for (int i = 0; i < 12; i++) f[i] = 0;
-            // f = RK(Rt pm - mx)
-            for (int i = 0; i < 12; i++)
-                for (int j = 0; j < 12; j++)
-                    f[i] += K[i * 12 + j] * (xc[j]-x0[j]);
 
             // calculation of strain (rotation excluded) e = B.xr
             // B[6][12]
