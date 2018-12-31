@@ -56,6 +56,16 @@ namespace icFlow
 
         #region math
 
+        unsafe static void fastRotationMatrixI(double* x, double* R)
+        {
+            R[0] = 1;
+            R[1] = R[2] = 0;
+            R[3] = R[5] = 0;
+            R[4] = R[8] = 1;
+            R[6] = R[7] = 0;
+        }
+
+
         unsafe static void fastRotationMatrix(double* x, double *R)
         {
             double d10x = x[3] - x[0];
@@ -205,8 +215,8 @@ int row2, int col2, double* m2,
             // rotation matrices
             double* R0 = stackalloc double[9];
             double* R1 = stackalloc double[9];
-            fastRotationMatrix(x0, R0);
-            fastRotationMatrix(xc, R1);
+            fastRotationMatrixI(x0, R0);
+            fastRotationMatrixI(xc, R1);
 
             double* R = stackalloc double[9]; // R = R1 x R0^T
             matrixMultByTranspose(3, 3, R1, 3, 3, R0, R);
