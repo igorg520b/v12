@@ -9,6 +9,7 @@
         public double[] pmax = new double[3], tmax = new double[3];
         public double avgDn, avgDt, avgTn, avgTt; // average traction-separations for subsequent analysis
         public double maxAvgDn, maxAvgDt;
+        public CPU_PPR_CZ.CZResult extension;
         
         public bool damagedAtLevel(double nLevel, double tLevel)
         {

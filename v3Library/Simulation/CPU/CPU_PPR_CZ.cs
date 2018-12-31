@@ -21,21 +21,11 @@ namespace icFlow
 
         public class CZResult
         {
-            public CZ cz;
             public bool contact, failed, damaged;
             public double avgDn, avgDt, avgTn, avgTt;
             public double pmax_, tmax_;
             public double[] pmax = new double[3], tmax = new double[3], rhs = new double[18];
             public double[,] Keff = new double[18, 18];
-
-            public CZResult(double[] pmax, double[] tmax)
-            {
-                for (int i = 0; i < 3; i++)
-                {
-                    this.pmax[i] = pmax[i];
-                    this.tmax[i] = tmax[i];
-                }
-            }
         }
 
         static double[,,] B;
@@ -163,6 +153,14 @@ namespace icFlow
         #endregion
 
         #region matrix math
+        unsafe static void transposeAndMultiplyByVector3(double* R,
+double x1, double x2, double x3,
+out double y1, out double y2, out double y3)
+        {
+            y1 = x1 * R[0] + x2 * R[3] + x3 * R[6];
+            y2 = x1 * R[1] + x2 * R[4] + x3 * R[7];
+            y3 = x1 * R[2] + x2 * R[5] + x3 * R[8];
+        }
 
         static void multAX(double a11, double a12, double a13,
     double a21, double a22, double a23,
@@ -234,7 +232,7 @@ namespace icFlow
 
         #region cohesive law
 
-        public static void cohesive_law(ref bool cz_contact, ref bool cz_failed,
+        public static void cohesive_law(out bool cz_contact, out bool cz_failed,
             ref double pmax, ref double tmax, double opn, double opt,
             out double Tn, out double Tt, out double Dnn, out double Dtt, out double Dnt, out double Dtn,
             CZParams prms)
@@ -242,9 +240,11 @@ namespace icFlow
             Tn = Tt = Dnn = Dtt = Dnt = Dtn = 0;
             if (opn > prms.deln || opt > prms.delt)
             {
+                cz_contact = false;
                 cz_failed = true; return;
             }
             cz_contact = (opn < 0);
+            cz_failed = false;
             const double epsilon = -1e-9;
             const double epsilon2 = 0.05; // if traction is <5% of max, CZ fails
             double threshold_tangential = prms.f_tt * epsilon2;
@@ -385,17 +385,17 @@ namespace icFlow
                 }
             }
             Dtn = Dnt;
-
         }
 
         #endregion
 
         // not to be invoked on failed CZ
-        static CZResult CZForce(CZ cz, double h, CZParams prms)
+        static unsafe void CZForce(CZ cz, double h, CZParams prms)
         {
-            double[] x0 = new double[18];
-            double[] un = new double[18];
-            double[] xc = new double[18]; // current node positions
+            double* x0 = stackalloc double[18];
+            double* un = stackalloc double[18];
+            double* xc = stackalloc double[18];
+            double* xr = stackalloc double[18];
 
             for (int i=0;i<6;i++)
             {
@@ -403,51 +403,47 @@ namespace icFlow
                 x0[i * 3 + 0] = nd.x0;
                 x0[i * 3 + 1] = nd.y0;
                 x0[i * 3 + 2] = nd.z0;
-
                 un[i * 3 + 0] = nd.unx;
                 un[i * 3 + 1] = nd.uny;
                 un[i * 3 + 2] = nd.unz;
-
                 xc[i * 3 + 0] = nd.tx;
                 xc[i * 3 + 1] = nd.ty;
                 xc[i * 3 + 2] = nd.tz;
             }
 
-            double[] mpc = new double[9]; // midplane
+            double* mpc = stackalloc double[9]; // midplane
             for (int i = 0; i < 9; i++) mpc[i] = (xc[i] + xc[i + 9]) * 0.5;
 
             // rotation matrix of midplane
-            double[,] R = new double[3, 3];
+            double* R = stackalloc double[9];
             double a_Jacob;
 
             CZRotationMatrix(
                 mpc[0], mpc[1], mpc[2],
                 mpc[3], mpc[4], mpc[5],
                 mpc[6], mpc[7], mpc[8],
-                out R[0, 0], out R[0, 1], out R[0, 2],
-                out R[1, 0], out R[1, 1], out R[1, 2],
-                out R[2, 0], out R[2, 1], out R[2, 2],
+                out R[0], out R[1], out R[2],
+                out R[3], out R[4], out R[5],
+                out R[6], out R[7], out R[8],
                 out a_Jacob);
 
-            // rotate xc to local system 
-            double[] xr = new double[18];
+            // xr = R xc 
             for (int i = 0; i < 6; i++)
                 multAX(
-                    R[0, 0], R[0, 1], R[0, 2],
-                    R[1, 0], R[1, 1], R[1, 2],
-                    R[2, 0], R[2, 1], R[2, 2],
+                    R[0], R[1], R[2],
+                    R[3], R[4], R[5],
+                    R[6], R[7], R[8],
                     xc[i * 3 + 0], xc[i * 3 + 1], xc[i * 3 + 2],
                     out xr[i * 3 + 0], out xr[i * 3 + 1], out xr[i * 3 + 2]);
 
-
-            bool[] cz_contact_gp = new bool[3];
-            bool[] cz_failed_gp = new bool[3];
+            bool* cz_contact_gp = stackalloc bool[3];
+            bool* cz_failed_gp = stackalloc bool[3];
 
             double avgDn, avgDt, avgTn, avgTt; // preserve average traction-separations for analysis
             avgDn = avgDt = avgTn = avgTt = 0;
 
-            CZResult r = new CZResult(cz.pmax, cz.tmax);
-            r.cz = cz;
+            CZResult r = cz.extension;
+            for(int i=0;i<3;i++) { r.pmax[i] = cz.pmax[i];  r.tmax[i] = cz.tmax[i]; }
 
             // loop over 3 Gauss points
             for (int gpt = 0; gpt < 3; gpt++)
@@ -467,8 +463,8 @@ namespace icFlow
                 double Tn, Tt, Dnn, Dtt, Dnt, Dtn;
 
                 cohesive_law(
-                ref cz_contact_gp[gpt],
-                ref cz_failed_gp[gpt],
+                out cz_contact_gp[gpt],
+                out cz_failed_gp[gpt],
                 ref r.pmax[gpt],
                 ref r.tmax[gpt],
                 opn, opt,
@@ -480,22 +476,22 @@ namespace icFlow
                 avgTn += Tn / 3;
                 avgTt += Tt / 3;
 
-                double[] T = new double[3];
-                double[,] T_d = new double[3, 3];
+                double* T = stackalloc double[3];
+                double* T_d = stackalloc double[9]; // 3x3 matrix
 
                 if (opt < 1e-20)
                 {
                     T[2] = Tn;
-                    T_d[0, 0] = Dtt;
-                    T_d[1, 1] = Dtt;
-                    T_d[2, 2] = Dnn;
+                    T_d[0*3+ 0] = Dtt;
+                    T_d[1 * 3 + 1] = Dtt;
+                    T_d[2 * 3 + 2] = Dnn;
 
-                    T_d[1, 0] = T_d[0, 1] = 0;
+                    T_d[1 * 3 + 0] = T_d[0 * 3 + 1] = 0;
 
-                    T_d[2, 0] = Dtn;
-                    T_d[0, 2] = Dnt;
-                    T_d[2, 1] = Dtn;
-                    T_d[1, 2] = Dnt;
+                    T_d[2 * 3 + 0] = Dtn;
+                    T_d[0 * 3 + 2] = Dnt;
+                    T_d[2 * 3 + 1] = Dtn;
+                    T_d[1 * 3 + 2] = Dnt;
                 }
                 else
                 {
@@ -509,16 +505,16 @@ namespace icFlow
                     double delu10 = dt2 * dt1;
                     double delu11 = dt2 * dt2;
 
-                    T_d[0, 0] = Dtt * delu00 / opt_sq + Tt * delu11 / opt_cu;
-                    T_d[1, 1] = Dtt * delu11 / opt_sq + Tt * delu00 / opt_cu;
-                    T_d[2, 2] = Dnn;
+                    T_d[0 * 3 + 0] = Dtt * delu00 / opt_sq + Tt * delu11 / opt_cu;
+                    T_d[1 * 3 + 1] = Dtt * delu11 / opt_sq + Tt * delu00 / opt_cu;
+                    T_d[2 * 3 + 2] = Dnn;
 
-                    T_d[1, 0] = T_d[0, 1] = Dtt * delu10 / opt_sq - Tt * delu10 / opt_cu;
+                    T_d[1 * 3 + 0] = T_d[0 * 3 + 1] = Dtt * delu10 / opt_sq - Tt * delu10 / opt_cu;
 
-                    T_d[2, 0] = Dtn * dt1 / opt;
-                    T_d[0, 2] = Dnt * dt1 / opt;
-                    T_d[2, 1] = Dtn * dt2 / opt;
-                    T_d[1, 2] = Dnt * dt2 / opt;
+                    T_d[2 * 3 + 0] = Dtn * dt1 / opt;
+                    T_d[0 * 3 + 2] = Dnt * dt1 / opt;
+                    T_d[2 * 3 + 1] = Dtn * dt2 / opt;
+                    T_d[1 * 3 + 2] = Dnt * dt2 / opt;
                 }
 
                 // RHS
@@ -536,12 +532,12 @@ namespace icFlow
                 }
 
                 // rotate BtT
-                double[] rhs_gp = new double[18];
+                double* rhs_gp = stackalloc double[18];
                 for (int i = 0; i < 6; i++)
                 {
-                    multAX(R[0, 0], R[1, 0], R[2, 0],
-                        R[0, 1], R[1, 1], R[2, 1],
-                        R[0, 2], R[1, 2], R[2, 2],
+                    multAX(R[0 * 3 + 0], R[1 * 3 + 0], R[2 * 3 + 0],
+                        R[0 * 3 + 1], R[1 * 3 + 1], R[2 * 3 + 1],
+                        R[0 * 3 + 2], R[1 * 3 + 2], R[2 * 3 + 2],
                         BtT[i * 3 + 0], BtT[i * 3 + 1], BtT[i * 3 + 2],
                         out rhs_gp[i * 3 + 0], out rhs_gp[i * 3 + 1], out rhs_gp[i * 3 + 2]);
                 }
@@ -551,22 +547,22 @@ namespace icFlow
 
                 // STIFFNESS MATRIX
                 // compute Bt x T_d x GP_W
-                double[,] BtTd = new double[18, 3];
+                double* BtTd = stackalloc double[18*3];
                 for (int row = 0; row < 18; row++)
                     for (int col = 0; col < 3; col++)
                     {
-                        for (int k = 0; k < 3; k++) BtTd[row, col] += B[gpt, k, row] * T_d[k, col];
-                        BtTd[row, col] *= (GP_W * a_Jacob);
+                        for (int k = 0; k < 3; k++) BtTd[row*3+ col] += B[gpt, k, row] * T_d[k * 3 + col];
+                        BtTd[row*3+ col] *= (GP_W * a_Jacob);
                     }
 
                 // BtTdB = BtTd x B
-                double[,] BtTdB = new double[18, 18];
+                double* BtTdB = stackalloc double[18* 18];
                 for (int row = 0; row < 18; row++)
                     for (int col = 0; col < 18; col++)
                         for (int k = 0; k < 3; k++)
-                            BtTdB[row, col] += BtTd[row, k] * B[gpt, k, col];
+                            BtTdB[row*18+ col] += BtTd[row*3+ k] * B[gpt, k, col];
 
-                double[,] TrMtBtTdB = new double[18, 18];
+                double* TrMtBtTdB = stackalloc double[18*18];
 
                 // Keff
                 for (int i = 0; i < 6; i++)
@@ -577,7 +573,7 @@ namespace icFlow
                             for (int l = 0; l < 3; l++)
                             {
                                 for (int m = 0; m < 3; m++)
-                                    TrMtBtTdB[3 * i + k, 3 * j + l] += R[m, k] * BtTdB[3 * i + m, 3 * j + l];
+                                    TrMtBtTdB[(3 * i + k)*18 +(3 * j + l)] += R[m*3+ k] * BtTdB[(3 * i + m)*18+(3 * j + l)];
                             }
 
                         // Keff = TrMt x BtTdB x TrM
@@ -585,11 +581,10 @@ namespace icFlow
                             for (int l = 0; l < 3; l++)
                             {
                                 for (int m = 0; m < 3; m++)
-                                    r.Keff[3 * i + k, 3 * j + l] += TrMtBtTdB[3 * i + k, 3 * j + m] * R[m, l];
+                                    r.Keff[3 * i + k, 3 * j + l] += TrMtBtTdB[(3 * i + k)*18 +(3 * j + m)] * R[m*3+ l];
                             }
                     }
             }
-
 
             // the following approach to pmax, tmax is somewhat experimental
             r.pmax_ = Max(Max(r.pmax[0], r.pmax[1]), r.pmax[2]);
@@ -609,14 +604,11 @@ namespace icFlow
             r.failed = cz_failed_gp[0] || cz_failed_gp[1] || cz_failed_gp[2];
             r.contact = cz_contact_gp[0] || cz_contact_gp[1] || cz_contact_gp[2];
             if (r.failed) r.damaged = false;
-
-            return r;
         }
 
-        public static CZResult[] AssembleCZs(LinearSystem ls, ref FrameInfo cf, MeshCollection mc, ModelPrms prms)
+        public static void AssembleCZs(LinearSystem ls, FrameInfo cf, MeshCollection mc, ModelPrms prms)
         {
             int nCZs = cf.nCZ = mc.nonFailedCZs.Length;
-            CZResult[] czResults = new CZResult[nCZs];
 
             CZParams czp = new CZParams();
             czp.G_fn = prms.G_fn;
@@ -637,22 +629,21 @@ namespace icFlow
             czp.gam_t = prms.gam_t;
 
             double h = cf.TimeStep;
-            Parallel.For(0, nCZs, i => {
-                CZ cz = mc.nonFailedCZs[i];
-                Debug.Assert(!cz.failed);
-                czResults[i] = CZForce(cz, h, czp);
-                });
+            foreach (CZ cz in mc.nonFailedCZs) if (cz.extension == null) cz.extension = new CZResult();
+
+            Parallel.ForEach(mc.nonFailedCZs, cz => { CZForce(cz, h, czp); });
 
             // distribute results into linear system
-            for (int idx = 0; idx < nCZs; idx++)
+            foreach(CZ cz in mc.nonFailedCZs)
             {
-                CZResult czr = czResults[idx];
+                CZResult czr = cz.extension;
+                if (czr.failed) continue;
                 double[,] lhs = czr.Keff;
-                CZ cz = czr.cz;
+                double[] rhs = czr.rhs;
                 for (int r = 0; r < 6; r++)
                 {
                     int ni = cz.vrts[r].altId;
-                    ls.AddToRHS(ni, czr.rhs[r * 3 + 0], czr.rhs[r * 3 + 1], czr.rhs[r * 3 + 2]);
+                    ls.AddToRHS(ni, rhs[r * 3 + 0], rhs[r * 3 + 1], rhs[r * 3 + 2]);
                     for (int c = 0; c < 6; c++)
                     {
                         int nj = cz.vrts[c].altId;
@@ -663,23 +654,23 @@ namespace icFlow
                     }
                 }
             }
-
-            return czResults;
         }
 
-        public static void TransferUpdatedState(CZResult[] czResults)
+        public static void TransferUpdatedState(MeshCollection mc)
         {
-
-            foreach (CZResult czr in czResults)
+            foreach(CZ cz in mc.nonFailedCZs)
             {
-                CZ cz = czr.cz;
+                CZResult czr = (CZResult)cz.extension;
                 if (czr.failed)
                 {
                     cz.failed = true;
                     continue;
                 }
-                cz.tmax = czr.tmax;
-                cz.pmax = czr.pmax;
+                for (int i = 0; i < 3; i++)
+                {
+                    cz.tmax[i] = czr.tmax[i];
+                    cz.pmax[i] = czr.pmax[i];
+                }
                 cz.avgDn = czr.avgDn;
                 cz.avgDt = czr.avgDt;
                 cz.avgTn = czr.avgTn;

@@ -434,7 +434,6 @@ namespace icFlow
             _beginStep(); // timestep, indenter position and parameters of GPU
 
             // Perform Newton Raphson iterations
-            CPU_PPR_CZ.CZResult[] czResults = null;
             do
             {
                 // infer tentative UVA from dU
@@ -459,8 +458,8 @@ namespace icFlow
                 }
                 else
                 {
-                    CPU_Linear_Tetrahedron.AssembleElems(linearSystem, ref tcf0, mc, prms);
-                    czResults = CPU_PPR_CZ.AssembleCZs(linearSystem, ref tcf0, mc, prms);
+                    CPU_Linear_Tetrahedron.AssembleElems(linearSystem, tcf0, mc, prms);
+                    CPU_PPR_CZ.AssembleCZs(linearSystem, tcf0, mc, prms);
                 }
                 explodes = _checkDamage(); // discard frame if threshold is exceeded
 
@@ -508,7 +507,7 @@ namespace icFlow
                 else
                 {
                     CPU_Linear_Tetrahedron.TransferUpdatedState(mc);
-                    CPU_PPR_CZ.TransferUpdatedState(czResults);
+                    CPU_PPR_CZ.TransferUpdatedState(mc);
                 }
 
                 tcf0.Total = sw.ElapsedMilliseconds;
