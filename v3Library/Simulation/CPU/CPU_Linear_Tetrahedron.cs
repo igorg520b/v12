@@ -325,7 +325,7 @@ int row2, int col2, double* m2,
             double* Df = stackalloc double[144];
             F_and_Df_Corotational2(x0, xc, f, Df, elem.stress, out double V);
 
-            ElementExtension ex = (ElementExtension)elem.extension;
+            ElementExtension ex = elem.extension;
             ex.Clear();
             double[] rhs = ex.rhs;
             double[,] lhs = ex.lhs;
@@ -409,11 +409,11 @@ int row2, int col2, double* m2,
 
 
             // update forces per node
-            foreach(Node nd in mc.activeNodes) nd.fx = nd.fy = nd.fz = 0;
+            foreach(Node nd in mc.allNodes) nd.fx = nd.fy = nd.fz = 0;
 
             foreach (Element elem in mc.elasticElements)
             {
-                ElementExtension ex = (ElementExtension)elem.extension;
+                ElementExtension ex = elem.extension;
                 Node[] vrts = elem.vrts;
                 for (int r = 0; r < 4; r++)
                 {
