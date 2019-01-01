@@ -529,7 +529,7 @@ out double y1, out double y2, out double y3)
                 // BtT = Bt x T x (-GP_W)
                 const double GP_W = 1.0 / 3.0; // Gauss point weight
 
-                double[] BtT = new double[18];
+                double* BtT = stackalloc double[18];
                 for (int i = 0; i < 18; i++)
                 {
                     for (int j = 0; j < 3; j++)
@@ -597,6 +597,10 @@ out double y1, out double y2, out double y3)
             // the following approach to pmax, tmax is somewhat experimental
             r.pmax_ = Max(Max(r.pmax[0], r.pmax[1]), r.pmax[2]);
             r.tmax_ = Max(Max(r.tmax[0], r.tmax[1]), r.tmax[2]);
+            r.avgDn = avgDn;
+            r.avgDt = avgDt;
+            r.avgTn = avgTn;
+            r.avgTt = avgTt;
 
             // detect damaged state
             r.damaged = false;
@@ -676,8 +680,10 @@ out double y1, out double y2, out double y3)
                 }
                 for (int i = 0; i < 3; i++)
                 {
-                    cz.tmax[i] = czr.tmax[i];
-                    cz.pmax[i] = czr.pmax[i];
+                    //                    cz.tmax[i] = czr.tmax[i];
+                    //                    cz.pmax[i] = czr.pmax[i];
+                    cz.tmax[i] = czr.tmax_;
+                    cz.pmax[i] = czr.pmax_;
                 }
                 cz.avgDn = czr.avgDn;
                 cz.avgDt = czr.avgDt;
