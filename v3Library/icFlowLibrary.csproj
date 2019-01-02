@@ -77,6 +77,7 @@
     <Compile Include="Simulation\CPU\CPU_Linear_Tetrahedron.cs" />
     <Compile Include="Simulation\CPU\CPU_NarrowPhase.cs" />
     <Compile Include="Simulation\CPU\CPU_PPR_CZ.cs" />
+    <Compile Include="Simulation\CPU\ExtendableList.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
