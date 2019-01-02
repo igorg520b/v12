@@ -4,17 +4,24 @@ namespace icFlow
 {
     public static class CPU_Collision_Response
     {
-        class CPResult
+        public class CPResult
         {
-            public double[] fi; 
-            public double[,] dfi;
+            public double[] fi = new double[12]; 
+            public double[,] dfi = new double[12,12];
             public int[] idxs = new int[4];
+
+            public void Clear()
+            {
+                Array.Clear(fi, 0, fi.Length);
+                Array.Clear(dfi, 0, dfi.Length);
+                Array.Clear(idxs, 0, idxs.Length);
+            }
         }
 
-        static CPResult OneCollision(Node nd, Face fc, double distanceEpsilonSqared, double k)
+        static unsafe CPResult OneCollision(Node nd, Face fc, double distanceEpsilonSqared, double k, CPResult res)
         {
-            CPResult res = new CPResult();
-            double[] x = new double[12];
+            res.Clear();
+            double* x = stackalloc double[12];
             x[0] = nd.tx;
             x[1] = nd.ty;
             x[2] = nd.tz;
@@ -36,10 +43,10 @@ namespace icFlow
             // exclude colliding rigid surfaces
             if (res.idxs[0] < 0 && res.idxs[1] < 0 && res.idxs[2] < 0 && res.idxs[3] < 0) return null;
 
-            double[] fd;
-            double[,] sd;
-            double[] w = new double[3];
-            double dsq = CPU_Distance_Derivatives.pt(x, out fd, out sd, out w[1], out w[2]);
+            double* fd = stackalloc double[12];
+            double* sd = stackalloc double[144]; //12x12
+            double* w = stackalloc double[3];
+            double dsq = CPU_Distance_Derivatives.pt(x, fd, sd, out w[1], out w[2]);
 
             if (dsq < distanceEpsilonSqared) return null;
 
@@ -68,28 +75,30 @@ namespace icFlow
             double[,] dfij = new double[12, 12];
             for (int i = 0; i < 12; i++)
                 for (int j = i; j < 12; j++)
-                    dfij[i, j] = dfij[j, i] = k * sd[i, j] / 2;
+                    dfij[i, j] = dfij[j, i] = k * sd[i*12+ j] / 2;
             res.dfi = dfij;
             return res;
         }
 
-        public static void CollisionResponse((Node, Face)[] cp, LinearSystem ls, ref FrameInfo cf, MeshCollection mc, ModelPrms prms)
+        public static void CollisionResponse((Node, Face)[] cp, LinearSystem ls, ref FrameInfo cf, 
+        MeshCollection mc, ModelPrms prms, ExtendableList<CPResult> cprList)
         {
             if (cp == null) return;
             int nCollisions = cp.Length;
             cf.nCollisions = nCollisions;
-            CPResult[] cpr = new CPResult[nCollisions];
+            cprList.actualCount = nCollisions;
             double distanceEpsilonSqared = prms.DistanceEpsilon * prms.DistanceEpsilon;
             double k = prms.penaltyK;
 
             Parallel.For(0, nCollisions, i => {
                 (Node nd, Face fc) = cp[i];
-                cpr[i] = OneCollision(nd, fc, distanceEpsilonSqared, k);
+                CPResult cpr = cprList[i];
+                OneCollision(nd, fc, distanceEpsilonSqared, k, cpr);
                 });
 
             for(int i=0;i<nCollisions;i++)
             {
-                CPResult res = cpr[i];
+                CPResult res = cprList[i];
                 if (res == null) continue;
                 double[,] lhs = res.dfi;
                 for (int r = 0; r < 4; r++)

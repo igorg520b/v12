@@ -20,7 +20,6 @@ namespace icFlow
     { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
     { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 } };
 
-
         // second derivatives of b
         static double[,] b2 = {
     { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
@@ -91,8 +90,8 @@ namespace icFlow
         /// <returns>dot product</returns>
         /// <param name="x">coords of p0,p1,p2</param>
         /// <param name="fd">first derivatives</param>
-        /// <param name="sd">second derivatives</param>
-        static double sp_dot3(double[] x, out double[] fd, out double[,] sd)
+        /// <param name="sd">second derivatives 9x9</param>
+        static unsafe double sp_dot3(double* x, double* fd, double* sd)
         {
 
             double x0 = x[0];
@@ -107,8 +106,6 @@ namespace icFlow
             double y2 = x[7];
             double z2 = x[8];
 
-            fd = new double[9];
-
             fd[0] = x1 - x2;
             fd[1] = y1 - y2;
             fd[2] = z1 - z2;
@@ -120,16 +117,15 @@ namespace icFlow
             fd[8] = z1 - z0;
 
             // second derivs
-            sd = new double[9, 9];
+            // sd is 9x9
             for (int k = 0; k < 3; k++)
             {
-                sd[k + 3, k + 3] = -2;
-                sd[k, k + 6] = sd[k + 6, k] = -1;
-                sd[k, k + 3] = sd[k + 3, k] = sd[k + 6, k + 3] = sd[k + 3, k + 6] = 1;
+                sd[(k + 3)*9+ k + 3] = -2;
+                sd[k*9+ (k + 6)] = sd[(k + 6)*9+ k] = -1;
+                sd[k*9+ (k + 3)] = sd[(k + 3)*9+ k] = sd[(k + 6)*9+ (k + 3)] = sd[(k + 3)*9+ (k + 6)] = 1;
             }
             return (x1 - x0) * (x2 - x1) + (y1 - y0) * (y2 - y1) + (z1 - z0) * (z2 - z1);
         }
-
 
         /// <summary>
         /// calculate the first and the second derivatives of f^2, given that f' and f'' are known
@@ -138,32 +134,29 @@ namespace icFlow
         /// <param name="f">value at point</param>
         /// <param name="fd">input first derivatives</param>
         /// <param name="sd">input second derivatives</param>
-        /// <param name="fdOut">output first derivatives</param>
-        /// <param name="sdOut">second derivatives</param>
-        static double function_squared(double f, double[] fd, double[,] sd, out double[] fdOut, out double[,] sdOut)
+        /// <param name="fdOut">output first derivatives 9</param>
+        /// <param name="sdOut">second derivatives 9x9</param>
+        static unsafe double function_squared(double f, double* fd, double* sd, double* fdOut, double* sdOut)
         {
-            fdOut = new double[9];
-            sdOut = new double[9, 9];
             for (int i = 0; i < 9; i++)
             {
                 fdOut[i] = 2 * f * fd[i];
-                for (int j = 0; j < 9; j++) sdOut[i, j] = 2 * (fd[i] * fd[j] + f * sd[i, j]);
+                for (int j = 0; j < 9; j++) sdOut[i*9+j] = 2 * (fd[i] * fd[j] + f * sd[i*9+j]);
             }
             return f * f;
         }
 
-
-        static double sp_dot3_squared(double[] x, out double[] fd, out double[,] sd)
+        // arrays are 9x9
+        static unsafe double sp_dot3_squared(double* x, double* fd, double* sd)
         {
-            double[] sp_dot3_fd;
-            double[,] sp_dot3_sd;
+            double* sp_dot3_fd = stackalloc double[9];
+            double* sp_dot3_sd = stackalloc double[81];
 
-            double sp_dot3_value = sp_dot3(x, out sp_dot3_fd, out sp_dot3_sd);
+            double sp_dot3_value = sp_dot3(x, sp_dot3_fd, sp_dot3_sd);
 
-            double result = function_squared(sp_dot3_value, sp_dot3_fd, sp_dot3_sd, out fd, out sd);
+            double result = function_squared(sp_dot3_value, sp_dot3_fd, sp_dot3_sd, fd, sd);
             return result;
         }
-
 
         /// <summary>
         /// value, 1st and 2nd derivatives of the squared distance between points selected by idx1 and idx2
@@ -172,10 +165,10 @@ namespace icFlow
         /// <param name="idx1">Idx1.</param>
         /// <param name="idx2">Idx2.</param>
         /// <param name="x">coordinates</param>
-        /// <param name="sdd">first derivs</param>
-        /// <param name="sdd2">second derivs</param>
-        static double vertex_vertex_distance_and_derivs(int idx1, int idx2,
-double[] x, out double[] sdd, out double[,] sdd2)
+        /// <param name="sdd">first derivs 9</param>
+        /// <param name="sdd2">second derivs 9x9</param>
+        static unsafe double vertex_vertex_distance_and_derivs(int idx1, int idx2,
+double* x, double* sdd, double* sdd2)
         {
 
             int ix0 = idx1 * 3 + 0;
@@ -194,7 +187,6 @@ double[] x, out double[] sdd, out double[,] sdd2)
             double y1 = x[iy1];
             double z1 = x[iz1];
 
-            sdd = new double[9];
             sdd[ix0] = 2 * (x0 - x1);
             sdd[iy0] = 2 * (y0 - y1);
             sdd[iz0] = 2 * (z0 - z1);
@@ -203,15 +195,13 @@ double[] x, out double[] sdd, out double[,] sdd2)
             sdd[iy1] = -sdd[iy0];
             sdd[iz1] = -sdd[iz0];
 
-            sdd2 = new double[9, 9];
-            sdd2[ix0, ix0] = sdd2[iy0, iy0] = sdd2[iz0, iz0] = 2;
-            sdd2[ix1, ix1] = sdd2[iy1, iy1] = sdd2[iz1, iz1] = 2;
-            sdd2[ix0, ix1] = sdd2[iy0, iy1] = sdd2[iz0, iz1] = -2;
-            sdd2[ix1, ix0] = sdd2[iy1, iy0] = sdd2[iz1, iz0] = -2;
+            sdd2[ix0*9+ ix0] = sdd2[iy0 * 9 + iy0] = sdd2[iz0 * 9 + iz0] = 2;
+            sdd2[ix1 * 9 + ix1] = sdd2[iy1 * 9 + iy1] = sdd2[iz1 * 9 + iz1] = 2;
+            sdd2[ix0 * 9 + ix1] = sdd2[iy0 * 9 + iy1] = sdd2[iz0 * 9 + iz1] = -2;
+            sdd2[ix1 * 9 + ix0] = sdd2[iy1 * 9 + iy0] = sdd2[iz1 * 9 + iz0] = -2;
 
             return (x0 - x1) * (x0 - x1) + (y0 - y1) * (y0 - y1) + (z0 - z1) * (z0 - z1);
         }
-
 
         /// <summary>
         /// value, 1st and 2nd derivatives of the squared distance between points selected by idx1 and idx2
@@ -220,10 +210,10 @@ double[] x, out double[] sdd, out double[,] sdd2)
         /// <param name="idx1">Idx1.</param>
         /// <param name="idx2">Idx2.</param>
         /// <param name="x">The x coordinate.</param>
-        /// <param name="fd">Fd.</param>
-        /// <param name="sd">Sd.</param>
-        static double vertex_vertex_distance_and_derivs_12(int idx1, int idx2,
-        double[] x, out double[] fd, out double[,] sd)
+        /// <param name="fd">Fd  12</param>
+        /// <param name="sd">Sd  12x12</param>
+        static unsafe double vertex_vertex_distance_and_derivs_12(int idx1, int idx2,
+        double* x, double* fd, double* sd)
         {
 
             int ix0 = idx1 * 3 + 0;
@@ -242,7 +232,6 @@ double[] x, out double[] sdd, out double[,] sdd2)
             double y1 = x[iy1];
             double z1 = x[iz1];
 
-            fd = new double[12];
             fd[ix0] = 2 * (x0 - x1);
             fd[iy0] = 2 * (y0 - y1);
             fd[iz0] = 2 * (z0 - z1);
@@ -251,21 +240,18 @@ double[] x, out double[] sdd, out double[,] sdd2)
             fd[iy1] = -fd[iy0];
             fd[iz1] = -fd[iz0];
 
-            sd = new double[12, 12];
-            sd[ix0, ix0] = sd[iy0, iy0] = sd[iz0, iz0] = 2;
-            sd[ix1, ix1] = sd[iy1, iy1] = sd[iz1, iz1] = 2;
-            sd[ix0, ix1] = sd[iy0, iy1] = sd[iz0, iz1] = -2;
-            sd[ix1, ix0] = sd[iy1, iy0] = sd[iz1, iz0] = -2;
+            sd[ix0*12+ ix0] = sd[iy0 * 12 + iy0] = sd[iz0 * 12 + iz0] = 2;
+            sd[ix1 * 12 + ix1] = sd[iy1 * 12 + iy1] = sd[iz1 * 12 + iz1] = 2;
+            sd[ix0 * 12 + ix1] = sd[iy0 * 12 + iy1] = sd[iz0 * 12 + iz1] = -2;
+            sd[ix1 * 12 + ix0] = sd[iy1 * 12 + iy0] = sd[iz1 * 12 + iz0] = -2;
 
             return (x0 - x1) * (x0 - x1) + (y0 - y1) * (y0 - y1) + (z0 - z1) * (z0 - z1);
         }
 
-
-        static double vertex_edge_distance_and_derivs(double[] x,
-    out double[] sdd,
-    out double[,] sdd2)
+        // in: x 9
+        // out: sdd 9; sdd2 9x9
+        static unsafe double vertex_edge_distance_and_derivs(double* x, double* sdd, double* sdd2)
         {
-
             double x0 = x[0];
             double x1 = x[1];
             double x2 = x[2];
@@ -290,19 +276,23 @@ double[] x, out double[] sdd, out double[,] sdd2)
             double ratio = sqrDist / edge_length;
 
             // |(x1-x0)(x2-x1)|^2 and its derivatives
-            double g = sp_dot3_squared(x, out double[] g_fd, out double[,] g_sd);
+            double* g_fd = stackalloc double[9];
+            double* g_sd = stackalloc double[81];
+            double g = sp_dot3_squared(x, g_fd, g_sd);
 
             // f1 = |x1-x0|^2
-            double f1 = vertex_vertex_distance_and_derivs(1, 0, x, out double[] f1fd, out double[,] f1sd);
+            double* f1fd = stackalloc double[9];
+            double* f1sd = stackalloc double[81];
+            double f1 = vertex_vertex_distance_and_derivs(1, 0, x, f1fd, f1sd);
 
             // f2 = |x2-x1|^2
-            double f2 = vertex_vertex_distance_and_derivs(2, 1, x, out double[] f2fd, out double[,] f2sd);
+            double* f2fd = stackalloc double[9];
+            double* f2sd = stackalloc double[81];
+            double f2 = vertex_vertex_distance_and_derivs(2, 1, x, f2fd, f2sd);
 
             // combine together
             double f2sq = f2 * f2;
             double f2cube = f2sq * f2;
-            sdd = new double[9];
-            sdd2 = new double[9, 9];
             for (int i = 0; i < 9; i++)
             {
                 sdd[i] = f1fd[i] + (g * f2fd[i] - f2 * g_fd[i]) / f2sq;
@@ -311,25 +301,22 @@ double[] x, out double[] sdd, out double[,] sdd2)
                 {
                     double term1 = -2 * g * f2fd[i] * f2fd[j] / f2cube;
                     double term2 = (g_fd[i] * f2fd[j] + g_fd[j] * f2fd[i]) / f2sq;
-                    double term3 = f1sd[i, j];
-                    double term4 = g * f2sd[i, j] / f2sq;
-                    double term5 = -g_sd[i, j] / f2;
-                    sdd2[i, j] = term1 + term2 + term3 + term4 + term5;
+                    double term3 = f1sd[i*9+ j];
+                    double term4 = g * f2sd[i * 9 + j] / f2sq;
+                    double term5 = -g_sd[i * 9 + j] / f2;
+                    sdd2[i * 9 + j] = term1 + term2 + term3 + term4 + term5;
                 }
             }
             return sqrDist;
         }
 
         // version for arrays with 12 elements
-        static double vertex_edge_distance_and_derivs_12(double[] x,
-        int idx1, int idx2,
-        out double[] fd,
-        out double[,] sd)
+        // input: x: 12
+        // output: fd 12, sd 12x12
+        static unsafe double vertex_edge_distance_and_derivs_12(double* x,
+        int idx1, int idx2, double* fd, double* sd)
         {
-
-            Debug.Assert(x.Length == 12);
-
-            double[] _x = new double[9];
+            double* _x = stackalloc double[9];
             _x[0] = x[0];
             _x[1] = x[1];
             _x[2] = x[2];
@@ -355,11 +342,11 @@ double[] x, out double[] sdd, out double[,] sdd2)
             _x[7] = x[1 + idx2];
             _x[8] = x[2 + idx2];
 
-            double result = vertex_edge_distance_and_derivs(_x, out double[] _fd, out double[,] _sd);
+            double* _fd = stackalloc double[9];
+            double* _sd = stackalloc double[81];
+            double result = vertex_edge_distance_and_derivs(_x, _fd, _sd);
 
             // distribute _fd and _sd
-            fd = new double[12];
-            sd = new double[12, 12];
             for (int i = 0; i < 3; i++)
             {
                 fd[i] = _fd[i];
@@ -368,21 +355,19 @@ double[] x, out double[] sdd, out double[,] sdd2)
 
                 for (int j = 0; j < 3; j++)
                 {
-                    sd[i, j] = _sd[i, j];
-                    sd[i + idx1, j] = _sd[3 + i, j];
-                    sd[i, j + idx1] = _sd[i, 3 + j];
-                    sd[i + idx1, j + idx1] = _sd[i + 3, j + 3];
-                    sd[i + idx1, j + idx2] = _sd[i + 3, j + 6];
-                    sd[i + idx2, j + idx1] = _sd[i + 6, j + 3];
-                    sd[i, j + idx2] = _sd[i, j + 6];
-                    sd[i + idx2, j] = _sd[i + 6, j];
-                    sd[i + idx2, j + idx2] = _sd[i + 6, j + 6];
+                    sd[i*12+ j] = _sd[i*9+ j];
+                    sd[(i + idx1) * 12 + j] = _sd[(3 + i) * 9 + j];
+                    sd[i * 12 + j + idx1] = _sd[i * 9 + 3 + j];
+                    sd[(i + idx1) * 12 + j + idx1] = _sd[(i + 3) * 9 + j + 3];
+                    sd[(i + idx1) * 12 + j + idx2] = _sd[(i + 3) * 9 + j + 6];
+                    sd[(i + idx2) * 12 + j + idx1] = _sd[(i + 6) * 9 + j + 3];
+                    sd[i * 12 + j + idx2] = _sd[i * 9 + j + 6];
+                    sd[(i + idx2) * 12 + j] = _sd[(i + 6) * 9 + j];
+                    sd[(i + idx2) * 12 + j + idx2] = _sd[(i + 6) * 9 + j + 6];
                 }
             }
-
             return result;
         }
-
 
         #endregion
 
@@ -396,9 +381,8 @@ double[] x, out double[] sdd, out double[,] sdd2)
         // second derivatives of squared distance sd[12][12]
         // return value is the squared distance
         // note: don't call this function directly
-        static double point_plane_distance(double[] x, out double[] fd, out double[,] sd)
+        static unsafe double point_plane_distance(double* x, double* fd, double* sd)
         {
-            Debug.Assert(x.Length == 12);
             double output_s, output_t; // for testing
             double x0 = x[0];
             double x1 = x[1];
@@ -441,28 +425,27 @@ double[] x, out double[] sdd, out double[,] sdd2)
             // u = zeta1; s = zeta2; t = zeta3;
             //        double s2[12][12], t2[12][12], det2[12][12];
             //    double u1[12], u2[12][12];
-            double[,] s2 = new double[12, 12];
-            double[,] t2 = new double[12, 12];
-            double[,] det2 = new double[12, 12];
-            double[,] u2 = new double[12, 12];
-            double[] u1 = new double[12];
+            double* s2 = stackalloc double[12* 12];
+            double* t2 = stackalloc double[12* 12];
+            double* det2 = stackalloc double[12* 12];
+            double* u2 = stackalloc double[12* 12];
+            double* u1 = stackalloc double[12];
 
             // derivatives of s and t
             // first derivatives of the above quantities
-            double[] a1 = { 0, 0, 0, -2 * (-x3 + x6), -2 * (-x4 + x7), -2 * (-x5 + x8), 2 * (-x3 + x6), 2 * (-x4 + x7), 2 * (-x5 + x8), 0, 0, 0 };
-            double[] b1 = { 0, 0, 0, 2 * x3 - x6 - x9, -x10 + 2 * x4 - x7, -x11 + 2 * x5 - x8, -x3 + x9, x10 - x4, x11 - x5, -x3 + x6, -x4 + x7, -x5 + x8 };
-            double[] c1 = { 0, 0, 0, -2 * (-x3 + x9), -2 * (x10 - x4), -2 * (x11 - x5), 0, 0, 0, 2 * (-x3 + x9), 2 * (x10 - x4), 2 * (x11 - x5) };
-            double[] d1 = { x3 - x6, x4 - x7, x5 - x8, x0 - 2 * x3 + x6, x1 - 2 * x4 + x7, x2 - 2 * x5 + x8, -x0 + x3, -x1 + x4, -x2 + x5, 0, 0, 0 };
-            double[] e1 = { x3 - x9, -x10 + x4, -x11 + x5, x0 - 2 * x3 + x9, x1 + x10 - 2 * x4, x11 + x2 - 2 * x5, 0, 0, 0, -x0 + x3, -x1 + x4, -x2 + x5 };
-            double[] f1 = { -2 * (-x0 + x3), -2 * (-x1 + x4), -2 * (-x2 + x5), 2 * (-x0 + x3), 2 * (-x1 + x4), 2 * (-x2 + x5), 0, 0, 0, 0, 0, 0 };
+            double z = 0;
+            double* a1 = stackalloc double[] { z, z, z, -2 * (-x3 + x6), -2 * (-x4 + x7), -2 * (-x5 + x8), 2 * (-x3 + x6), 2 * (-x4 + x7), 2 * (-x5 + x8), z, z, z };
+            double* b1 = stackalloc double[] { z, z, z, 2 * x3 - x6 - x9, -x10 + 2 * x4 - x7, -x11 + 2 * x5 - x8, -x3 + x9, x10 - x4, x11 - x5, -x3 + x6, -x4 + x7, -x5 + x8 };
+            double* c1 = stackalloc double[] { z, z, z, -2 * (-x3 + x9), -2 * (x10 - x4), -2 * (x11 - x5), z, z, z, 2 * (-x3 + x9), 2 * (x10 - x4), 2 * (x11 - x5) };
+            double* d1 = stackalloc double[] { x3 - x6, x4 - x7, x5 - x8, x0 - 2 * x3 + x6, x1 - 2 * x4 + x7, x2 - 2 * x5 + x8, -x0 + x3, -x1 + x4, -x2 + x5, z, z, z };
+            double* e1 = stackalloc double[] { x3 - x9, -x10 + x4, -x11 + x5, x0 - 2 * x3 + x9, x1 + x10 - 2 * x4, x11 + x2 - 2 * x5, z, z, z, -x0 + x3, -x1 + x4, -x2 + x5 };
+//            double* f1 = stackalloc double[] { -2 * (-x0 + x3), -2 * (-x1 + x4), -2 * (-x2 + x5), 2 * (-x0 + x3), 2 * (-x1 + x4), 2 * (-x2 + x5), z, z, z, z, z, z };
 
             //        double s1[12], t1[12], det1[12];
-            double[] s1 = new double[12];
-            double[] t1 = new double[12];
-            double[] det1 = new double[12];
+            double* s1 = stackalloc double[12];
+            double* t1 = stackalloc double[12];
+            double* det1 = stackalloc double[12];
 
-            fd = new double[12];
-            sd = new double[12, 12];
             // first derivatives 
             for (int i = 0; i < 12; i++)
             {
@@ -487,44 +470,44 @@ double[] x, out double[] sdd, out double[,] sdd2)
             for (int i = 0; i < 12; i++)
                 for (int j = 0; j < 12; j++)
                 {
-                    det2[i, j] = -2 * b1[i] * b1[j] + a1[j] * c1[i] + a1[i] * c1[j] + c * a2[i, j] - 2 * b * b2[i, j] + a * c2[i, j];
+                    det2[i*12+ j] = -2 * b1[i] * b1[j] + a1[j] * c1[i] + a1[i] * c1[j] + c * a2[i, j] - 2 * b * b2[i, j] + a * c2[i, j];
 
-                    s2[i, j] =
+                    s2[i * 12 + j] =
                         +(-(c1[j] * d1[i]) - c1[i] * d1[j] + b1[j] * e1[i] + b1[i] * e1[j] + e * b2[i, j] - d * c2[i, j] - c * d2[i, j] + b * e2[i, j]) / det
                         - ((det1[j] * (e * b1[i] - d * c1[i] - c * d1[i] + b * e1[i])) + (det1[i] * (e * b1[j] - d * c1[j] - c * d1[j] + b * e1[j])) + ((-(c * d) + b * e) * det2[i, j])) / detsq
                         + (2 * (-(c * d) + b * e) * det1[i] * det1[j]) / detcube;
 
-                    t2[i, j] =
+                    t2[i * 12 + j] =
                         +(b1[j] * d1[i] + b1[i] * d1[j] - a1[j] * e1[i] - a1[i] * e1[j] - e * a2[i, j] + d * b2[i, j] + b * d2[i, j] - a * e2[i, j]) / det
                         - ((det1[j] * (-(e * a1[i]) + d * b1[i] + b * d1[i] - a * e1[i])) + (det1[i] * (-(e * a1[j]) + d * b1[j] + b * d1[j] - a * e1[j])) + ((b * d - a * e) * det2[i, j])) / detsq
                         + (2 * (b * d - a * e) * det1[i] * det1[j]) / detcube;
 
-                    u2[i, j] = -(s2[i, j] + t2[i, j]);
+                    u2[i * 12 + j] = -(s2[i * 12 + j] + t2[i * 12 + j]);
 
                     // this expression was machine-generated
-                    sd[i, j] = 2 * ((x6 * s1[i] + x9 * t1[i] + x3 * u1[i] - xd(0, i) + u * xd(3, i) +
+                    sd[i * 12 + j] = 2 * ((x6 * s1[i] + x9 * t1[i] + x3 * u1[i] - xd(0, i) + u * xd(3, i) +
                         s * xd(6, i) + t * xd(9, i)) *
                         (x6 * s1[j] + x9 * t1[j] + x3 * u1[j] - xd(0, j) + u * xd(3, j) +
                             s * xd(6, j) + t * xd(9, j)) -
                             (x0 - x6 * s - x9 * t - x3 * u) *
-                        (x6 * s2[i, j] + x9 * t2[i, j] +
-                            x3 * u2[i, j] + u1[j] * xd(3, i) + u1[i] * xd(3, j) + s1[j] * xd(6, i) +
+                        (x6 * s2[i * 12 + j] + x9 * t2[i * 12 + j] +
+                            x3 * u2[i * 12 + j] + u1[j] * xd(3, i) + u1[i] * xd(3, j) + s1[j] * xd(6, i) +
                             s1[i] * xd(6, j) + t1[j] * xd(9, i) + t1[i] * xd(9, j)) +
                             (x7 * s1[i] + x10 * t1[i] + x4 * u1[i] - xd(1, i) + u * xd(4, i) +
                                 s * xd(7, i) + t * xd(10, i)) *
                                 (x7 * s1[j] + x10 * t1[j] + x4 * u1[j] - xd(1, j) + u * xd(4, j) +
                                     s * xd(7, j) + t * xd(10, j)) -
                                     (x1 - x7 * s - x10 * t - x4 * u) *
-                        (x7 * s2[i, j] + x10 * t2[i, j] +
-                            x4 * u2[i, j] + u1[j] * xd(4, i) + u1[i] * xd(4, j) + s1[j] * xd(7, i) +
+                        (x7 * s2[i * 12 + j] + x10 * t2[i * 12 + j] +
+                            x4 * u2[i * 12 + j] + u1[j] * xd(4, i) + u1[i] * xd(4, j) + s1[j] * xd(7, i) +
                             s1[i] * xd(7, j) + t1[j] * xd(10, i) + t1[i] * xd(10, j)) +
                             (x8 * s1[i] + x11 * t1[i] + x5 * u1[i] - xd(2, i) + u * xd(5, i) +
                                 s * xd(8, i) + t * xd(11, i)) *
                                 (x8 * s1[j] + x11 * t1[j] + x5 * u1[j] - xd(2, j) + u * xd(5, j) +
                                     s * xd(8, j) + t * xd(11, j)) -
                                     (x2 - x8 * s - x11 * t - x5 * u) *
-                        (x8 * s2[i, j] + x11 * t2[i, j] +
-                            x5 * u2[i, j] + u1[j] * xd(5, i) + u1[i] * xd(5, j) + s1[j] * xd(8, i) +
+                        (x8 * s2[i * 12 + j] + x11 * t2[i * 12 + j] +
+                            x5 * u2[i * 12 + j] + u1[j] * xd(5, i) + u1[i] * xd(5, j) + s1[j] * xd(8, i) +
                             s1[i] * xd(8, j) + t1[j] * xd(11, i) + t1[i] * xd(11, j)));
                 }
 
@@ -534,9 +517,10 @@ double[] x, out double[] sdd, out double[,] sdd2)
         #endregion
 
         #region point-triangle
-        public static double pt(double[] x, out double[] fd, out double[,] sd, out double zeta2, out double zeta3)
+
+        // fd 12; sd 12x12
+        public unsafe static double pt(double* x, double* fd, double* sd, out double zeta2, out double zeta3)
         {
-            Debug.Assert(x.Length == 12);
             double x0 = x[0];
             double x1 = x[1];
             double x2 = x[2];
@@ -573,12 +557,12 @@ double[] x, out double[] sdd, out double[,] sdd2)
                             if (-d >= a)
                             {
                                 s = 1;
-                                sqrDistance = vertex_vertex_distance_and_derivs_12(0, 2, x, out fd, out sd);
+                                sqrDistance = vertex_vertex_distance_and_derivs_12(0, 2, x, fd, sd);
                             }
                             else
                             {
                                 s = -d / a;
-                                sqrDistance = vertex_edge_distance_and_derivs_12(x, 2, 1, out fd, out sd);
+                                sqrDistance = vertex_edge_distance_and_derivs_12(x, 2, 1, fd, sd);
                             }
                         }
                         else
@@ -587,17 +571,17 @@ double[] x, out double[] sdd, out double[,] sdd2)
                             if (e >= 0)
                             {
                                 t = 0;
-                                sqrDistance = vertex_vertex_distance_and_derivs_12(0, 1, x, out fd, out sd);
+                                sqrDistance = vertex_vertex_distance_and_derivs_12(0, 1, x, fd, sd);
                             }
                             else if (-e >= c)
                             {
                                 t = 1;
-                                sqrDistance = vertex_vertex_distance_and_derivs_12(0, 3, x, out fd, out sd);
+                                sqrDistance = vertex_vertex_distance_and_derivs_12(0, 3, x, fd, sd);
                             }
                             else
                             {
                                 t = -e / c;
-                                sqrDistance = vertex_edge_distance_and_derivs_12(x, 3, 1, out fd, out sd);
+                                sqrDistance = vertex_edge_distance_and_derivs_12(x, 3, 1, fd, sd);
                             }
                         }
                     }
@@ -607,17 +591,17 @@ double[] x, out double[] sdd, out double[,] sdd2)
                         if (e >= 0)
                         {
                             t = 0;
-                            sqrDistance = vertex_vertex_distance_and_derivs_12(0, 1, x, out fd, out sd);
+                            sqrDistance = vertex_vertex_distance_and_derivs_12(0, 1, x, fd, sd);
                         }
                         else if (-e >= c)
                         {
                             t = 1;
-                            sqrDistance = vertex_vertex_distance_and_derivs_12(0, 3, x, out fd, out sd);
+                            sqrDistance = vertex_vertex_distance_and_derivs_12(0, 3, x, fd, sd);
                         }
                         else
                         {
                             t = -e / c;
-                            sqrDistance = vertex_edge_distance_and_derivs_12(x, 3, 1, out fd, out sd);
+                            sqrDistance = vertex_edge_distance_and_derivs_12(x, 3, 1, fd, sd);
                         }
                     }
                 }
@@ -627,17 +611,17 @@ double[] x, out double[] sdd, out double[,] sdd2)
                     if (d >= 0)
                     {
                         s = 0;
-                        sqrDistance = vertex_vertex_distance_and_derivs_12(0, 1, x, out fd, out sd);
+                        sqrDistance = vertex_vertex_distance_and_derivs_12(0, 1, x, fd, sd);
                     }
                     else if (-d >= a)
                     {
                         s = 1;
-                        sqrDistance = vertex_vertex_distance_and_derivs_12(0, 2, x, out fd, out sd);
+                        sqrDistance = vertex_vertex_distance_and_derivs_12(0, 2, x, fd, sd);
                     }
                     else
                     {
                         s = -d / a;
-                        sqrDistance = vertex_edge_distance_and_derivs_12(x, 1, 2, out fd, out sd);
+                        sqrDistance = vertex_edge_distance_and_derivs_12(x, 1, 2, fd, sd);
                     }
                 }
                 else  // region 0
@@ -645,7 +629,7 @@ double[] x, out double[] sdd, out double[,] sdd2)
                     double invDet = (1) / det;
                     s *= invDet;
                     t *= invDet;
-                    sqrDistance = point_plane_distance(x, out fd, out sd);
+                    sqrDistance = point_plane_distance(x, fd, sd);
                 }
             }
             else
@@ -664,13 +648,13 @@ double[] x, out double[] sdd, out double[,] sdd2)
                         {
                             s = 1;
                             t = 0;
-                            sqrDistance = vertex_vertex_distance_and_derivs_12(0, 2, x, out fd, out sd);
+                            sqrDistance = vertex_vertex_distance_and_derivs_12(0, 2, x, fd, sd);
                         }
                         else
                         {
                             s = numer / denom;
                             t = 1 - s;
-                            sqrDistance = vertex_edge_distance_and_derivs_12(x, 2, 3, out fd, out sd);
+                            sqrDistance = vertex_edge_distance_and_derivs_12(x, 2, 3, fd, sd);
                         }
                     }
                     else
@@ -679,17 +663,17 @@ double[] x, out double[] sdd, out double[,] sdd2)
                         if (tmp1 <= 0)
                         {
                             t = 1;
-                            sqrDistance = vertex_vertex_distance_and_derivs_12(0, 3, x, out fd, out sd);
+                            sqrDistance = vertex_vertex_distance_and_derivs_12(0, 3, x, fd, sd);
                         }
                         else if (e >= 0)
                         {
                             t = 0;
-                            sqrDistance = vertex_vertex_distance_and_derivs_12(0, 1, x, out fd, out sd);
+                            sqrDistance = vertex_vertex_distance_and_derivs_12(0, 1, x, fd, sd);
                         }
                         else
                         {
                             t = -e / c;
-                            sqrDistance = vertex_edge_distance_and_derivs_12(x, 1, 3, out fd, out sd);
+                            sqrDistance = vertex_edge_distance_and_derivs_12(x, 1, 3, fd, sd);
                         }
                     }
                 }
@@ -705,13 +689,13 @@ double[] x, out double[] sdd, out double[,] sdd2)
                         {
                             t = 1;
                             s = 0;
-                            sqrDistance = vertex_vertex_distance_and_derivs_12(0, 3, x, out fd, out sd);
+                            sqrDistance = vertex_vertex_distance_and_derivs_12(0, 3, x, fd, sd);
                         }
                         else
                         {
                             t = numer / denom;
                             s = 1 - t;
-                            sqrDistance = vertex_edge_distance_and_derivs_12(x, 2, 3, out fd, out sd);
+                            sqrDistance = vertex_edge_distance_and_derivs_12(x, 2, 3, fd, sd);
                         }
                     }
                     else
@@ -720,17 +704,17 @@ double[] x, out double[] sdd, out double[,] sdd2)
                         if (tmp1 <= 0)
                         {
                             s = 1;
-                            sqrDistance = vertex_vertex_distance_and_derivs_12(0, 2, x, out fd, out sd);
+                            sqrDistance = vertex_vertex_distance_and_derivs_12(0, 2, x, fd, sd);
                         }
                         else if (d >= 0)
                         {
                             s = 0;
-                            sqrDistance = vertex_vertex_distance_and_derivs_12(0, 1, x, out fd, out sd);
+                            sqrDistance = vertex_vertex_distance_and_derivs_12(0, 1, x, fd, sd);
                         }
                         else
                         {
                             s = -d / a;
-                            sqrDistance = vertex_edge_distance_and_derivs_12(x, 1, 2, out fd, out sd);
+                            sqrDistance = vertex_edge_distance_and_derivs_12(x, 1, 2, fd, sd);
                         }
                     }
                 }
@@ -741,7 +725,7 @@ double[] x, out double[] sdd, out double[,] sdd2)
                     {
                         s = 0;
                         t = 1;
-                        sqrDistance = vertex_vertex_distance_and_derivs_12(0, 3, x, out fd, out sd);
+                        sqrDistance = vertex_vertex_distance_and_derivs_12(0, 3, x, fd, sd);
                     }
                     else
                     {
@@ -750,13 +734,13 @@ double[] x, out double[] sdd, out double[,] sdd2)
                         {
                             s = 1;
                             t = 0;
-                            sqrDistance = vertex_vertex_distance_and_derivs_12(0, 2, x, out fd, out sd);
+                            sqrDistance = vertex_vertex_distance_and_derivs_12(0, 2, x, fd, sd);
                         }
                         else
                         {
                             s = numer / denom;
                             t = 1 - s;
-                            sqrDistance = vertex_edge_distance_and_derivs_12(x, 2, 3, out fd, out sd);
+                            sqrDistance = vertex_edge_distance_and_derivs_12(x, 2, 3, fd, sd);
                         }
                     }
                 }

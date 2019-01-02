@@ -425,6 +425,7 @@ namespace icFlow
         #region one simulation step
 
         (Node, Face)[] collisions;
+        ExtendableList<CPU_Collision_Response.CPResult> cprList = new ExtendableList<CPU_Collision_Response.CPResult>();
         bool explodes, diverges;
         public void Step()
         {
@@ -440,12 +441,11 @@ namespace icFlow
                 foreach (Node nd in mc.allNodes) nd.InferTentativeValues(tcf0.TimeStep, prms.NewmarkBeta, prms.NewmarkGamma);
                 
                 // detect collisions; add colliding nodes to Node.collisionNodes
-                /*if(prms.UseGPU)*/ gf.TransferNodesToGPU();
+                if(prms.UseGPU) gf.TransferNodesToGPU();
                 bvh.ConstructAndTraverse(tcf0); // broad phase of collision detection
 
-                gf.NarrowPhaseCollisionDetection(bvh.broad_list);
-                collisions = CPU_NarrowPhase.NarrowPhase(bvh.broad_list, prms, ref tcf0, mc);
-                Debug.Assert(gf.nImpacts == collisions.Length, $"gf.nImpacts == collisions.Length; {gf.nImpacts}; {collisions.Length}");
+                if (prms.UseGPU) gf.NarrowPhaseCollisionDetection(bvh.broad_list);
+                else collisions = CPU_NarrowPhase.NarrowPhase(bvh.broad_list, prms, ref tcf0, mc);
 
                 _addCollidingNodesToStructure(collisions); // account for impacts in matrix structure
 
@@ -473,7 +473,7 @@ namespace icFlow
                 }
                 else
                 {
-                    CPU_Collision_Response.CollisionResponse(collisions, linearSystem, ref tcf0, mc, prms);
+                    CPU_Collision_Response.CollisionResponse(collisions, linearSystem, ref tcf0, mc, prms, cprList);
                 }
 
                 // solve with MKL
