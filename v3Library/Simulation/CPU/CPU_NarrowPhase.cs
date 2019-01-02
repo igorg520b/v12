@@ -59,19 +59,31 @@ namespace icFlow
 
         #region narrow phase
 
-        static int NarrowPhaseTwoElems(double[] nds, int[] nd_idxs)
+        static unsafe int NarrowPhaseTwoElems(Element tetra1, Element tetra2)
         {
-            Debug.Assert(nds.Length == 24);
-            Debug.Assert(nd_idxs.Length == 8);
+            double* nds = stackalloc double[24];
+            int* nd_idxs = stackalloc int[8];
+            for (int i = 0; i < 4; i++)
+            {
+                nd_idxs[i] = tetra1.vrts[i].globalNodeId;
+                nd_idxs[i + 4] = tetra2.vrts[i].globalNodeId;
+                nds[i * 3 + 0] = tetra1.vrts[i].tx;
+                nds[i * 3 + 1] = tetra1.vrts[i].ty;
+                nds[i * 3 + 2] = tetra1.vrts[i].tz;
+
+                nds[(i + 4) * 3 + 0] = tetra2.vrts[i].tx;
+                nds[(i + 4) * 3 + 1] = tetra2.vrts[i].ty;
+                nds[(i + 4) * 3 + 2] = tetra2.vrts[i].tz;
+            }
 
             // verify that elements are non-adjacent
             for (int i = 0; i < 4; i++)
                 for (int j = 4; j < 8; j++)
                     if (nd_idxs[i] == nd_idxs[j]) return 0;
 
-
             // b-values for elements
-            double[] bv0 = new double[9], bv1 = new double[9];
+            double* bv0 = stackalloc double[9]; 
+            double* bv1 = stackalloc double[9];
 
             Bvalues(nds[0], nds[1], nds[2],
             nds[3], nds[4], nds[5],
@@ -153,13 +165,15 @@ namespace icFlow
             return result;
         }
 
-        public static (Node,Face)[] NarrowPhase(List<Element> broadList, 
-        ModelPrms prms, ref FrameInfo cf, MeshCollection mc)
+        public static void NarrowPhase(List<Element> broadList, 
+        ModelPrms prms, ref FrameInfo cf, MeshCollection mc,
+            ExtendableList<CPU_Collision_Response.CPResult> cprList)
         {
             if (prms.CollisionScheme == ModelPrms.CollisionSchemes.None || broadList.Count == 0) 
             { 
-                cf.nCollisions = 0; 
-                return null; 
+                cf.nCollisions = 0;
+                cprList.actualCount = 0;
+                return;
             }
 
             int nTetra = broadList.Count;
@@ -171,21 +185,7 @@ namespace icFlow
             Parallel.For(0, nPairs, item => {
                 Element tetra1 = broadList[item * 2];
                 Element tetra2 = broadList[item * 2 + 1];
-                double[] nds = new double[24];
-                int[] nd_idxs = new int[8];
-                for (int i = 0; i < 4; i++)
-                {
-                    nd_idxs[i] = tetra1.vrts[i].globalNodeId;
-                    nd_idxs[i + 4] = tetra2.vrts[i].globalNodeId;
-                    nds[i * 3 + 0] = tetra1.vrts[i].tx;
-                    nds[i * 3 + 1] = tetra1.vrts[i].ty;
-                    nds[i * 3 + 2] = tetra1.vrts[i].tz;
-
-                    nds[(i + 4) * 3 + 0] = tetra2.vrts[i].tx;
-                    nds[(i + 4) * 3 + 1] = tetra2.vrts[i].ty;
-                    nds[(i + 4) * 3 + 2] = tetra2.vrts[i].tz;
-                }
-                resultingList[item] = NarrowPhaseTwoElems(nds, nd_idxs);
+                resultingList[item] = NarrowPhaseTwoElems(tetra1, tetra2);
             });
 
             // Tuple ( node# inside element, which element)
@@ -210,18 +210,19 @@ namespace icFlow
             if (nPairs == 0)
             {
                 cf.nCollisions = 0;
-                return null;
+                cprList.actualCount = 0;
+                return;
             }
 
             (int, int)[] arr = NL2set.ToArray();
-            (Node, Face)[] result = new (Node, Face)[arr.Length];
+            cprList.actualCount = arr.Length;
             Parallel.For(0, arr.Length, i => {
                 Node nd = mc.allNodes[arr[i].Item1];
                 Element elem = mc.surfaceElements[arr[i].Item2];
                 Face fc = FindClosestFace(nd, elem);
-                result[i] = (nd, fc);
+                cprList[i].nd = nd;
+                cprList[i].fc = fc;
             });
-            return result;
         }
 
         #endregion

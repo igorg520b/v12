@@ -6,6 +6,8 @@ namespace icFlow
     {
         public class CPResult
         {
+            public Node nd;
+            public Face fc;
             public double[] fi = new double[12]; 
             public double[,] dfi = new double[12,12];
             public int[] idxs = new int[4];
@@ -18,9 +20,12 @@ namespace icFlow
             }
         }
 
-        static unsafe CPResult OneCollision(Node nd, Face fc, double distanceEpsilonSqared, double k, CPResult res)
+        static unsafe void OneCollision(double distanceEpsilonSqared, double k, CPResult res)
         {
+            Node nd = res.nd;
+            Face fc = res.fc;
             res.Clear();
+
             double* x = stackalloc double[12];
             x[0] = nd.tx;
             x[1] = nd.ty;
@@ -41,14 +46,14 @@ namespace icFlow
             res.idxs[3] = fc.vrts[2].altId;
 
             // exclude colliding rigid surfaces
-            if (res.idxs[0] < 0 && res.idxs[1] < 0 && res.idxs[2] < 0 && res.idxs[3] < 0) return null;
+            if (res.idxs[0] < 0 && res.idxs[1] < 0 && res.idxs[2] < 0 && res.idxs[3] < 0) return;
 
             double* fd = stackalloc double[12];
             double* sd = stackalloc double[144]; //12x12
             double* w = stackalloc double[3];
             double dsq = CPU_Distance_Derivatives.pt(x, fd, sd, out w[1], out w[2]);
 
-            if (dsq < distanceEpsilonSqared) return null;
+            if (dsq < distanceEpsilonSqared) return;
 
             w[0] = 1 - (w[1] + w[2]);
 
@@ -57,7 +62,7 @@ namespace icFlow
             fy = k * 0.5 * fd[1];
             fz = k * 0.5 * fd[2];
 
-            double[] fi = new double[12];
+            double[] fi = res.fi;
             fi[0] = -fx;
             fi[1] = -fy;
             fi[2] = -fz;
@@ -70,30 +75,28 @@ namespace icFlow
             fi[9] = w[2] * fx;
             fi[10] = w[2] * fy;
             fi[11] = w[2] * fz;
-            res.fi = fi;
 
-            double[,] dfij = new double[12, 12];
+            double[,] dfij = res.dfi;
             for (int i = 0; i < 12; i++)
                 for (int j = i; j < 12; j++)
                     dfij[i, j] = dfij[j, i] = k * sd[i*12+ j] / 2;
             res.dfi = dfij;
-            return res;
         }
 
-        public static void CollisionResponse((Node, Face)[] cp, LinearSystem ls, ref FrameInfo cf, 
+        public static void CollisionResponse(LinearSystem ls, ref FrameInfo cf, 
         MeshCollection mc, ModelPrms prms, ExtendableList<CPResult> cprList)
         {
-            if (cp == null) return;
-            int nCollisions = cp.Length;
+            if (cprList.actualCount == 0) return;
+            int nCollisions = cprList.actualCount;
             cf.nCollisions = nCollisions;
-            cprList.actualCount = nCollisions;
             double distanceEpsilonSqared = prms.DistanceEpsilon * prms.DistanceEpsilon;
             double k = prms.penaltyK;
 
             Parallel.For(0, nCollisions, i => {
-                (Node nd, Face fc) = cp[i];
                 CPResult cpr = cprList[i];
-                OneCollision(nd, fc, distanceEpsilonSqared, k, cpr);
+                Node nd = cpr.nd;
+                Face fc = cpr.fc;
+                OneCollision(distanceEpsilonSqared, k, cpr);
                 });
 
             for(int i=0;i<nCollisions;i++)
@@ -115,7 +118,6 @@ namespace icFlow
                     }
                 }
             }
-
         }
 
     }

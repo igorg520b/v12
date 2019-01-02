@@ -198,7 +198,7 @@ namespace icFlow
             }
         }
 
-        void _addCollidingNodesToStructure((Node, Face)[] collisions = null)
+        void _addCollidingNodesToStructure()
         {
             linearSystem.csrd.ClearDynamic();
             if (prms.UseGPU)
@@ -223,11 +223,12 @@ namespace icFlow
             else
             {
                 // use CPU
-                if (collisions == null) return;
-                foreach((Node,Face) tuple in collisions)
+                if (cprList.actualCount == 0) return;
+                for(int k=0;k<cprList.actualCount;k++)
                 {
-                    Node nd = tuple.Item1;
-                    Face fc = tuple.Item2;
+                    CPU_Collision_Response.CPResult cpr = cprList[k];
+                    Node nd = cpr.nd;
+                    Face fc = cpr.fc;
                     Node[] nds = { nd, fc.vrts[0], fc.vrts[1], fc.vrts[2] };
                     //                    double[] idxs = { nd.altId, fc.vrts[0].altId, fc.vrts[1].altId, fc.vrts[2].altId };
                     for (int i = 0; i < 4; i++)
@@ -240,9 +241,7 @@ namespace icFlow
                                 linearSystem.csrd.AddDynamic(n1.altId, n2.altId);
                         }
                     }
-
                 }
-
             }
         }
 
@@ -424,7 +423,6 @@ namespace icFlow
 
         #region one simulation step
 
-        (Node, Face)[] collisions;
         ExtendableList<CPU_Collision_Response.CPResult> cprList = new ExtendableList<CPU_Collision_Response.CPResult>();
         bool explodes, diverges;
         public void Step()
@@ -445,9 +443,9 @@ namespace icFlow
                 bvh.ConstructAndTraverse(tcf0); // broad phase of collision detection
 
                 if (prms.UseGPU) gf.NarrowPhaseCollisionDetection(bvh.broad_list);
-                else collisions = CPU_NarrowPhase.NarrowPhase(bvh.broad_list, prms, ref tcf0, mc);
+                else CPU_NarrowPhase.NarrowPhase(bvh.broad_list, prms, ref tcf0, mc, cprList);
 
-                _addCollidingNodesToStructure(collisions); // account for impacts in matrix structure
+                _addCollidingNodesToStructure(); // account for impacts in matrix structure
 
                 // create CSR, accounting for collision Nodes
                 linearSystem.CreateStructure(tcf0);
