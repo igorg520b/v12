@@ -474,12 +474,12 @@ double* x, double* sdd, double* sdd2)
 
                     s2[i * 12 + j] =
                         +(-(c1[j] * d1[i]) - c1[i] * d1[j] + b1[j] * e1[i] + b1[i] * e1[j] + e * b2[i, j] - d * c2[i, j] - c * d2[i, j] + b * e2[i, j]) / det
-                        - ((det1[j] * (e * b1[i] - d * c1[i] - c * d1[i] + b * e1[i])) + (det1[i] * (e * b1[j] - d * c1[j] - c * d1[j] + b * e1[j])) + ((-(c * d) + b * e) * det2[i, j])) / detsq
+                        - ((det1[j] * (e * b1[i] - d * c1[i] - c * d1[i] + b * e1[i])) + (det1[i] * (e * b1[j] - d * c1[j] - c * d1[j] + b * e1[j])) + ((-(c * d) + b * e) * det2[i*12+ j])) / detsq
                         + (2 * (-(c * d) + b * e) * det1[i] * det1[j]) / detcube;
 
                     t2[i * 12 + j] =
                         +(b1[j] * d1[i] + b1[i] * d1[j] - a1[j] * e1[i] - a1[i] * e1[j] - e * a2[i, j] + d * b2[i, j] + b * d2[i, j] - a * e2[i, j]) / det
-                        - ((det1[j] * (-(e * a1[i]) + d * b1[i] + b * d1[i] - a * e1[i])) + (det1[i] * (-(e * a1[j]) + d * b1[j] + b * d1[j] - a * e1[j])) + ((b * d - a * e) * det2[i, j])) / detsq
+                        - ((det1[j] * (-(e * a1[i]) + d * b1[i] + b * d1[i] - a * e1[i])) + (det1[i] * (-(e * a1[j]) + d * b1[j] + b * d1[j] - a * e1[j])) + ((b * d - a * e) * det2[i*12+ j])) / detsq
                         + (2 * (b * d - a * e) * det1[i] * det1[j]) / detcube;
 
                     u2[i * 12 + j] = -(s2[i * 12 + j] + t2[i * 12 + j]);
