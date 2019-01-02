@@ -471,7 +471,7 @@ namespace icFlow
                 }
                 else
                 {
-                    CPU_Collision_Response.CollisionResponse(collisions, linearSystem, ref tcf0, mc, prms, cprList);
+                    CPU_Collision_Response.CollisionResponse(linearSystem, ref tcf0, mc, prms, cprList);
                 }
 
                 // solve with MKL
