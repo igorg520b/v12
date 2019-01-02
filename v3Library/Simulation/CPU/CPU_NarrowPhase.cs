@@ -165,14 +165,14 @@ namespace icFlow
             int nTetra = broadList.Count;
             int nPairs = nTetra / 2;
             Debug.Assert(nTetra % 2 == 0, "broadList length is not even");
-            double[] nds = new double[24];
-            int[] nd_idxs = new int[8];
 
             int[] resultingList = new int[nPairs];
 
             Parallel.For(0, nPairs, item => {
                 Element tetra1 = broadList[item * 2];
                 Element tetra2 = broadList[item * 2 + 1];
+                double[] nds = new double[24];
+                int[] nd_idxs = new int[8];
                 for (int i = 0; i < 4; i++)
                 {
                     nd_idxs[i] = tetra1.vrts[i].globalNodeId;
