@@ -409,7 +409,6 @@ int row2, int col2, double* m2,
 
 
             // update forces per node
-            foreach(Node nd in mc.allNodes) nd.fx = nd.fy = nd.fz = 0;
 
             foreach (Element elem in mc.elasticElements)
             {

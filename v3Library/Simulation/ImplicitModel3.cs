@@ -458,6 +458,7 @@ namespace icFlow
                 }
                 else
                 {
+                    foreach (Node nd in mc.allNodes) nd.fx = nd.fy = nd.fz = 0;
                     CPU_Linear_Tetrahedron.AssembleElems(linearSystem, tcf0, mc, prms);
                     CPU_PPR_CZ.AssembleCZs(linearSystem, tcf0, mc, prms);
                 }

@@ -649,7 +649,7 @@ out double y1, out double y2, out double y3)
             foreach(CZ cz in mc.nonFailedCZs)
             {
                 CZResult czr = cz.extension;
-                if (czr.failed) continue;
+                if (czr.failed || cz.failed) continue;
                 double[,] lhs = czr.Keff;
                 double[] rhs = czr.rhs;
                 for (int r = 0; r < 6; r++)

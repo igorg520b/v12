@@ -321,6 +321,41 @@ namespace icFlow
         private void tsbExport_Click(object sender, EventArgs e)
         {
             // export CSV
+            string CSVFolder = $"_sims\\{tbStudyName.Text}\\_CSV";
+            if (!Directory.Exists(CSVFolder)) Directory.CreateDirectory(CSVFolder);
+            string CSVPath = CSVFolder + "\\parametric_study.csv";
+
+
+            StreamWriter sw = new StreamWriter(File.Create(CSVPath));
+            sw.WriteLine($"class, XValue, YValue");
+
+            Dictionary<string, List<(double, double)>> pointData = new Dictionary<string, List<(double, double)>>();
+            foreach (PSPoint psp in classes) pointData.Add(psp.className, new List<(double, double)>());
+
+            foreach (PSPoint psp in resultingBatch)
+            {
+                if (psp.status == PSPoint.Status.Success)
+                {
+                    double X = psp.parameterValue;
+                    double Y = psp.beamParams.type == BeamParams.BeamType.LBeam ? psp.resultForce : psp.resultFlexuralStrength;
+                    pointData[psp.className].Add((X, Y));
+                }
+            }
+
+            foreach (PSPoint psp in classes)
+            {
+                List<(double, double)> lst = pointData[psp.className];
+                double[] xValues = new double[lst.Count];
+                double[] yValues = new double[lst.Count];
+                for (int i = 0; i < lst.Count; i++)
+                {
+                    xValues[i] = lst[i].Item1;
+                    yValues[i] = lst[i].Item2;
+                    sw.WriteLine($"{psp.className}, {xValues[i]}, {yValues[i]}");
+                }
+            }
+            sw.Close();
+
         }
     }
 }
