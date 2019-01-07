@@ -1072,7 +1072,6 @@ namespace icFlow
                 } else if(beamParams.type == IcyGrains.BeamParams.BeamType.LBeam)
                     model3.prms.SelectPreset(ModelPrms.ParameterPresets.LBeam);
                 model3.prms.name = beamParams.name;
-                model3.prms.UseGPU = false;
             }
 
             Mesh mg = new Mesh(strBeam, beamParams.name, ".msh");

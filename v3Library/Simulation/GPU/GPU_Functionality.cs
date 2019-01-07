@@ -6,6 +6,7 @@ using System.Diagnostics;
 using ManagedCuda;
 using ManagedCuda.BasicTypes;
 using ManagedCuda.VectorTypes;
+using System.Runtime.InteropServices;
 using System.IO;
 
 namespace icFlow
@@ -480,7 +481,9 @@ namespace icFlow
             g_drhs.CopyToHost(linearSystem.rhs, 0, 0, linearSystem.dxSize * sizeof(double));
         }
 
-        GeometricTools.GT gt = new GeometricTools.GT();
+        [DllImport("PardisoLoader2.dll", CallingConvention = CallingConvention.Cdecl)]
+        static extern void Eigenvalues(double xx, double yy, double zz, double xy, double yz, double zx, double[] eigenvalues);
+
         public void TransferUpdatedStateToHost()
         {
             if (cz_stride != 0)
@@ -533,7 +536,8 @@ namespace icFlow
                 Element e = mc.elasticElements[i];
                 for (int j = 0; j < 6; j++) e.stress[j] = c_de[i + j * el_elastic_stride];
                 // compute principal stresses
-                gt.Eigenvalues(e.stress, e.principal_stresses);
+                Eigenvalues(e.stress[0], e.stress[1], e.stress[2], e.stress[3], e.stress[4], e.stress[5], e.principal_stresses);
+
                 if (cf.PrincipalStress1Max < e.principal_stresses[0]) cf.PrincipalStress1Max = e.principal_stresses[0];
                 if (cf.PrincipalStress2Max < e.principal_stresses[1]) cf.PrincipalStress2Max = e.principal_stresses[1];
                 if (cf.PrincipalStress3Max < e.principal_stresses[2]) cf.PrincipalStress3Max = e.principal_stresses[2];

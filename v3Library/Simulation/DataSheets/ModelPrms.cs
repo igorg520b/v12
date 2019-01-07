@@ -423,6 +423,31 @@ namespace icFlow
 
         #endregion
 
+
+        #region parametric study
+
+        [Category("ParametricStudy")]
+        public string studyName { get; set; }
+
+        public enum StudyParameters { none, sigma, ratio, length, width, thickness, resolution}
+        [Category("ParametricStudy")]
+        public StudyParameters studyParameter { get; set; } = StudyParameters.none;
+
+        [Category("ParametricStudy")]
+        public double parameterValue { get; set; }
+
+        [Category("ParametricStudy")]
+        public double resultingForce { get; set; }
+
+        [Category("ParametricStudy")]
+        public double resultingFlexuralStrength { get; set; }
+
+        public enum StudyStatus { Ready, Paused, Finished}
+        [Category("ParametricStudy")]
+        public StudyStatus studyStatus { get; set; } = StudyStatus.Ready;
+
+        #endregion
+
         #region copy constructor 
 
         public ModelPrms(ModelPrms other)

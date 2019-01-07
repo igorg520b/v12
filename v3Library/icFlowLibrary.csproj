@@ -82,12 +82,6 @@
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\GeometricTools\GeometricTools.vcxproj">
-      <Project>{f6e3e054-0e90-4a49-b925-5bc675d9806d}</Project>
-      <Name>GeometricTools</Name>
-    </ProjectReference>
-  </ItemGroup>
   <ItemGroup />
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

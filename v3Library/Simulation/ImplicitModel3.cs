@@ -43,6 +43,8 @@ namespace icFlow
             mc.Clear();
             cf = null;
             tcf0 = null;
+            saveFolder = null;
+            isReady = false;
         }
         #endregion
 
@@ -52,7 +54,7 @@ namespace icFlow
         {
             // this is called once before simulation starts
             mc.Prepare();
-
+            prms.SetComputedVariables();
             if (cf == null || cf.StepNumber==0)
             {
                 mc.Reset();

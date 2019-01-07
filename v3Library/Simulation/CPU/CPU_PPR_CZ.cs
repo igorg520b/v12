@@ -1,5 +1,6 @@
 ﻿using System.Threading.Tasks;
 using System;
+using System.Linq;
 using System.Diagnostics;
 using static System.Math;
 
@@ -666,6 +667,9 @@ out double y1, out double y2, out double y3)
                     }
                 }
             }
+
+            cf.nCZDamaged = mc.nonFailedCZs.Sum(cz => cz.extension.damaged ? 1 : 0);
+            cf.nCZFailedThisStep = mc.nonFailedCZs.Sum(cz => cz.extension.failed ? 1 : 0);
         }
 
         public static void TransferUpdatedState(MeshCollection mc)

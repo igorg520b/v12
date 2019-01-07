@@ -363,7 +363,9 @@ namespace gte
 	void SymmetricEigensolver3x3<Real>::GetCosSin(Real u, Real v, Real& cs,
 		Real& sn) const
 	{
-		Real maxAbsComp = std::max(std::abs(u), std::abs(v));
+		Real abs_u = std::abs(u);
+		Real abs_v = std::abs(v);
+		Real maxAbsComp = abs_u > abs_v ? abs_u : abs_v;
 		if (maxAbsComp > (Real)0)
 		{
 			u /= maxAbsComp;  // in [-1,1]

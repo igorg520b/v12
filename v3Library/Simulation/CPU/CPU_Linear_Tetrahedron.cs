@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Threading.Tasks;
+using System.Runtime.InteropServices;
 using static System.Math;
 
 namespace icFlow
@@ -295,6 +296,8 @@ int row2, int col2, double* m2,
         #endregion
 
         #region element forces
+        [DllImport("PardisoLoader2.dll", CallingConvention = CallingConvention.Cdecl)]
+        static extern void Eigenvalues(double xx, double yy, double zz, double xy, double yz, double zx, double[] eigenvalues);
 
         // one element
         unsafe static void ElementElasticity(Element elem)
@@ -359,6 +362,9 @@ int row2, int col2, double* m2,
  
         public unsafe static void AssembleElems(LinearSystem ls, FrameInfo cf, MeshCollection mc, ModelPrms prms)
         {
+            cf.PrincipalStress1Max = cf.PrincipalStress2Max = cf.PrincipalStress3Max = double.MinValue;
+            cf.PrincipalStress1Min = cf.PrincipalStress2Min = cf.PrincipalStress3Min = double.MaxValue;
+
             // update static variables
             h = cf.TimeStep;
             Y = prms.Y;
@@ -399,6 +405,18 @@ int row2, int col2, double* m2,
                         lhs[r * 3 + 2, c * 3 + 0], lhs[r * 3 + 2, c * 3 + 1], lhs[r * 3 + 2, c * 3 + 2]);
                     }
                 }
+
+                // compute principal stresses
+                Element e = elem;
+                Eigenvalues(e.stress[0], e.stress[1], e.stress[2], e.stress[3], e.stress[4], e.stress[5], e.principal_stresses);
+
+                if (cf.PrincipalStress1Max < e.principal_stresses[0]) cf.PrincipalStress1Max = e.principal_stresses[0];
+                if (cf.PrincipalStress2Max < e.principal_stresses[1]) cf.PrincipalStress2Max = e.principal_stresses[1];
+                if (cf.PrincipalStress3Max < e.principal_stresses[2]) cf.PrincipalStress3Max = e.principal_stresses[2];
+
+                if (cf.PrincipalStress1Min > e.principal_stresses[0]) cf.PrincipalStress1Min = e.principal_stresses[0];
+                if (cf.PrincipalStress2Min > e.principal_stresses[1]) cf.PrincipalStress2Min = e.principal_stresses[1];
+                if (cf.PrincipalStress3Min > e.principal_stresses[2]) cf.PrincipalStress3Min = e.principal_stresses[2];
             }
         }
 

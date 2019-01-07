@@ -7,7 +7,9 @@
 #include "mkl_pardiso.h"
 #include "mkl_types.h"
 #include "mkl.h"
+#include "GteSymmetricEigensolver3x3.h"
 
+using namespace gte;
 
 BOOL APIENTRY DllMain(HMODULE hModule,
 	DWORD  ul_reason_for_call,
@@ -24,6 +26,7 @@ BOOL APIENTRY DllMain(HMODULE hModule,
 	}
 	return TRUE;
 }
+
 
 
 // ja = rows; ia = cols; a = vals
@@ -76,4 +79,19 @@ extern "C" __declspec(dllexport) int SolveDouble3(int *ja, int *ia, double *a,
 	PARDISO(pt, &maxfct, &mnum, &mtype, &phase, &n, &ddum, ia, ja, &idum, &nrhs, iparm, &msglvl, &ddum, &ddum, &error);
 
 	return error;
+}
+
+
+
+// solver
+SymmetricEigensolver3x3<double> solver;
+extern "C" __declspec(dllexport) void Eigenvalues(double xx, double yy, double zz, 
+	double xy, double yz, double zx, 
+	double* eigenvalues) {
+	std::array<double, 3> eval;
+	std::array<std::array<double, 3>, 3> evec;
+	solver(xx, xy, zx, yy, yz, zz, false, -1, eval, evec);
+	eigenvalues[0] = eval[0];
+	eigenvalues[1] = eval[1];
+	eigenvalues[2] = eval[2];
 }
