@@ -81,9 +81,139 @@ namespace icFlow
                             }
                         }
                     }
-
-
                     break;
+
+                case "ratio":
+                    for (int i = 0; i < steps; i++)
+                    {
+                        double mix = (double)i / (steps - 1);
+                        double ratio1 = fromValue * (1 - mix) + toValue * mix;
+                        foreach (PSPoint psc in classes)
+                        {
+                            PSPoint current = new PSPoint(psc);
+                            resultingBatch.Add(current);
+                            current.modelParams.tau_max = current.modelParams.sigma_max * ratio1;
+                            current.className = psc.className;
+                            current.parameterName = "ratio";
+                            current.parameterValue = ratio1;
+                            current.modelParams.name = $"{tbStudyName.Text}/{psc.className}-{i}";
+
+                            if (psc.beamParams.type == IcyGrains.BeamParams.BeamType.Plain)
+                            {
+                                current.modelParams.BeamLength = current.beamParams.beamL2;
+                                current.modelParams.BeamThickness = current.beamParams.beamThickness;
+                                current.modelParams.BeamWidth = current.beamParams.beamA;
+                            }
+                        }
+                    }
+                    break;
+
+
+                case "length":
+                    for (int i = 0; i < steps; i++)
+                    {
+                        double mix = (double)i / (steps - 1);
+                        double length1 = fromValue * (1 - mix) + toValue * mix;
+                        foreach (PSPoint psc in classes)
+                        {
+                            PSPoint current = new PSPoint(psc);
+                            resultingBatch.Add(current);
+                            current.beamParams.beamL2 = length1;
+                            current.className = psc.className;
+                            current.parameterName = "length";
+                            current.parameterValue = length1;
+                            current.modelParams.name = $"{tbStudyName.Text}/{psc.className}-{i}";
+
+                            if (psc.beamParams.type == IcyGrains.BeamParams.BeamType.Plain)
+                            {
+                                current.modelParams.BeamLength = current.beamParams.beamL2;
+                                current.modelParams.BeamThickness = current.beamParams.beamThickness;
+                                current.modelParams.BeamWidth = current.beamParams.beamA;
+                            }
+                        }
+                    }
+                    break;
+
+
+                case "width":
+                    for (int i = 0; i < steps; i++)
+                    {
+                        double mix = (double)i / (steps - 1);
+                        double width1 = fromValue * (1 - mix) + toValue * mix;
+                        foreach (PSPoint psc in classes)
+                        {
+                            PSPoint current = new PSPoint(psc);
+                            resultingBatch.Add(current);
+                            current.beamParams.beamA = width1;
+                            current.className = psc.className;
+                            current.parameterName = "width";
+                            current.parameterValue = width1;
+                            current.modelParams.name = $"{tbStudyName.Text}/{psc.className}-{i}";
+
+                            if (psc.beamParams.type == IcyGrains.BeamParams.BeamType.Plain)
+                            {
+                                current.modelParams.BeamLength = current.beamParams.beamL2;
+                                current.modelParams.BeamThickness = current.beamParams.beamThickness;
+                                current.modelParams.BeamWidth = current.beamParams.beamA;
+                            }
+                        }
+                    }
+                    break;
+
+
+                case "thickness":
+                    for (int i = 0; i < steps; i++)
+                    {
+                        double mix = (double)i / (steps - 1);
+                        double thickness1 = fromValue * (1 - mix) + toValue * mix;
+                        foreach (PSPoint psc in classes)
+                        {
+                            PSPoint current = new PSPoint(psc);
+                            resultingBatch.Add(current);
+                            current.beamParams.beamThickness = thickness1;
+                            current.className = psc.className;
+                            current.parameterName = "thickness";
+                            current.parameterValue = thickness1;
+                            current.modelParams.name = $"{tbStudyName.Text}/{psc.className}-{i}";
+
+                            if (psc.beamParams.type == IcyGrains.BeamParams.BeamType.Plain)
+                            {
+                                current.modelParams.BeamLength = current.beamParams.beamL2;
+                                current.modelParams.BeamThickness = current.beamParams.beamThickness;
+                                current.modelParams.BeamWidth = current.beamParams.beamA;
+                            }
+                        }
+                    }
+                    break;
+
+
+                case "resolution":
+                    double initialRatio = firstPsc.beamParams.RefinementMultiplier/ firstPsc.beamParams.CharacteristicLengthMax;
+                    for (int i = 0; i < steps; i++)
+                    {
+                        double mix = (double)i / (steps - 1);
+                        double resolution1 = fromValue * (1 - mix) + toValue * mix;
+                        foreach (PSPoint psc in classes)
+                        {
+                            PSPoint current = new PSPoint(psc);
+                            resultingBatch.Add(current);
+                            current.beamParams.CharacteristicLengthMax = resolution1;
+                            current.beamParams.RefinementMultiplier = initialRatio * resolution1;
+                            current.className = psc.className;
+                            current.parameterName = "resolution";
+                            current.parameterValue = resolution1;
+                            current.modelParams.name = $"{tbStudyName.Text}/{psc.className}-{i}";
+
+                            if (psc.beamParams.type == IcyGrains.BeamParams.BeamType.Plain)
+                            {
+                                current.modelParams.BeamLength = current.beamParams.beamL2;
+                                current.modelParams.BeamThickness = current.beamParams.beamThickness;
+                                current.modelParams.BeamWidth = current.beamParams.beamA;
+                            }
+                        }
+                    }
+                    break;
+
                 default:
                     return;
             }
@@ -325,37 +455,16 @@ namespace icFlow
             if (!Directory.Exists(CSVFolder)) Directory.CreateDirectory(CSVFolder);
             string CSVPath = CSVFolder + "\\parametric_study.csv";
 
-
             StreamWriter sw = new StreamWriter(File.Create(CSVPath));
-            sw.WriteLine($"class, XValue, YValue");
-
-            Dictionary<string, List<(double, double)>> pointData = new Dictionary<string, List<(double, double)>>();
-            foreach (PSPoint psp in classes) pointData.Add(psp.className, new List<(double, double)>());
+            sw.WriteLine($"class, BeamType, parameter, XValue, Force, FlexuralStrength");
 
             foreach (PSPoint psp in resultingBatch)
             {
                 if (psp.status == PSPoint.Status.Success)
-                {
-                    double X = psp.parameterValue;
-                    double Y = psp.beamParams.type == BeamParams.BeamType.LBeam ? psp.resultForce : psp.resultFlexuralStrength;
-                    pointData[psp.className].Add((X, Y));
-                }
+                    sw.WriteLine($"{psp.className},{psp.beamParams.type}, {psp.parameterName}, {psp.parameterValue}, {psp.resultForce}, {psp.resultFlexuralStrength}");
             }
 
-            foreach (PSPoint psp in classes)
-            {
-                List<(double, double)> lst = pointData[psp.className];
-                double[] xValues = new double[lst.Count];
-                double[] yValues = new double[lst.Count];
-                for (int i = 0; i < lst.Count; i++)
-                {
-                    xValues[i] = lst[i].Item1;
-                    yValues[i] = lst[i].Item2;
-                    sw.WriteLine($"{psp.className}, {xValues[i]}, {yValues[i]}");
-                }
-            }
             sw.Close();
-
         }
     }
 }
