@@ -7,6 +7,7 @@ using IcyGrains;
 
 namespace icFlow
 {
+    [Serializable]
     public class PSPoint
     {
         public BeamParams beamParams = new BeamParams();

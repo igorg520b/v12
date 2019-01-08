@@ -1,6 +1,12 @@
 #include<iostream>
 #include<sstream>
+
+#ifdef __linux__
+#define __declspec(dllexport)
+#else
 #include <windows.h>
+#endif
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
@@ -10,7 +16,7 @@
 #include "GteSymmetricEigensolver3x3.h"
 
 using namespace gte;
-
+#ifndef __linux__
 BOOL APIENTRY DllMain(HMODULE hModule,
 	DWORD  ul_reason_for_call,
 	LPVOID lpReserved
@@ -26,7 +32,7 @@ BOOL APIENTRY DllMain(HMODULE hModule,
 	}
 	return TRUE;
 }
-
+#endif
 
 
 // ja = rows; ia = cols; a = vals

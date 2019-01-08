@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Windows.Forms.DataVisualization.Charting;
 using System.IO;
+using System.Xml.Serialization;
 using IcyGrains;
 
 namespace icFlow
@@ -221,27 +222,7 @@ namespace icFlow
             UpdateListbox2();
 
 
-            /*
-            panelSetup.Visible = false;
-            panelRun.Visible = true;
-            panelRun.Dock = DockStyle.Fill;
 
-            // populate listbox
-            foreach (PSPoint psp in resultingBatch) lbSimulations.Items.Add(psp);
-
-            // prepare series
-            foreach (PSPoint psp in classes)
-            {
-                Series s = new Series();
-                s.ChartArea = "ChartArea1";
-                s.ChartType = SeriesChartType.Point;
-                s.Legend = "Legend1";
-                s.MarkerSize = 7;
-                s.MarkerStyle = System.Windows.Forms.DataVisualization.Charting.MarkerStyle.Circle;
-                s.Name = psp.className;
-                chart1.Series.Add(s);
-            }
-            */
 
         }
 
@@ -330,121 +311,6 @@ namespace icFlow
             pgModelParams.Refresh();
         }
 
-        bool running = false;
-        bool requestToPause = false;
-        private async void tsbRun_Click(object sender, EventArgs e)
-        {
-            if(running == true)
-            {
-                tsbRun.Enabled = false;
-                tsbRun.Text = "Pausing";
-                requestToPause = true;
-                return;
-            }
-
-            tsbRun.Text = "Pause";
-            requestToPause = false;
-            running = true;
-
-            foreach(PSPoint psc in resultingBatch)
-            {
-                // check the state
-
-                // if "Success, Failed" then skip
-                if (psc.status == PSPoint.Status.Success ||
-                    psc.status == PSPoint.Status.Failed) continue;
-
-                // if "Ready", then set up (using mainWindow)
-                if (psc.status == PSPoint.Status.Ready)
-                {
-                    GrainTool2 gt2 = new GrainTool2();
-                    if (psc.beamParams.type == BeamParams.BeamType.LBeam)
-                        await Task.Run(() => gt2.LBeamGeneration(psc.beamParams));
-                    else if (psc.beamParams.type == BeamParams.BeamType.Plain)
-                        await Task.Run(() => gt2.PlainBeamGeneration(psc.beamParams));
-                    else throw new Exception("beam type not set");
-
-                    // save to memory stream
-                    Stream strBeam = new MemoryStream(5000000);
-                    Stream strIndenter = new MemoryStream(5000000);
-                    gt2.tmesh.SaveMsh2(strBeam);
-                    strBeam.Seek(0, SeekOrigin.Begin);
-
-                    gt2.indenter_mesh.SaveMsh2(strIndenter);
-                    strIndenter.Seek(0, SeekOrigin.Begin);
-
-                    mainWindow.SetUpBeamSimulation(strBeam, strIndenter, psc.beamParams, psc.modelParams);
-                }
-                else if (psc.status == PSPoint.Status.Paused)
-                {
-                    // if "Paused", then load from existing file
-                    throw new NotImplementedException();
-
-                }
-                else throw new Exception("incorrect psc status");
-
-
-                // run until completion 
-                psc.status = PSPoint.Status.Running;
-                lbSimulations.Items.Clear();
-                foreach (PSPoint psp in this.resultingBatch) lbSimulations.Items.Add(psp);
-
-                //=============
-                mainWindow.tsbPreviewMode.Checked = false;
-                mainWindow.tssStatus.Text = "Running";
-                mainWindow.trackBar1.Enabled = false;
-
-                bool completed = false;
-                do
-                {
-                    await Task.Run(() => mainWindow.model3.Step());
-                    if (mainWindow.model3.cf.StepNumber >= mainWindow.model3.prms.MaxSteps ||
-                        mainWindow.model3.prms.DetectFracture && mainWindow.model3.cf.fractureDetected)
-                        completed = true;
-
-                    // report progress
-                    mainWindow.glControl1.Invalidate();
-                    mainWindow.tnCurrentFrame.Tag = mainWindow.model3.cf;
-                    if (mainWindow.treeView1.SelectedNode == mainWindow.tnCurrentFrame)
-                    {
-                        mainWindow.pg.SelectedObject = mainWindow.model3.cf;
-                        mainWindow.pg.Refresh();
-                    }
-                    if (mainWindow.model3.cf != null) mainWindow.tssCurrentFrame.Text = $"{mainWindow.model3.cf.StepNumber}-{mainWindow.model3.cf.IterationsPerformed}-{mainWindow.model3.cf.TimeScaleFactor}";
-
-                } while (!(requestToPause || completed));
-
-                //=============
-
-
-                if (requestToPause)
-                {
-                    psc.status = PSPoint.Status.Paused;
-                    requestToPause = false;
-                    break;
-                } else if(completed)
-                {
-                    psc.status = PSPoint.Status.Success;
-
-                    // generate frame summary
-                    FrameInfo.FrameSummary smr = new FrameInfo.FrameSummary(mainWindow.model3.allFrames, mainWindow.model3.prms);
-                    psc.resultFlexuralStrength = smr.FlexuralStrength;
-                    psc.resultForce = smr.MaxForce;
-
-                    // update chart (!)
-                    UpdateChart();
-                }
-                lbSimulations.Items.Clear();
-                foreach (PSPoint psp in this.resultingBatch) lbSimulations.Items.Add(psp);
-
-            }
-            running = false;
-            tsbRun.Text = "Run";
-            tsbRun.Enabled = true;
-            mainWindow.tssCurrentFrame.Text = "-";
-            mainWindow.tssStatus.Text = "done";
-
-        }
 
         void UpdateChart()
         {
@@ -531,9 +397,201 @@ namespace icFlow
             UpdateListbox2();
         }
 
-        private void btnInitialize_Click(object sender, EventArgs e)
+        private async void btnInitialize_Click(object sender, EventArgs e)
+        {
+            tss1.Text = "initializing";
+            foreach (PSPoint psc in resultingBatch)
+            {
+                GrainTool2 gt2 = new GrainTool2();
+                if (psc.beamParams.type == BeamParams.BeamType.LBeam)
+                    await Task.Run(() => gt2.LBeamGeneration(psc.beamParams));
+                else if (psc.beamParams.type == BeamParams.BeamType.Plain)
+                    await Task.Run(() => gt2.PlainBeamGeneration(psc.beamParams));
+                else throw new Exception("beam type not set");
+
+                // save to memory stream
+                Stream strBeam = new MemoryStream(5000000);
+                Stream strIndenter = new MemoryStream(5000000);
+                gt2.tmesh.SaveMsh2(strBeam);
+                strBeam.Seek(0, SeekOrigin.Begin);
+
+                gt2.indenter_mesh.SaveMsh2(strIndenter);
+                strIndenter.Seek(0, SeekOrigin.Begin);
+
+                mainWindow.SetUpBeamSimulation(strBeam, strIndenter, psc.beamParams, psc.modelParams);
+                mainWindow.model3.SaveSimulationInitialState();
+
+            }
+            tss1.Text = "done";
+
+            SaveStudy();
+
+            // reload from that file
+  
+        }
+
+        void SaveStudy()
+        {
+            // save study as XML file into the study folder
+            Stream strXML = File.Create($"_sims//{tbStudyName.Text}//study.xml");
+            StreamWriter sw = new StreamWriter(strXML);
+            XmlSerializer xs = new XmlSerializer(typeof(List<PSPoint>));
+            xs.Serialize(sw, resultingBatch);
+            sw.Close();
+        }
+
+        void LoadStudy(Stream str)
+        {
+
+        }
+
+        private void btnLoad_Click(object sender, EventArgs e)
         {
             // set up simulations for the study
+            /*
+panelSetup.Visible = false;
+panelRun.Visible = true;
+panelRun.Dock = DockStyle.Fill;
+
+// populate listbox
+foreach (PSPoint psp in resultingBatch) lbSimulations.Items.Add(psp);
+
+// prepare series
+foreach (PSPoint psp in classes)
+{
+    Series s = new Series();
+    s.ChartArea = "ChartArea1";
+    s.ChartType = SeriesChartType.Point;
+    s.Legend = "Legend1";
+    s.MarkerSize = 7;
+    s.MarkerStyle = System.Windows.Forms.DataVisualization.Charting.MarkerStyle.Circle;
+    s.Name = psp.className;
+    chart1.Series.Add(s);
+}
+*/
         }
+
+        #region main loop
+
+        bool running = false;
+        bool requestToPause = false;
+        private async void tsbRun_Click(object sender, EventArgs e)
+        {
+            if (running == true)
+            {
+                tsbRun.Enabled = false;
+                tsbRun.Text = "Pausing";
+                requestToPause = true;
+                return;
+            }
+
+            tsbRun.Text = "Pause";
+            requestToPause = false;
+            running = true;
+
+            foreach (PSPoint psc in resultingBatch)
+            {
+                // check the state
+
+                // if "Success, Failed" then skip
+                if (psc.status == PSPoint.Status.Success ||
+                    psc.status == PSPoint.Status.Failed) continue;
+
+                // if "Ready", then set up (using mainWindow)
+                if (psc.status == PSPoint.Status.Ready)
+                {
+                    GrainTool2 gt2 = new GrainTool2();
+                    if (psc.beamParams.type == BeamParams.BeamType.LBeam)
+                        await Task.Run(() => gt2.LBeamGeneration(psc.beamParams));
+                    else if (psc.beamParams.type == BeamParams.BeamType.Plain)
+                        await Task.Run(() => gt2.PlainBeamGeneration(psc.beamParams));
+                    else throw new Exception("beam type not set");
+
+                    // save to memory stream
+                    Stream strBeam = new MemoryStream(5000000);
+                    Stream strIndenter = new MemoryStream(5000000);
+                    gt2.tmesh.SaveMsh2(strBeam);
+                    strBeam.Seek(0, SeekOrigin.Begin);
+
+                    gt2.indenter_mesh.SaveMsh2(strIndenter);
+                    strIndenter.Seek(0, SeekOrigin.Begin);
+
+                    mainWindow.SetUpBeamSimulation(strBeam, strIndenter, psc.beamParams, psc.modelParams);
+                }
+                else if (psc.status == PSPoint.Status.Paused)
+                {
+                    // if "Paused", then load from existing file
+                    throw new NotImplementedException();
+
+                }
+                else throw new Exception("incorrect psc status");
+
+
+                // run until completion 
+                psc.status = PSPoint.Status.Running;
+                lbSimulations.Items.Clear();
+                foreach (PSPoint psp in this.resultingBatch) lbSimulations.Items.Add(psp);
+
+                //=============
+                mainWindow.tsbPreviewMode.Checked = false;
+                mainWindow.tssStatus.Text = "Running";
+                mainWindow.trackBar1.Enabled = false;
+
+                bool completed = false;
+                do
+                {
+                    await Task.Run(() => mainWindow.model3.Step());
+                    if (mainWindow.model3.cf.StepNumber >= mainWindow.model3.prms.MaxSteps ||
+                        mainWindow.model3.prms.DetectFracture && mainWindow.model3.cf.fractureDetected)
+                        completed = true;
+
+                    // report progress
+                    mainWindow.glControl1.Invalidate();
+                    mainWindow.tnCurrentFrame.Tag = mainWindow.model3.cf;
+                    if (mainWindow.treeView1.SelectedNode == mainWindow.tnCurrentFrame)
+                    {
+                        mainWindow.pg.SelectedObject = mainWindow.model3.cf;
+                        mainWindow.pg.Refresh();
+                    }
+                    if (mainWindow.model3.cf != null) mainWindow.tssCurrentFrame.Text = $"{mainWindow.model3.cf.StepNumber}-{mainWindow.model3.cf.IterationsPerformed}-{mainWindow.model3.cf.TimeScaleFactor}";
+
+                } while (!(requestToPause || completed));
+
+                //=============
+
+
+                if (requestToPause)
+                {
+                    psc.status = PSPoint.Status.Paused;
+                    requestToPause = false;
+                    break;
+                }
+                else if (completed)
+                {
+                    psc.status = PSPoint.Status.Success;
+
+                    // generate frame summary
+                    FrameInfo.FrameSummary smr = new FrameInfo.FrameSummary(mainWindow.model3.allFrames, mainWindow.model3.prms);
+                    psc.resultFlexuralStrength = smr.FlexuralStrength;
+                    psc.resultForce = smr.MaxForce;
+
+                    // update chart (!)
+                    UpdateChart();
+                }
+                lbSimulations.Items.Clear();
+                foreach (PSPoint psp in this.resultingBatch) lbSimulations.Items.Add(psp);
+            }
+
+            running = false;
+            tsbRun.Text = "Run";
+            tsbRun.Enabled = true;
+            mainWindow.tssCurrentFrame.Text = "-";
+            mainWindow.tssStatus.Text = "done";
+        }
+        #endregion
+
+
+
+
     }
 }

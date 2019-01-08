@@ -28,8 +28,8 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea5 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-            System.Windows.Forms.DataVisualization.Charting.Legend legend5 = new System.Windows.Forms.DataVisualization.Charting.Legend();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea2 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.Legend legend2 = new System.Windows.Forms.DataVisualization.Charting.Legend();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ParametricStudyForm));
             this.panel1 = new System.Windows.Forms.Panel();
             this.pgBeamParams = new System.Windows.Forms.PropertyGrid();
@@ -64,6 +64,9 @@
             this.listBox2 = new System.Windows.Forms.ListBox();
             this.btnClear = new System.Windows.Forms.Button();
             this.btnInitialize = new System.Windows.Forms.Button();
+            this.statusStrip1 = new System.Windows.Forms.StatusStrip();
+            this.tss1 = new System.Windows.Forms.ToolStripStatusLabel();
+            this.btnLoad = new System.Windows.Forms.Button();
             this.panel1.SuspendLayout();
             this.panel2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.nudSteps)).BeginInit();
@@ -72,6 +75,7 @@
             this.panelRun.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.chart1)).BeginInit();
             this.toolStrip1.SuspendLayout();
+            this.statusStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
             // panel1
@@ -83,7 +87,7 @@
             this.panel1.Dock = System.Windows.Forms.DockStyle.Left;
             this.panel1.Location = new System.Drawing.Point(211, 0);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(404, 376);
+            this.panel1.Size = new System.Drawing.Size(404, 354);
             this.panel1.TabIndex = 0;
             // 
             // pgBeamParams
@@ -91,7 +95,7 @@
             this.pgBeamParams.Dock = System.Windows.Forms.DockStyle.Fill;
             this.pgBeamParams.Location = new System.Drawing.Point(190, 136);
             this.pgBeamParams.Name = "pgBeamParams";
-            this.pgBeamParams.Size = new System.Drawing.Size(214, 240);
+            this.pgBeamParams.Size = new System.Drawing.Size(214, 218);
             this.pgBeamParams.TabIndex = 2;
             // 
             // pgModelParams
@@ -99,7 +103,7 @@
             this.pgModelParams.Dock = System.Windows.Forms.DockStyle.Left;
             this.pgModelParams.Location = new System.Drawing.Point(0, 136);
             this.pgModelParams.Name = "pgModelParams";
-            this.pgModelParams.Size = new System.Drawing.Size(190, 240);
+            this.pgModelParams.Size = new System.Drawing.Size(190, 218);
             this.pgModelParams.TabIndex = 1;
             // 
             // panel2
@@ -239,7 +243,7 @@
             // 
             // btnGenerate
             // 
-            this.btnGenerate.Location = new System.Drawing.Point(53, 280);
+            this.btnGenerate.Location = new System.Drawing.Point(16, 280);
             this.btnGenerate.Name = "btnGenerate";
             this.btnGenerate.Size = new System.Drawing.Size(75, 23);
             this.btnGenerate.TabIndex = 7;
@@ -305,6 +309,7 @@
             // panel3
             // 
             this.panel3.BackColor = System.Drawing.Color.Moccasin;
+            this.panel3.Controls.Add(this.btnLoad);
             this.panel3.Controls.Add(this.btnInitialize);
             this.panel3.Controls.Add(this.btnClear);
             this.panel3.Controls.Add(this.label5);
@@ -321,7 +326,7 @@
             this.panel3.Dock = System.Windows.Forms.DockStyle.Left;
             this.panel3.Location = new System.Drawing.Point(0, 0);
             this.panel3.Name = "panel3";
-            this.panel3.Size = new System.Drawing.Size(211, 376);
+            this.panel3.Size = new System.Drawing.Size(211, 354);
             this.panel3.TabIndex = 13;
             // 
             // panelSetup
@@ -332,30 +337,32 @@
             this.panelSetup.Controls.Add(this.panel3);
             this.panelSetup.Location = new System.Drawing.Point(12, 12);
             this.panelSetup.Name = "panelSetup";
-            this.panelSetup.Size = new System.Drawing.Size(1046, 376);
+            this.panelSetup.Size = new System.Drawing.Size(880, 354);
             this.panelSetup.TabIndex = 14;
             // 
             // panelRun
             // 
             this.panelRun.BackColor = System.Drawing.Color.PowderBlue;
+            this.panelRun.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.panelRun.Controls.Add(this.chart1);
             this.panelRun.Controls.Add(this.lbSimulations);
             this.panelRun.Controls.Add(this.toolStrip1);
-            this.panelRun.Location = new System.Drawing.Point(383, 428);
+            this.panelRun.Location = new System.Drawing.Point(338, 383);
             this.panelRun.Name = "panelRun";
+            this.panelRun.Padding = new System.Windows.Forms.Padding(2);
             this.panelRun.Size = new System.Drawing.Size(554, 305);
             this.panelRun.TabIndex = 15;
             // 
             // chart1
             // 
-            chartArea5.Name = "ChartArea1";
-            this.chart1.ChartAreas.Add(chartArea5);
+            chartArea2.Name = "ChartArea1";
+            this.chart1.ChartAreas.Add(chartArea2);
             this.chart1.Dock = System.Windows.Forms.DockStyle.Fill;
-            legend5.Name = "Legend1";
-            this.chart1.Legends.Add(legend5);
-            this.chart1.Location = new System.Drawing.Point(160, 25);
+            legend2.Name = "Legend1";
+            this.chart1.Legends.Add(legend2);
+            this.chart1.Location = new System.Drawing.Point(162, 27);
             this.chart1.Name = "chart1";
-            this.chart1.Size = new System.Drawing.Size(394, 280);
+            this.chart1.Size = new System.Drawing.Size(388, 274);
             this.chart1.TabIndex = 5;
             this.chart1.Text = "chart1";
             // 
@@ -363,9 +370,9 @@
             // 
             this.lbSimulations.Dock = System.Windows.Forms.DockStyle.Left;
             this.lbSimulations.FormattingEnabled = true;
-            this.lbSimulations.Location = new System.Drawing.Point(0, 25);
+            this.lbSimulations.Location = new System.Drawing.Point(2, 27);
             this.lbSimulations.Name = "lbSimulations";
-            this.lbSimulations.Size = new System.Drawing.Size(160, 280);
+            this.lbSimulations.Size = new System.Drawing.Size(160, 274);
             this.lbSimulations.TabIndex = 2;
             // 
             // toolStrip1
@@ -373,9 +380,9 @@
             this.toolStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.tsbRun,
             this.tsbExport});
-            this.toolStrip1.Location = new System.Drawing.Point(0, 0);
+            this.toolStrip1.Location = new System.Drawing.Point(2, 2);
             this.toolStrip1.Name = "toolStrip1";
-            this.toolStrip1.Size = new System.Drawing.Size(554, 25);
+            this.toolStrip1.Size = new System.Drawing.Size(548, 25);
             this.toolStrip1.TabIndex = 1;
             this.toolStrip1.Text = "toolStrip1";
             // 
@@ -405,13 +412,13 @@
             this.listBox2.FormattingEnabled = true;
             this.listBox2.Location = new System.Drawing.Point(615, 0);
             this.listBox2.Name = "listBox2";
-            this.listBox2.Size = new System.Drawing.Size(135, 376);
+            this.listBox2.Size = new System.Drawing.Size(135, 354);
             this.listBox2.TabIndex = 14;
             this.listBox2.SelectedIndexChanged += new System.EventHandler(this.listBox2_SelectedIndexChanged);
             // 
             // btnClear
             // 
-            this.btnClear.Location = new System.Drawing.Point(53, 309);
+            this.btnClear.Location = new System.Drawing.Point(16, 309);
             this.btnClear.Name = "btnClear";
             this.btnClear.Size = new System.Drawing.Size(75, 23);
             this.btnClear.TabIndex = 13;
@@ -421,13 +428,39 @@
             // 
             // btnInitialize
             // 
-            this.btnInitialize.Location = new System.Drawing.Point(53, 338);
+            this.btnInitialize.Location = new System.Drawing.Point(97, 280);
             this.btnInitialize.Name = "btnInitialize";
             this.btnInitialize.Size = new System.Drawing.Size(75, 23);
             this.btnInitialize.TabIndex = 14;
             this.btnInitialize.Text = "Initialize Study";
             this.btnInitialize.UseVisualStyleBackColor = true;
             this.btnInitialize.Click += new System.EventHandler(this.btnInitialize_Click);
+            // 
+            // statusStrip1
+            // 
+            this.statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.tss1});
+            this.statusStrip1.Location = new System.Drawing.Point(0, 723);
+            this.statusStrip1.Name = "statusStrip1";
+            this.statusStrip1.Size = new System.Drawing.Size(1165, 22);
+            this.statusStrip1.TabIndex = 16;
+            this.statusStrip1.Text = "statusStrip1";
+            // 
+            // tss1
+            // 
+            this.tss1.Name = "tss1";
+            this.tss1.Size = new System.Drawing.Size(27, 17);
+            this.tss1.Text = "tss1";
+            // 
+            // btnLoad
+            // 
+            this.btnLoad.Location = new System.Drawing.Point(97, 309);
+            this.btnLoad.Name = "btnLoad";
+            this.btnLoad.Size = new System.Drawing.Size(75, 23);
+            this.btnLoad.TabIndex = 15;
+            this.btnLoad.Text = "Load";
+            this.btnLoad.UseVisualStyleBackColor = true;
+            this.btnLoad.Click += new System.EventHandler(this.btnLoad_Click);
             // 
             // ParametricStudyForm
             // 
@@ -436,6 +469,7 @@
             this.ClientSize = new System.Drawing.Size(1165, 745);
             this.Controls.Add(this.panelRun);
             this.Controls.Add(this.panelSetup);
+            this.Controls.Add(this.statusStrip1);
             this.Name = "ParametricStudyForm";
             this.Text = "PS_Setup";
             this.WindowState = System.Windows.Forms.FormWindowState.Maximized;
@@ -452,7 +486,10 @@
             ((System.ComponentModel.ISupportInitialize)(this.chart1)).EndInit();
             this.toolStrip1.ResumeLayout(false);
             this.toolStrip1.PerformLayout();
+            this.statusStrip1.ResumeLayout(false);
+            this.statusStrip1.PerformLayout();
             this.ResumeLayout(false);
+            this.PerformLayout();
 
         }
 
@@ -491,5 +528,8 @@
         private System.Windows.Forms.Button btnInitialize;
         private System.Windows.Forms.Button btnClear;
         private System.Windows.Forms.ListBox listBox2;
+        private System.Windows.Forms.StatusStrip statusStrip1;
+        private System.Windows.Forms.ToolStripStatusLabel tss1;
+        private System.Windows.Forms.Button btnLoad;
     }
 }
