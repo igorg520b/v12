@@ -218,6 +218,10 @@ namespace icFlow
                     return;
             }
 
+            UpdateListbox2();
+
+
+            /*
             panelSetup.Visible = false;
             panelRun.Visible = true;
             panelRun.Dock = DockStyle.Fill;
@@ -237,6 +241,14 @@ namespace icFlow
                 s.Name = psp.className;
                 chart1.Series.Add(s);
             }
+            */
+
+        }
+
+        void UpdateListbox2()
+        {
+            listBox2.Items.Clear();
+            foreach (PSPoint psp in resultingBatch) listBox2.Items.Add(psp);
         }
 
         private void btnAssignName_Click(object sender, EventArgs e)
@@ -281,6 +293,21 @@ namespace icFlow
                 pgBeamParams.SelectedObject = psc.beamParams;
             }
 
+        }
+
+        private void listBox2_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            PSPoint psc = (PSPoint)listBox2.SelectedItem;
+            if (psc == null)
+            {
+                pgModelParams.SelectedObject = null;
+                pgBeamParams.SelectedObject = null;
+            }
+            else
+            {
+                pgModelParams.SelectedObject = psc.modelParams;
+                pgBeamParams.SelectedObject = psc.beamParams;
+            }
         }
 
         private void btnDefaultL_Click(object sender, EventArgs e)
@@ -465,6 +492,48 @@ namespace icFlow
             }
 
             sw.Close();
+        }
+
+        private void lbParameters_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            switch(lbParameters.SelectedItem.ToString())
+            {
+                case "length":
+                    tbFrom.Text = "1.3";
+                    tbTo.Text = "2.5";
+                    break;
+                case "sigma":
+                    tbFrom.Text = "100000";
+                    tbTo.Text = "150000";
+                    break;
+                case "ratio":
+                    tbFrom.Text = "1";
+                    tbTo.Text = "2";
+                    break;
+                case "width":
+                    tbFrom.Text = "0.4";
+                    tbTo.Text = "0.8";
+                    break;
+                case "thickness":
+                    tbFrom.Text = "0.15";
+                    tbTo.Text = "0.5";
+                    break;
+                case "resolution":
+                    tbFrom.Text = "0.015";
+                    tbTo.Text = "0.025";
+                    break;
+            }
+        }
+
+        private void btnClear_Click(object sender, EventArgs e)
+        {
+            resultingBatch.Clear();
+            UpdateListbox2();
+        }
+
+        private void btnInitialize_Click(object sender, EventArgs e)
+        {
+            // set up simulations for the study
         }
     }
 }

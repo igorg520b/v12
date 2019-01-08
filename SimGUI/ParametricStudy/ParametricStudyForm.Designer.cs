@@ -28,8 +28,8 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea2 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-            System.Windows.Forms.DataVisualization.Charting.Legend legend2 = new System.Windows.Forms.DataVisualization.Charting.Legend();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea5 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.Legend legend5 = new System.Windows.Forms.DataVisualization.Charting.Legend();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ParametricStudyForm));
             this.panel1 = new System.Windows.Forms.Panel();
             this.pgBeamParams = new System.Windows.Forms.PropertyGrid();
@@ -61,6 +61,9 @@
             this.toolStrip1 = new System.Windows.Forms.ToolStrip();
             this.tsbRun = new System.Windows.Forms.ToolStripButton();
             this.tsbExport = new System.Windows.Forms.ToolStripButton();
+            this.listBox2 = new System.Windows.Forms.ListBox();
+            this.btnClear = new System.Windows.Forms.Button();
+            this.btnInitialize = new System.Windows.Forms.Button();
             this.panel1.SuspendLayout();
             this.panel2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.nudSteps)).BeginInit();
@@ -205,6 +208,7 @@
             this.lbParameters.Name = "lbParameters";
             this.lbParameters.Size = new System.Drawing.Size(93, 108);
             this.lbParameters.TabIndex = 2;
+            this.lbParameters.SelectedIndexChanged += new System.EventHandler(this.lbParameters_SelectedIndexChanged);
             // 
             // label2
             // 
@@ -218,7 +222,7 @@
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(13, 237);
+            this.label3.Location = new System.Drawing.Point(13, 228);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(20, 13);
             this.label3.TabIndex = 4;
@@ -227,7 +231,7 @@
             // label4
             // 
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(13, 273);
+            this.label4.Location = new System.Drawing.Point(13, 256);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(34, 13);
             this.label4.TabIndex = 5;
@@ -235,7 +239,7 @@
             // 
             // btnGenerate
             // 
-            this.btnGenerate.Location = new System.Drawing.Point(53, 328);
+            this.btnGenerate.Location = new System.Drawing.Point(53, 280);
             this.btnGenerate.Name = "btnGenerate";
             this.btnGenerate.Size = new System.Drawing.Size(75, 23);
             this.btnGenerate.TabIndex = 7;
@@ -245,7 +249,7 @@
             // 
             // nudSteps
             // 
-            this.nudSteps.Location = new System.Drawing.Point(53, 271);
+            this.nudSteps.Location = new System.Drawing.Point(53, 254);
             this.nudSteps.Maximum = new decimal(new int[] {
             1000,
             0,
@@ -275,7 +279,7 @@
             // 
             // tbTo
             // 
-            this.tbTo.Location = new System.Drawing.Point(53, 237);
+            this.tbTo.Location = new System.Drawing.Point(53, 228);
             this.tbTo.Name = "tbTo";
             this.tbTo.Size = new System.Drawing.Size(100, 20);
             this.tbTo.TabIndex = 10;
@@ -301,6 +305,8 @@
             // panel3
             // 
             this.panel3.BackColor = System.Drawing.Color.Moccasin;
+            this.panel3.Controls.Add(this.btnInitialize);
+            this.panel3.Controls.Add(this.btnClear);
             this.panel3.Controls.Add(this.label5);
             this.panel3.Controls.Add(this.tbStudyName);
             this.panel3.Controls.Add(this.label1);
@@ -321,11 +327,12 @@
             // panelSetup
             // 
             this.panelSetup.BackColor = System.Drawing.Color.LightBlue;
+            this.panelSetup.Controls.Add(this.listBox2);
             this.panelSetup.Controls.Add(this.panel1);
             this.panelSetup.Controls.Add(this.panel3);
             this.panelSetup.Location = new System.Drawing.Point(12, 12);
             this.panelSetup.Name = "panelSetup";
-            this.panelSetup.Size = new System.Drawing.Size(645, 376);
+            this.panelSetup.Size = new System.Drawing.Size(1046, 376);
             this.panelSetup.TabIndex = 14;
             // 
             // panelRun
@@ -341,11 +348,11 @@
             // 
             // chart1
             // 
-            chartArea2.Name = "ChartArea1";
-            this.chart1.ChartAreas.Add(chartArea2);
+            chartArea5.Name = "ChartArea1";
+            this.chart1.ChartAreas.Add(chartArea5);
             this.chart1.Dock = System.Windows.Forms.DockStyle.Fill;
-            legend2.Name = "Legend1";
-            this.chart1.Legends.Add(legend2);
+            legend5.Name = "Legend1";
+            this.chart1.Legends.Add(legend5);
             this.chart1.Location = new System.Drawing.Point(160, 25);
             this.chart1.Name = "chart1";
             this.chart1.Size = new System.Drawing.Size(394, 280);
@@ -391,6 +398,36 @@
             this.tsbExport.Size = new System.Drawing.Size(44, 22);
             this.tsbExport.Text = "Export";
             this.tsbExport.Click += new System.EventHandler(this.tsbExport_Click);
+            // 
+            // listBox2
+            // 
+            this.listBox2.Dock = System.Windows.Forms.DockStyle.Left;
+            this.listBox2.FormattingEnabled = true;
+            this.listBox2.Location = new System.Drawing.Point(615, 0);
+            this.listBox2.Name = "listBox2";
+            this.listBox2.Size = new System.Drawing.Size(135, 376);
+            this.listBox2.TabIndex = 14;
+            this.listBox2.SelectedIndexChanged += new System.EventHandler(this.listBox2_SelectedIndexChanged);
+            // 
+            // btnClear
+            // 
+            this.btnClear.Location = new System.Drawing.Point(53, 309);
+            this.btnClear.Name = "btnClear";
+            this.btnClear.Size = new System.Drawing.Size(75, 23);
+            this.btnClear.TabIndex = 13;
+            this.btnClear.Text = "Clear";
+            this.btnClear.UseVisualStyleBackColor = true;
+            this.btnClear.Click += new System.EventHandler(this.btnClear_Click);
+            // 
+            // btnInitialize
+            // 
+            this.btnInitialize.Location = new System.Drawing.Point(53, 338);
+            this.btnInitialize.Name = "btnInitialize";
+            this.btnInitialize.Size = new System.Drawing.Size(75, 23);
+            this.btnInitialize.TabIndex = 14;
+            this.btnInitialize.Text = "Initialize Study";
+            this.btnInitialize.UseVisualStyleBackColor = true;
+            this.btnInitialize.Click += new System.EventHandler(this.btnInitialize_Click);
             // 
             // ParametricStudyForm
             // 
@@ -451,5 +488,8 @@
         private System.Windows.Forms.ToolStripButton tsbExport;
         private System.Windows.Forms.ListBox lbSimulations;
         public System.Windows.Forms.DataVisualization.Charting.Chart chart1;
+        private System.Windows.Forms.Button btnInitialize;
+        private System.Windows.Forms.Button btnClear;
+        private System.Windows.Forms.ListBox listBox2;
     }
 }
