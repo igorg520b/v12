@@ -54,19 +54,20 @@
             this.tbStudyName = new System.Windows.Forms.TextBox();
             this.label5 = new System.Windows.Forms.Label();
             this.panel3 = new System.Windows.Forms.Panel();
+            this.btnLoad = new System.Windows.Forms.Button();
+            this.btnInitialize = new System.Windows.Forms.Button();
+            this.btnClear = new System.Windows.Forms.Button();
             this.panelSetup = new System.Windows.Forms.Panel();
+            this.listBox2 = new System.Windows.Forms.ListBox();
             this.panelRun = new System.Windows.Forms.Panel();
             this.chart1 = new System.Windows.Forms.DataVisualization.Charting.Chart();
             this.lbSimulations = new System.Windows.Forms.ListBox();
             this.toolStrip1 = new System.Windows.Forms.ToolStrip();
             this.tsbRun = new System.Windows.Forms.ToolStripButton();
             this.tsbExport = new System.Windows.Forms.ToolStripButton();
-            this.listBox2 = new System.Windows.Forms.ListBox();
-            this.btnClear = new System.Windows.Forms.Button();
-            this.btnInitialize = new System.Windows.Forms.Button();
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.tss1 = new System.Windows.Forms.ToolStripStatusLabel();
-            this.btnLoad = new System.Windows.Forms.Button();
+            this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
             this.panel1.SuspendLayout();
             this.panel2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.nudSteps)).BeginInit();
@@ -329,6 +330,36 @@
             this.panel3.Size = new System.Drawing.Size(211, 354);
             this.panel3.TabIndex = 13;
             // 
+            // btnLoad
+            // 
+            this.btnLoad.Location = new System.Drawing.Point(97, 309);
+            this.btnLoad.Name = "btnLoad";
+            this.btnLoad.Size = new System.Drawing.Size(75, 23);
+            this.btnLoad.TabIndex = 15;
+            this.btnLoad.Text = "Load";
+            this.btnLoad.UseVisualStyleBackColor = true;
+            this.btnLoad.Click += new System.EventHandler(this.btnLoad_Click);
+            // 
+            // btnInitialize
+            // 
+            this.btnInitialize.Location = new System.Drawing.Point(97, 280);
+            this.btnInitialize.Name = "btnInitialize";
+            this.btnInitialize.Size = new System.Drawing.Size(75, 23);
+            this.btnInitialize.TabIndex = 14;
+            this.btnInitialize.Text = "Initialize Study";
+            this.btnInitialize.UseVisualStyleBackColor = true;
+            this.btnInitialize.Click += new System.EventHandler(this.btnInitialize_Click);
+            // 
+            // btnClear
+            // 
+            this.btnClear.Location = new System.Drawing.Point(16, 309);
+            this.btnClear.Name = "btnClear";
+            this.btnClear.Size = new System.Drawing.Size(75, 23);
+            this.btnClear.TabIndex = 13;
+            this.btnClear.Text = "Clear";
+            this.btnClear.UseVisualStyleBackColor = true;
+            this.btnClear.Click += new System.EventHandler(this.btnClear_Click);
+            // 
             // panelSetup
             // 
             this.panelSetup.BackColor = System.Drawing.Color.LightBlue;
@@ -339,6 +370,16 @@
             this.panelSetup.Name = "panelSetup";
             this.panelSetup.Size = new System.Drawing.Size(880, 354);
             this.panelSetup.TabIndex = 14;
+            // 
+            // listBox2
+            // 
+            this.listBox2.Dock = System.Windows.Forms.DockStyle.Left;
+            this.listBox2.FormattingEnabled = true;
+            this.listBox2.Location = new System.Drawing.Point(615, 0);
+            this.listBox2.Name = "listBox2";
+            this.listBox2.Size = new System.Drawing.Size(135, 354);
+            this.listBox2.TabIndex = 14;
+            this.listBox2.SelectedIndexChanged += new System.EventHandler(this.listBox2_SelectedIndexChanged);
             // 
             // panelRun
             // 
@@ -406,36 +447,6 @@
             this.tsbExport.Text = "Export";
             this.tsbExport.Click += new System.EventHandler(this.tsbExport_Click);
             // 
-            // listBox2
-            // 
-            this.listBox2.Dock = System.Windows.Forms.DockStyle.Left;
-            this.listBox2.FormattingEnabled = true;
-            this.listBox2.Location = new System.Drawing.Point(615, 0);
-            this.listBox2.Name = "listBox2";
-            this.listBox2.Size = new System.Drawing.Size(135, 354);
-            this.listBox2.TabIndex = 14;
-            this.listBox2.SelectedIndexChanged += new System.EventHandler(this.listBox2_SelectedIndexChanged);
-            // 
-            // btnClear
-            // 
-            this.btnClear.Location = new System.Drawing.Point(16, 309);
-            this.btnClear.Name = "btnClear";
-            this.btnClear.Size = new System.Drawing.Size(75, 23);
-            this.btnClear.TabIndex = 13;
-            this.btnClear.Text = "Clear";
-            this.btnClear.UseVisualStyleBackColor = true;
-            this.btnClear.Click += new System.EventHandler(this.btnClear_Click);
-            // 
-            // btnInitialize
-            // 
-            this.btnInitialize.Location = new System.Drawing.Point(97, 280);
-            this.btnInitialize.Name = "btnInitialize";
-            this.btnInitialize.Size = new System.Drawing.Size(75, 23);
-            this.btnInitialize.TabIndex = 14;
-            this.btnInitialize.Text = "Initialize Study";
-            this.btnInitialize.UseVisualStyleBackColor = true;
-            this.btnInitialize.Click += new System.EventHandler(this.btnInitialize_Click);
-            // 
             // statusStrip1
             // 
             this.statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
@@ -452,15 +463,10 @@
             this.tss1.Size = new System.Drawing.Size(27, 17);
             this.tss1.Text = "tss1";
             // 
-            // btnLoad
+            // openFileDialog1
             // 
-            this.btnLoad.Location = new System.Drawing.Point(97, 309);
-            this.btnLoad.Name = "btnLoad";
-            this.btnLoad.Size = new System.Drawing.Size(75, 23);
-            this.btnLoad.TabIndex = 15;
-            this.btnLoad.Text = "Load";
-            this.btnLoad.UseVisualStyleBackColor = true;
-            this.btnLoad.Click += new System.EventHandler(this.btnLoad_Click);
+            this.openFileDialog1.FileName = "openFileDialog1";
+            this.openFileDialog1.Filter = "XML|*.xml";
             // 
             // ParametricStudyForm
             // 
@@ -531,5 +537,6 @@
         private System.Windows.Forms.StatusStrip statusStrip1;
         private System.Windows.Forms.ToolStripStatusLabel tss1;
         private System.Windows.Forms.Button btnLoad;
+        private System.Windows.Forms.OpenFileDialog openFileDialog1;
     }
 }

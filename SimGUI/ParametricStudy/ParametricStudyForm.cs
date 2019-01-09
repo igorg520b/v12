@@ -9,6 +9,7 @@ using System.Windows.Forms.DataVisualization.Charting;
 using System.IO;
 using System.Xml.Serialization;
 using IcyGrains;
+using icFlow.Rendering;
 
 namespace icFlow
 {
@@ -18,7 +19,7 @@ namespace icFlow
         public List<PSPoint> resultingBatch;
         public Form1 mainWindow;
 
-
+        #region initialization
         public ParametricStudyForm()
         {
             InitializeComponent();
@@ -39,11 +40,14 @@ namespace icFlow
         void UpdateClassList()
         {
             listBox1.Items.Clear();
-            foreach(PSPoint ps in classes)
+            foreach (PSPoint ps in classes)
             {
                 listBox1.Items.Add(ps);
             }
         }
+        #endregion
+
+        #region first interface
 
         private void btnGenerate_Click(object sender, EventArgs e)
         {
@@ -59,11 +63,11 @@ namespace icFlow
             {
                 case "sigma":
                     double ratio = firstPsc.modelParams.tau_max / firstPsc.modelParams.sigma_max;
-                    for(int i=0;i<steps;i++)
+                    for (int i = 0; i < steps; i++)
                     {
                         double mix = (double)i / (steps - 1);
                         double sigma = fromValue * (1 - mix) + toValue * mix;
-                        foreach(PSPoint psc in classes)
+                        foreach (PSPoint psc in classes)
                         {
                             PSPoint current = new PSPoint(psc);
                             resultingBatch.Add(current);
@@ -72,7 +76,7 @@ namespace icFlow
                             current.className = psc.className;
                             current.parameterName = "sigma";
                             current.parameterValue = sigma;
-                            current.modelParams.name = $"{tbStudyName.Text}/{psc.className}-{i}";
+                            current.path = current.modelParams.name = $"{tbStudyName.Text}/{psc.className}-{i}";
 
                             if (psc.beamParams.type == IcyGrains.BeamParams.BeamType.Plain)
                             {
@@ -97,7 +101,7 @@ namespace icFlow
                             current.className = psc.className;
                             current.parameterName = "ratio";
                             current.parameterValue = ratio1;
-                            current.modelParams.name = $"{tbStudyName.Text}/{psc.className}-{i}";
+                            current.path = current.modelParams.name = $"{tbStudyName.Text}/{psc.className}-{i}";
 
                             if (psc.beamParams.type == IcyGrains.BeamParams.BeamType.Plain)
                             {
@@ -123,7 +127,7 @@ namespace icFlow
                             current.className = psc.className;
                             current.parameterName = "length";
                             current.parameterValue = length1;
-                            current.modelParams.name = $"{tbStudyName.Text}/{psc.className}-{i}";
+                            current.path = current.modelParams.name = $"{tbStudyName.Text}/{psc.className}-{i}";
 
                             if (psc.beamParams.type == IcyGrains.BeamParams.BeamType.Plain)
                             {
@@ -149,7 +153,7 @@ namespace icFlow
                             current.className = psc.className;
                             current.parameterName = "width";
                             current.parameterValue = width1;
-                            current.modelParams.name = $"{tbStudyName.Text}/{psc.className}-{i}";
+                            current.path = current.modelParams.name = $"{tbStudyName.Text}/{psc.className}-{i}";
 
                             if (psc.beamParams.type == IcyGrains.BeamParams.BeamType.Plain)
                             {
@@ -175,7 +179,7 @@ namespace icFlow
                             current.className = psc.className;
                             current.parameterName = "thickness";
                             current.parameterValue = thickness1;
-                            current.modelParams.name = $"{tbStudyName.Text}/{psc.className}-{i}";
+                            current.path = current.modelParams.name = $"{tbStudyName.Text}/{psc.className}-{i}";
 
                             if (psc.beamParams.type == IcyGrains.BeamParams.BeamType.Plain)
                             {
@@ -189,7 +193,7 @@ namespace icFlow
 
 
                 case "resolution":
-                    double initialRatio = firstPsc.beamParams.RefinementMultiplier/ firstPsc.beamParams.CharacteristicLengthMax;
+                    double initialRatio = firstPsc.beamParams.RefinementMultiplier / firstPsc.beamParams.CharacteristicLengthMax;
                     for (int i = 0; i < steps; i++)
                     {
                         double mix = (double)i / (steps - 1);
@@ -203,8 +207,7 @@ namespace icFlow
                             current.className = psc.className;
                             current.parameterName = "resolution";
                             current.parameterValue = resolution1;
-                            current.modelParams.name = $"{tbStudyName.Text}/{psc.className}-{i}";
-
+                            current.path = current.modelParams.name = $"{tbStudyName.Text}/{psc.className}-{i}";
                             if (psc.beamParams.type == IcyGrains.BeamParams.BeamType.Plain)
                             {
                                 current.modelParams.BeamLength = current.beamParams.beamL2;
@@ -216,14 +219,9 @@ namespace icFlow
                     break;
 
                 default:
-                    return;
+                    throw new Exception();
             }
-
             UpdateListbox2();
-
-
-
-
         }
 
         void UpdateListbox2()
@@ -268,7 +266,8 @@ namespace icFlow
             {
                 pgModelParams.SelectedObject = null;
                 pgBeamParams.SelectedObject = null;
-            } else
+            }
+            else
             {
                 pgModelParams.SelectedObject = psc.modelParams;
                 pgBeamParams.SelectedObject = psc.beamParams;
@@ -311,58 +310,9 @@ namespace icFlow
             pgModelParams.Refresh();
         }
 
-
-        void UpdateChart()
-        {
-            Dictionary<string, List<(double, double)>> pointData = new Dictionary<string, List<(double, double)>>();
-            foreach (PSPoint psp in classes) pointData.Add(psp.className, new List<(double, double)>());
-
-            foreach(PSPoint psp in resultingBatch)
-            {
-                if(psp.status == PSPoint.Status.Success)
-                {
-                    double X = psp.parameterValue;
-                    double Y = psp.beamParams.type == BeamParams.BeamType.LBeam ? psp.resultForce : psp.resultFlexuralStrength;
-                    pointData[psp.className].Add((X, Y));
-                }
-            }
-
-            foreach (PSPoint psp in classes)
-            {
-                List<(double, double)> lst = pointData[psp.className];
-                double[] xValues = new double[lst.Count];
-                double[] yValues = new double[lst.Count];
-                for(int i = 0; i < lst.Count; i++)
-                {
-                    xValues[i] = lst[i].Item1;
-                    yValues[i] = lst[i].Item2;
-                }
-                chart1.Series[psp.className].Points.DataBindXY(xValues, yValues);
-            }
-        }
-
-        private void tsbExport_Click(object sender, EventArgs e)
-        {
-            // export CSV
-            string CSVFolder = $"_sims\\{tbStudyName.Text}\\_CSV";
-            if (!Directory.Exists(CSVFolder)) Directory.CreateDirectory(CSVFolder);
-            string CSVPath = CSVFolder + "\\parametric_study.csv";
-
-            StreamWriter sw = new StreamWriter(File.Create(CSVPath));
-            sw.WriteLine($"class, BeamType, parameter, XValue, Force, FlexuralStrength");
-
-            foreach (PSPoint psp in resultingBatch)
-            {
-                if (psp.status == PSPoint.Status.Success)
-                    sw.WriteLine($"{psp.className},{psp.beamParams.type}, {psp.parameterName}, {psp.parameterValue}, {psp.resultForce}, {psp.resultFlexuralStrength}");
-            }
-
-            sw.Close();
-        }
-
         private void lbParameters_SelectedIndexChanged(object sender, EventArgs e)
         {
-            switch(lbParameters.SelectedItem.ToString())
+            switch (lbParameters.SelectedItem.ToString())
             {
                 case "length":
                     tbFrom.Text = "1.3";
@@ -425,9 +375,7 @@ namespace icFlow
             tss1.Text = "done";
 
             SaveStudy();
-
-            // reload from that file
-  
+            PrepareToRun();
         }
 
         void SaveStudy()
@@ -440,36 +388,97 @@ namespace icFlow
             sw.Close();
         }
 
-        void LoadStudy(Stream str)
-        {
-
-        }
-
         private void btnLoad_Click(object sender, EventArgs e)
         {
-            // set up simulations for the study
-            /*
-panelSetup.Visible = false;
-panelRun.Visible = true;
-panelRun.Dock = DockStyle.Fill;
-
-// populate listbox
-foreach (PSPoint psp in resultingBatch) lbSimulations.Items.Add(psp);
-
-// prepare series
-foreach (PSPoint psp in classes)
-{
-    Series s = new Series();
-    s.ChartArea = "ChartArea1";
-    s.ChartType = SeriesChartType.Point;
-    s.Legend = "Legend1";
-    s.MarkerSize = 7;
-    s.MarkerStyle = System.Windows.Forms.DataVisualization.Charting.MarkerStyle.Circle;
-    s.Name = psp.className;
-    chart1.Series.Add(s);
-}
-*/
+            if (openFileDialog1.ShowDialog() == DialogResult.OK)
+            {
+                Stream str1 = openFileDialog1.OpenFile();
+                XmlSerializer xs = new XmlSerializer(typeof(List<PSPoint>));
+                resultingBatch = (List<PSPoint>)xs.Deserialize(str1);
+                str1.Close();
+                PrepareToRun();
+                UpdateChart();
+            }
         }
+        #endregion
+
+        #region second interface
+        private void tsbExport_Click(object sender, EventArgs e)
+        {
+            // export CSV
+            string CSVFolder = $"_sims\\{tbStudyName.Text}\\_CSV";
+            if (!Directory.Exists(CSVFolder)) Directory.CreateDirectory(CSVFolder);
+            string CSVPath = CSVFolder + "\\parametric_study.csv";
+
+            StreamWriter sw = new StreamWriter(File.Create(CSVPath));
+            sw.WriteLine($"class, BeamType, parameter, XValue, Force, FlexuralStrength");
+
+            foreach (PSPoint psp in resultingBatch)
+            {
+                if (psp.status == PSPoint.Status.Success)
+                    sw.WriteLine($"{psp.className},{psp.beamParams.type}, {psp.parameterName}, {psp.parameterValue}, {psp.resultForce}, {psp.resultFlexuralStrength}");
+            }
+
+            sw.Close();
+        }
+        #endregion
+
+        #region chart
+        void UpdateChart()
+        {
+            Dictionary<string, List<(double, double)>> pointData = new Dictionary<string, List<(double, double)>>();
+            foreach (PSPoint psp in classes) pointData.Add(psp.className, new List<(double, double)>());
+
+            foreach (PSPoint psp in resultingBatch)
+            {
+                if (psp.status == PSPoint.Status.Success)
+                {
+                    double X = psp.parameterValue;
+                    double Y = psp.beamParams.type == BeamParams.BeamType.LBeam ? psp.resultForce : psp.resultFlexuralStrength;
+                    pointData[psp.className].Add((X, Y));
+                }
+            }
+
+            foreach (PSPoint psp in classes)
+            {
+                List<(double, double)> lst = pointData[psp.className];
+                double[] xValues = new double[lst.Count];
+                double[] yValues = new double[lst.Count];
+                for (int i = 0; i < lst.Count; i++)
+                {
+                    xValues[i] = lst[i].Item1;
+                    yValues[i] = lst[i].Item2;
+                }
+                chart1.Series[psp.className].Points.DataBindXY(xValues, yValues);
+            }
+        }
+
+        void PrepareToRun()
+        {
+            // set up simulations for the study
+
+            panelSetup.Visible = false;
+            panelRun.Visible = true;
+            panelRun.Dock = DockStyle.Fill;
+
+            // populate listbox
+            foreach (PSPoint psp in resultingBatch) lbSimulations.Items.Add(psp);
+
+            // prepare series
+            chart1.Series.Clear();
+            foreach (PSPoint psp in classes)
+            {
+                Series s = new Series();
+                s.ChartArea = "ChartArea1";
+                s.ChartType = SeriesChartType.Point;
+                s.Legend = "Legend1";
+                s.MarkerSize = 7;
+                s.MarkerStyle = System.Windows.Forms.DataVisualization.Charting.MarkerStyle.Circle;
+                s.Name = psp.className;
+                chart1.Series.Add(s);
+            }
+        }
+        #endregion
 
         #region main loop
 
@@ -500,29 +509,22 @@ foreach (PSPoint psp in classes)
                 // if "Ready", then set up (using mainWindow)
                 if (psc.status == PSPoint.Status.Ready)
                 {
-                    GrainTool2 gt2 = new GrainTool2();
-                    if (psc.beamParams.type == BeamParams.BeamType.LBeam)
-                        await Task.Run(() => gt2.LBeamGeneration(psc.beamParams));
-                    else if (psc.beamParams.type == BeamParams.BeamType.Plain)
-                        await Task.Run(() => gt2.PlainBeamGeneration(psc.beamParams));
-                    else throw new Exception("beam type not set");
-
-                    // save to memory stream
-                    Stream strBeam = new MemoryStream(5000000);
-                    Stream strIndenter = new MemoryStream(5000000);
-                    gt2.tmesh.SaveMsh2(strBeam);
-                    strBeam.Seek(0, SeekOrigin.Begin);
-
-                    gt2.indenter_mesh.SaveMsh2(strIndenter);
-                    strIndenter.Seek(0, SeekOrigin.Begin);
-
-                    mainWindow.SetUpBeamSimulation(strBeam, strIndenter, psc.beamParams, psc.modelParams);
+                    // open clear sim
+                    mainWindow.model3.Clear();
+                    mainWindow.model3.saveFolder = $"_sims\\{psc.path}";
+                    mainWindow.model3.LoadSimulation(clear: true);
+                    mainWindow.model3.cf = null;
+                    mainWindow.UpdateTrackbar();
+                    mainWindow.glControl1.Invalidate();
+                    mainWindow.model3.mc.Prepare();
+                    mainWindow.rprm = RenderPrms.Load(mainWindow.model3.saveFolder);
+                    mainWindow.RebuildTree();
+                    mainWindow.reshape();
                 }
                 else if (psc.status == PSPoint.Status.Paused)
                 {
-                    // if "Paused", then load from existing file
+                    // open existing sim
                     throw new NotImplementedException();
-
                 }
                 else throw new Exception("incorrect psc status");
 
@@ -534,16 +536,19 @@ foreach (PSPoint psp in classes)
 
                 //=============
                 mainWindow.tsbPreviewMode.Checked = false;
-                mainWindow.tssStatus.Text = "Running";
+                mainWindow.tssStatus.Text = $"Running {psc.path}";
                 mainWindow.trackBar1.Enabled = false;
 
                 bool completed = false;
+                mainWindow.tssCurrentFrame.Text = "*";
                 do
                 {
+                    if (mainWindow.model3.cf == null)
+                        mainWindow.model3.Step();
+                    else
                     await Task.Run(() => mainWindow.model3.Step());
-                    if (mainWindow.model3.cf.StepNumber >= mainWindow.model3.prms.MaxSteps ||
-                        mainWindow.model3.prms.DetectFracture && mainWindow.model3.cf.fractureDetected)
-                        completed = true;
+                    if (mainWindow.model3.cf.StepNumber >= mainWindow.model3.prms.MaxSteps || 
+                        mainWindow.model3.cf.fractureDetected) completed = true;
 
                     // report progress
                     mainWindow.glControl1.Invalidate();
@@ -580,6 +585,7 @@ foreach (PSPoint psp in classes)
                 }
                 lbSimulations.Items.Clear();
                 foreach (PSPoint psp in this.resultingBatch) lbSimulations.Items.Add(psp);
+                SaveStudy();
             }
 
             running = false;

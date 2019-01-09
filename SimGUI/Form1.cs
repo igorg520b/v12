@@ -23,7 +23,7 @@ namespace icFlow
         public ImplicitModel3 model3 = new ImplicitModel3();
         TreeNode tnRoot, tnPrms, tnMeshCollection, tnRender;
         public TreeNode tnCurrentFrame;
-        RenderPrms rprm = RenderPrms.Load();
+        public RenderPrms rprm = RenderPrms.Load();
 
         #region initialize
 
@@ -57,7 +57,7 @@ namespace icFlow
             
         }
 
-        void RebuildTree()
+        public void RebuildTree()
         {
             treeView1.Nodes.Clear();
             tnRoot = treeView1.Nodes.Add("sim");
@@ -433,7 +433,7 @@ namespace icFlow
             glControl1.Invalidate();
         }
 
-        void reshape()
+        public void reshape()
         {
             aspectRatio = (double)glControl1.Width / glControl1.Height;
             if (rprm.UseFrustum)
@@ -480,7 +480,7 @@ namespace icFlow
 
 
         #region trackbar
-        void UpdateTrackbar()
+        public void UpdateTrackbar()
         {
             trackBar1.ValueChanged -= trackBar1_ValueChanged;
             if (tsbPreviewMode.Checked)
@@ -800,7 +800,6 @@ namespace icFlow
                 model3.saveFolder = Path.GetDirectoryName(openFileDialog1.FileName);
                 model3.LoadSimulation(clear: true);
                 UpdateTrackbar();
-                reshape();
                 glControl1.Invalidate();
                 model3.mc.Prepare();
                 rprm = RenderPrms.Load(model3.saveFolder);

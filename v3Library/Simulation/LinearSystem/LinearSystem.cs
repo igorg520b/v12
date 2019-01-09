@@ -24,6 +24,13 @@ namespace icFlow
         const int mklCriterionExp = 6;
         const int mklPreconditioner = 1;
 
+        public void Clear()
+        {
+            vals = rhs = dx = null;
+            csrd.ClearDynamic();
+            csrd.ClearStatic();
+        }
+
         // before this function runs, it is assumed that
         // activeNodes have sequential .altId, .neighbors are filled
         public void CreateStructure(FrameInfo cf)

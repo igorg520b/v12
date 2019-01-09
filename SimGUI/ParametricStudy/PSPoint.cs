@@ -13,6 +13,7 @@ namespace icFlow
         public BeamParams beamParams = new BeamParams();
         public ModelPrms modelParams = new ModelPrms();
         public string className = "c1";
+        public string path;
         public string parameterName;
         public double parameterValue;
 

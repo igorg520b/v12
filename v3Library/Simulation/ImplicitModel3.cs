@@ -39,6 +39,7 @@ namespace icFlow
         // resets model pristine state
         public void Clear()
         {
+            linearSystem.Clear();
             allFrames.Clear();
             mc.Clear();
             cf = null;
