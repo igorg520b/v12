@@ -543,9 +543,6 @@ namespace icFlow
                 mainWindow.tssCurrentFrame.Text = "*";
                 do
                 {
-                    if (mainWindow.model3.cf == null)
-                        mainWindow.model3.Step();
-                    else
                     await Task.Run(() => mainWindow.model3.Step());
                     if (mainWindow.model3.cf.StepNumber >= mainWindow.model3.prms.MaxSteps || 
                         mainWindow.model3.cf.fractureDetected) completed = true;
