@@ -255,6 +255,8 @@ namespace IcyGrains
             beamGap = 0.1;
             beamMargin = 0.35;
             type = BeamParams.BeamType.LBeam;
+            CharacteristicLengthMax = 0.6;
+            RefinementMultiplier = 0.15;
             switch (preset)
             {
                 case 1:
