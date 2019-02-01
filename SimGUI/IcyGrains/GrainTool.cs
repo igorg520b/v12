@@ -156,16 +156,16 @@ Extrude {0, indsize, 0} {
             sw.WriteLine($"Point(15) = {{ dx + b,dy - l1 + c / 2, 0, {prms.RefinementMultiplier / 2}}};");
             sw.WriteLine($"Point(16) = {{ dx + b + c,dy - l1 + c / 2, 0, {prms.RefinementMultiplier / 2}}};");
             sw.WriteLine($"Point(17) = {{ dx + b + c / 2,dy - l1 + c / 2, 0, {prms.RefinementMultiplier / 2}}};");
-            sw.WriteLine(@"Point(18) = { dx - c - d, dy + c + d, 0, 1.0};
+            sw.WriteLine(@"Point(18) = { -d, dy + c + d, 0, 1.0};
 Point(19) = { dx + l2 + c + d, dy + c + d, 0, 1.0};
-Point(20) = { dx + l2 + c + d, dy - l1 - c - d, 0, 1.0};
+Point(20) = { dx + l2 + c + d, dy - l1 - c - 2*d, 0, 1.0};
 ");
 
-            sw.WriteLine($"Point(21) = {{ 0, 0, 0, {prms.RefinementMultiplier}}};");
-            sw.WriteLine($"Point(23) = {{  dx/4 + l2/4 + c/4 + d/4, 0 , 0, {prms.RefinementMultiplier*0.75}}};");
-            sw.WriteLine($"Point(24) = {{ 0, dy/4 + c/4 + d/4, 0, {prms.RefinementMultiplier}}};");
-            sw.WriteLine($"Point(25) = {{ 0 , dy/2 + c/2 + d/2, 0, 1.0}};");
-            sw.WriteLine($"Point(26) = {{  dx/2 + l2/2 + c/2 + d/2, 0, 0, 1.0}};");
+            sw.WriteLine($"Point(21) = {{ -d, -d, 0, {prms.RefinementMultiplier}}};");
+            sw.WriteLine($"Point(23) = {{  dx/4 + l2/4 + c/4 + d/4, -d , 0, {prms.RefinementMultiplier*0.75}}};");
+            sw.WriteLine($"Point(24) = {{ -d, dy/4 + c/4 + d/4, 0, {prms.RefinementMultiplier}}};");
+            sw.WriteLine($"Point(25) = {{ -d , dy/2 + c/2 + d/2, 0, 1.0}};");
+            sw.WriteLine($"Point(26) = {{  dx/2 + l2/2 + c/2 + d/2, -d, 0, 1.0}};");
 
             sw.WriteLine(@"Circle(1) = { 4, 6, 5};
 Circle(8) = { 10, 12, 11};
