@@ -15,7 +15,7 @@ namespace icFlow
         public int id { get; set; }
         public bool sensor { get; set; }
         public List<int> faces = new List<int>();
-        public enum SurfaceRole { Free, Anchored, Forced };
+        public enum SurfaceRole { Free, Anchored, Forced, Rotated };
         public SurfaceRole role { get; set; } = SurfaceRole.Free;
         [Category("Stress")]
         public double px { get; set; }

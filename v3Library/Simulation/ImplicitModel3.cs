@@ -86,7 +86,7 @@ namespace icFlow
             // identify and mark anchored nodes
             foreach (Mesh deformableMesh in mc.deformables)
                 foreach (SurfaceFragment sf in deformableMesh.surfaceFragments)
-                    if (sf.role == SurfaceFragment.SurfaceRole.Anchored)
+                    if (sf.role == SurfaceFragment.SurfaceRole.Anchored || sf.role == SurfaceFragment.SurfaceRole.Rotated)
                         foreach (Node nd in sf.nodes) { nd.anchored = true; nd.altId = -1; }
 
             // list active nodes
@@ -154,6 +154,7 @@ namespace icFlow
             // position nodes of anchored surfaces
             foreach (Mesh deformable in mc.deformables)
                 foreach (SurfaceFragment sf in deformable.surfaceFragments)
+                {
                     if (sf.role == SurfaceFragment.SurfaceRole.Anchored)
                     {
                         // compute tentative location of this anchored surface
@@ -162,14 +163,29 @@ namespace icFlow
                         double dy = attenuation * sf.dy;
                         double dz = attenuation * sf.dz;
 
-                        foreach(Node nd in sf.nodes)
+                        foreach (Node nd in sf.nodes)
                         {
                             Debug.Assert(nd.anchored && nd.altId == -1, "_beginStep assertion failed");
                             nd.dux = (nd.x0 + dx) - nd.cx;
                             nd.duy = (nd.y0 + dy) - nd.cy;
                             nd.duz = (nd.z0 + dz) - nd.cz;
                         }
+                    } else if(sf.role == SurfaceFragment.SurfaceRole.Rotated)
+                    {
+                        double alpha = sf.applicationTime < tcf0.SimulationTime ? 1 : tcf0.SimulationTime / sf.applicationTime;
+                        alpha *= Math.PI;
+                        foreach (Node nd in sf.nodes)
+                        {
+                            double newZ = Math.Cos(alpha) * nd.z0 - Math.Sin(alpha) * nd.y0;
+                            double newY = Math.Sin(alpha) * nd.z0 + Math.Cos(alpha) * nd.y0;
+                            Debug.Assert(nd.anchored && nd.altId == -1, "_beginStep assertion failed");
+                            nd.duz = newZ - nd.cz;
+                            nd.duy = newY - nd.cy;
+                            nd.dux = 0;
+                        }
+
                     }
+                }
             _positionNonDeformables(tcf0.SimulationTime);
 
             // initial displacement guess for active nodes

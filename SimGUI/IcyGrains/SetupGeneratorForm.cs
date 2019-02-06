@@ -302,6 +302,8 @@ namespace IcyGrains
                 await Task.Run(() => gt2.LBeamGeneration(rprm));
             else if (rprm.type == BeamParams.BeamType.Plain)
                 await Task.Run(() => gt2.PlainBeamGeneration(rprm));
+            else if (rprm.type == BeamParams.BeamType.Plain2)
+                await Task.Run(() => gt2.PlainBeamGeneration2(rprm));
             else throw new Exception("beam type not set");
 
             gt = gt2;
@@ -309,6 +311,15 @@ namespace IcyGrains
             viewSelector.Text = "mesh";
             reshape();
             glControl1.Invalidate();
+        }
+
+        private void plain2ToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            rprm.RefinementMultiplier = 0.1;// 0.07;
+            rprm.beamMargin = 0.6;
+            rprm.type = BeamParams.BeamType.Plain2;
+            propertyGrid1.Refresh();
+            generateToolStripMenuItem_Click(null, null);
         }
 
         private void viewSelector_TextUpdate(object sender, EventArgs e)

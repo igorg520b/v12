@@ -1068,8 +1068,12 @@ namespace icFlow
                     model3.prms.BeamLength = beamParams.beamL2;
                     model3.prms.BeamThickness = beamParams.beamThickness;
                     model3.prms.BeamWidth = beamParams.beamA;
-                } else if(beamParams.type == IcyGrains.BeamParams.BeamType.LBeam)
+                }
+                else if (beamParams.type == IcyGrains.BeamParams.BeamType.LBeam)
+                {
                     model3.prms.SelectPreset(ModelPrms.ParameterPresets.LBeam);
+                }
+                else model3.prms.SelectPreset(ModelPrms.ParameterPresets.LBeam);
                 model3.prms.name = beamParams.name;
             }
 
@@ -1079,17 +1083,22 @@ namespace icFlow
             mgIndenter.isIndenter = true;
             mgIndenter.isDeformable = false;
             model3.mc.mgs.Add(mg);
-            model3.mc.mgs.Add(mgIndenter);
+            if (beamParams.type != IcyGrains.BeamParams.BeamType.Plain2)
+            {
+                model3.mc.mgs.Add(mgIndenter);
+            }
 
             (double x, double y, _) = mg.CenterSample(); // returns displacement
             mgIndenter.Translate(-x, -y, -mgIndenter.zmin + mg.zmax + 1e-10);
             Translation t0 = new Translation(0, 0, 0, 0);
-            Translation t1 = new Translation(0, 0, -0.6, 120);
+            Translation t1 = new Translation(0, 0, -0.6, 240);
             mgIndenter.translationCollection.Add(t0);
             mgIndenter.translationCollection.Add(t1);
 
             model3.prms.GrainSize = mg.AverageGrainSize();
             mg.InsertCohesiveElements(anchorsides: true);
+            mg.surfaceFragments[2].role = SurfaceFragment.SurfaceRole.Rotated;
+            mg.surfaceFragments[2].applicationTime = 1000;
             RebuildTree();
             glControl1.Invalidate();
 

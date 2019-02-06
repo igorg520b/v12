@@ -252,13 +252,9 @@ Extrude {0, 0, h} {
             selectedRegion.InferExteriorPoint();
         }
 
- 
-
-
         #endregion
 
         #region PlainBeam
-
 
 
         public void PlainBeamGeneration(BeamParams prms)
@@ -373,6 +369,100 @@ Extrude {0, 0, h} {
                 selectedRegion.InferExteriorPoint();
             }
 
+        }
+
+        public void PlainBeamGeneration2(BeamParams prms)
+        {
+            // prepare .geo file
+            string filename = $"tmp//PBeam.geo";
+            Stream str = File.Create(filename);
+            StreamWriter sw = new StreamWriter(str);
+
+            sw.WriteLine(@"SetFactory(""OpenCASCADE"");");
+            sw.WriteLine($"b = {prms.beamB};");
+            sw.WriteLine($"l2 = {prms.beamL2};");
+            sw.WriteLine($"c = {prms.beamGap};");
+            sw.WriteLine($"d = {prms.beamMargin};");
+            sw.WriteLine($"h = {prms.beamThickness};");
+            sw.WriteLine($"Point(1) = {{ d, -b/2-c/2, -h/2, {prms.RefinementMultiplier}}};");
+            sw.WriteLine($"Point(2) = {{ d, b/2+c/2, -h/2, {prms.RefinementMultiplier}}};");
+            sw.WriteLine($"Point(3) = {{ d, -b/2, -h/2, {prms.RefinementMultiplier}}};");
+            sw.WriteLine($"Point(4) = {{ d, b/2, -h/2, {prms.RefinementMultiplier}}};");
+            sw.WriteLine($"Point(5) = {{ d+l2, -b/2, -h/2, {prms.RefinementMultiplier}}};");
+            sw.WriteLine($"Point(6) = {{ d+l2, b/2, -h/2, {prms.RefinementMultiplier}}};");
+            sw.WriteLine($"Point(9) = {{ d-c/2, -b/2-c/2, -h/2, {prms.RefinementMultiplier}}};");
+            sw.WriteLine($"Point(10) = {{ d-c/2, b/2+c/2, -h/2, {prms.RefinementMultiplier}}};");
+            sw.WriteLine($"Point(7) = {{ d-c/2, -b/2-c-d, -h/2, {prms.RefinementMultiplier}}};");
+            sw.WriteLine($"Point(8) = {{ d-c/2, b/2+c+d, -h/2, {prms.RefinementMultiplier}}};");
+            sw.WriteLine($"Point(11) = {{ 0, -b/2-c-d, -h/2, {prms.RefinementMultiplier}}};");
+            sw.WriteLine($"Point(12) = {{ 0, b/2+c+d, -h/2, {prms.RefinementMultiplier}}};");
+
+            sw.WriteLine(@"
+Line(1) = { 7, 9};
+Circle(2) = { 9, 1, 3};
+Line(3) = { 3, 5};
+Line(4) = { 5, 6};
+Line(5) = { 6, 4};
+Circle(6) = { 4, 2, 10};
+Line(7) = { 10, 8};
+Line(8) = { 8, 12};
+Line(9) = { 12, 11};
+Line(10) = { 11, 7};
+
+Curve Loop(2) = {1, 2, 3, 4, 5, 6, 7, 8,9,10};
+Plane Surface(1) = {2};
+Extrude {0, 0, h} {
+  Surface{1}; 
+}");
+            sw.WriteLine($"Mesh.CharacteristicLengthMax = {prms.CharacteristicLengthMax};");
+            sw.Close();
+
+            // invoke gmsh
+            Process process = new Process();
+            ProcessStartInfo startInfo = new ProcessStartInfo();
+            startInfo.WindowStyle = ProcessWindowStyle.Hidden;
+            startInfo.FileName = "gmsh.exe";
+            startInfo.Arguments = $"{filename} -format msh2 -3";
+            process.StartInfo = startInfo;
+            process.Start();
+            process.WaitForExit();
+
+            // load .msh -> tmesh
+            lock (tmesh.allTetra)
+            {
+                tmesh.LoadMsh(File.OpenRead($"tmp//PBeam.msh"));
+            }
+
+            // now, enumerate tetrahedra inside the region
+            GenerateSelectedRegionPBeam();
+            int count = 2;
+            foreach (TetraMesh.Tetra t in tmesh.allTetra)
+            {
+                if (selectedRegion.PointInsideLoop(t.center.Xy)) t.tag = count++;
+                else t.tag = 1;
+            }
+
+            PlainBeamGenerateIndenter(prms);
+
+            void GenerateSelectedRegionPBeam()
+            {
+                double a = prms.beamA;
+                double b = prms.beamB;
+                double l1 = prms.beamL1;
+                double l2 = prms.beamL2;
+                double c = prms.beamGap;
+                double d = prms.beamMargin;
+                double dx = c + d;
+                double dy = l1 + c + d;
+
+                selectedRegion.region = new List<Vector2d>();
+                List<Vector2d> s = selectedRegion.region;
+
+                s.Add(new Vector2d(d + l2*0.9, -b));
+                s.Add(new Vector2d(d + l2 * 0.9, b));
+                s.Add(new Vector2d(d /3, b));
+                s.Add(new Vector2d(d / 3, -b));
+            }
         }
 
         void PlainBeamGenerateIndenter(BeamParams prms)

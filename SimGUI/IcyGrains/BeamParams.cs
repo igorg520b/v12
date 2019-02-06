@@ -14,7 +14,7 @@ namespace IcyGrains
     public class BeamParams
     {
         #region beam
-        public enum BeamType { Unknown, LBeam, Plain };
+        public enum BeamType { Unknown, LBeam, Plain, Plain2 };
 
         [Category("Beam")]
         public BeamType type { get; set; } = BeamType.Unknown;
