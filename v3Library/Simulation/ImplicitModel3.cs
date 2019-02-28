@@ -399,7 +399,8 @@ namespace icFlow
                 Mesh msh = mc.deformables[0]; // assuming there is just one cylinder
                 SurfaceFragment top = msh.surfaceFragments[0];
                 SurfaceFragment bottom = msh.surfaceFragments[1];
-                if(top != null && bottom != null && 
+                SurfaceFragment xmax = msh.surfaceFragments[2];
+                if (top != null && bottom != null && 
                     top.role == SurfaceFragment.SurfaceRole.Anchored && 
                     bottom.role == SurfaceFragment.SurfaceRole.Anchored)
                 {
@@ -412,6 +413,13 @@ namespace icFlow
                     double height = msh.height; // undeformed
                     cf.strain = (tz - bz) / height;
                     cf.stress = top.fz / top.area;
+                }
+
+                if(xmax != null && xmax.role == SurfaceFragment.SurfaceRole.Anchored)
+                {
+                    xmax.ComputeTotalForce();
+                    xmax.ComputeArea();
+                    cf.stress = xmax.fx / xmax.area;
                 }
             }
 
@@ -427,7 +435,7 @@ namespace icFlow
             cf.IndenterForce = Math.Sqrt(indFrcX * indFrcX + indFrcY * indFrcY + indFrcZ * indFrcZ);
 
             // detect fracture
-            if (prms.DetectFracture && cf.StepNumber % 10 == 0)
+            if (prms.DetectFracture)
             {
                 cf.fractureDetected = false;
                 foreach (Mesh m in mc.deformables)

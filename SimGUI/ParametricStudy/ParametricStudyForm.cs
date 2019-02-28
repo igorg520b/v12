@@ -139,6 +139,23 @@ namespace icFlow
                     }
                     break;
 
+                case "lengthL1":
+                    for (int i = 0; i < steps; i++)
+                    {
+                        double mix = (double)i / (steps - 1);
+                        double length1 = fromValue * (1 - mix) + toValue * mix;
+                        foreach (PSPoint psc in classes)
+                        {
+                            PSPoint current = new PSPoint(psc);
+                            resultingBatch.Add(current);
+                            current.beamParams.beamL1 = length1;
+                            current.className = psc.className;
+                            current.parameterName = "lengthL1";
+                            current.parameterValue = length1;
+                            current.path = current.modelParams.name = $"{tbStudyName.Text}/{psc.className}-{i}";
+                        }
+                    }
+                    break;
 
                 case "width":
                     for (int i = 0; i < steps; i++)
@@ -165,6 +182,30 @@ namespace icFlow
                     }
                     break;
 
+                case "widthB":
+                    for (int i = 0; i < steps; i++)
+                    {
+                        double mix = (double)i / (steps - 1);
+                        double width1 = fromValue * (1 - mix) + toValue * mix;
+                        foreach (PSPoint psc in classes)
+                        {
+                            PSPoint current = new PSPoint(psc);
+                            resultingBatch.Add(current);
+                            current.beamParams.beamB = width1;
+                            current.className = psc.className;
+                            current.parameterName = "width";
+                            current.parameterValue = width1;
+                            current.path = current.modelParams.name = $"{tbStudyName.Text}/{psc.className}-{i}";
+
+                            if (psc.beamParams.type == IcyGrains.BeamParams.BeamType.Plain)
+                            {
+                                current.modelParams.BeamLength = current.beamParams.beamL2;
+                                current.modelParams.BeamThickness = current.beamParams.beamThickness;
+                                current.modelParams.BeamWidth = current.beamParams.beamA;
+                            }
+                        }
+                    }
+                    break;
 
                 case "thickness":
                     for (int i = 0; i < steps; i++)
@@ -318,6 +359,10 @@ namespace icFlow
                     tbFrom.Text = "1.3";
                     tbTo.Text = "2.5";
                     break;
+                case "lengthL1":
+                    tbFrom.Text = "0.8";
+                    tbTo.Text = "1.2";
+                    break;
                 case "sigma":
                     tbFrom.Text = "100000";
                     tbTo.Text = "150000";
@@ -327,6 +372,7 @@ namespace icFlow
                     tbTo.Text = "2";
                     break;
                 case "width":
+                case "widthB":
                     tbFrom.Text = "0.4";
                     tbTo.Text = "0.8";
                     break;

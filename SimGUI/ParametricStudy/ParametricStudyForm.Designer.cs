@@ -28,8 +28,8 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea2 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-            System.Windows.Forms.DataVisualization.Charting.Legend legend2 = new System.Windows.Forms.DataVisualization.Charting.Legend();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea1 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.Legend legend1 = new System.Windows.Forms.DataVisualization.Charting.Legend();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ParametricStudyForm));
             this.panel1 = new System.Windows.Forms.Panel();
             this.pgBeamParams = new System.Windows.Forms.PropertyGrid();
@@ -208,7 +208,9 @@
             "length",
             "width",
             "thickness",
-            "resolution"});
+            "resolution",
+            "widthB",
+            "lengthL1"});
             this.lbParameters.Location = new System.Drawing.Point(16, 72);
             this.lbParameters.Name = "lbParameters";
             this.lbParameters.Size = new System.Drawing.Size(93, 108);
@@ -396,11 +398,11 @@
             // 
             // chart1
             // 
-            chartArea2.Name = "ChartArea1";
-            this.chart1.ChartAreas.Add(chartArea2);
+            chartArea1.Name = "ChartArea1";
+            this.chart1.ChartAreas.Add(chartArea1);
             this.chart1.Dock = System.Windows.Forms.DockStyle.Fill;
-            legend2.Name = "Legend1";
-            this.chart1.Legends.Add(legend2);
+            legend1.Name = "Legend1";
+            this.chart1.Legends.Add(legend1);
             this.chart1.Location = new System.Drawing.Point(162, 27);
             this.chart1.Name = "chart1";
             this.chart1.Size = new System.Drawing.Size(388, 274);

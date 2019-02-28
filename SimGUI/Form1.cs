@@ -1097,8 +1097,6 @@ namespace icFlow
 
             model3.prms.GrainSize = mg.AverageGrainSize();
             mg.InsertCohesiveElements(anchorsides: true);
-            mg.surfaceFragments[2].role = SurfaceFragment.SurfaceRole.Rotated;
-            mg.surfaceFragments[2].applicationTime = 1000;
             RebuildTree();
             glControl1.Invalidate();
 

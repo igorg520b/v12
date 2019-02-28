@@ -256,7 +256,7 @@ namespace IcyGrains
             beamMargin = 0.35;
             type = BeamParams.BeamType.LBeam;
             CharacteristicLengthMax = 0.6;
-            RefinementMultiplier = 0.15;
+            RefinementMultiplier = 0.085;
             switch (preset)
             {
                 case 1:
