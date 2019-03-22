@@ -92,6 +92,8 @@
             this.removeToolStripMenuItem2 = new System.Windows.Forms.ToolStripMenuItem();
             this.openFileDialogMeshes = new System.Windows.Forms.OpenFileDialog();
             this.timer1 = new System.Windows.Forms.Timer(this.components);
+            this.toolStripMenuItem9 = new System.Windows.Forms.ToolStripSeparator();
+            this.setUpShearTestToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             this.statusStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.trackBar1)).BeginInit();
@@ -250,7 +252,9 @@
             this.toolStripMenuItem4,
             this.setupGenerationToolStripMenuItem,
             this.toolStripMenuItem8,
-            this.parametricStudyToolStripMenuItem});
+            this.parametricStudyToolStripMenuItem,
+            this.toolStripMenuItem9,
+            this.setUpShearTestToolStripMenuItem});
             this.toolsToolStripMenuItem.Name = "toolsToolStripMenuItem";
             this.toolsToolStripMenuItem.Size = new System.Drawing.Size(47, 20);
             this.toolsToolStripMenuItem.Text = "Tools";
@@ -633,6 +637,19 @@
             // 
             this.timer1.Tick += new System.EventHandler(this.timer1_Tick);
             // 
+            // toolStripMenuItem9
+            // 
+            this.toolStripMenuItem9.Name = "toolStripMenuItem9";
+            this.toolStripMenuItem9.Size = new System.Drawing.Size(213, 6);
+            // 
+            // setUpShearTestToolStripMenuItem
+            // 
+            this.setUpShearTestToolStripMenuItem.Name = "setUpShearTestToolStripMenuItem";
+            this.setUpShearTestToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.R)));
+            this.setUpShearTestToolStripMenuItem.Size = new System.Drawing.Size(216, 22);
+            this.setUpShearTestToolStripMenuItem.Text = "Set up shear test...";
+            this.setUpShearTestToolStripMenuItem.Click += new System.EventHandler(this.setUpShearTestToolStripMenuItem_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -732,6 +749,8 @@
         public System.Windows.Forms.ToolStripStatusLabel tssCurrentFrame;
         public System.Windows.Forms.TreeView treeView1;
         public System.Windows.Forms.PropertyGrid pg;
+        private System.Windows.Forms.ToolStripSeparator toolStripMenuItem9;
+        private System.Windows.Forms.ToolStripMenuItem setUpShearTestToolStripMenuItem;
     }
 }
 

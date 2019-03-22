@@ -1108,6 +1108,25 @@ namespace icFlow
 
         StreamWriter swReport;
         double mixingCoeff, frameTime, firstFrameTime, lastFrameTime, timeSpan;
+
+        private void setUpShearTestToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            using (ShearTestSetupForm stsf = new ShearTestSetupForm())
+            {
+                if(stsf.ShowDialog() == DialogResult.OK)
+                {
+                    double InnerIndenterLocation = stsf.InnerIndenterLocation;
+                    double OuterIndenterLocation = stsf.OuterIndenterLocation;
+                    double IndentationRate = stsf.IndentationRate;
+
+                    Debug.WriteLine($"setting up shear test with parameters {InnerIndenterLocation}, {OuterIndenterLocation}, {IndentationRate}");
+
+                    //
+                }
+            }
+
+        }
+
         int renderingFrame;
         private void renderSimulationToolStripMenuItem_Click(object sender, EventArgs e)
         {
