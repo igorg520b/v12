@@ -53,13 +53,45 @@ namespace icFlow
 
         public Mesh() { }
 
-        public Mesh(Stream str, string name, string type) : this() {
+        public Mesh(Stream str, string name, string type) {
             this.name = name;
             if (type == ".geo") LoadGeo(str);
             else if (type == ".msh") LoadMsh(str);
             else if (type == ".mg") LoadFrame(str);
             else throw new Exception("Load: incorrect mesh type");
         }
+
+        public Mesh(Mesh other, string name)
+        {
+            this.name = name;
+            Dictionary<Node, Node> d = new Dictionary<Node, Node>();
+            foreach (Node nd in other.nodes)
+            {
+                Node newNode = new Node(nd);
+                nodes.Add(newNode);
+                d.Add(nd, newNode);
+            }
+            foreach(Element elem in other.elems)
+            {
+                Element newElement = new Element();
+                newElement.vrts[0] = d[elem.vrts[0]];
+                newElement.vrts[1] = d[elem.vrts[1]];
+                newElement.vrts[2] = d[elem.vrts[2]];
+                newElement.vrts[3] = d[elem.vrts[3]];
+                elems.Add(newElement);
+            }
+            foreach(Face fc in other.faces)
+            {
+                Face newFace = new Face();
+                newFace.vrts[0] = d[fc.vrts[0]];
+                newFace.vrts[1] = d[fc.vrts[1]];
+                newFace.vrts[2] = d[fc.vrts[2]];
+                faces.Add(newFace);
+            }
+
+            BoundingBox();
+        }
+
 
         public void BoundingBox()
         {
@@ -753,6 +785,25 @@ namespace icFlow
             BoundingBox();
             return (x_center, y_center, 0);
         }
+
+        public void CenterSampleXYZ()
+        {
+            BoundingBox();
+            double x_center = (xmax + xmin) / 2D;
+            double y_center = (ymax + ymin) / 2D;
+            double z_center = (zmax + zmin) / 2D;
+            foreach (Node nd in nodes)
+            {
+                nd.x0 = nd.x0 - x_center;
+                nd.y0 = nd.y0 - y_center;
+                nd.z0 = nd.z0 - z_center;
+                nd.cx = nd.x0;
+                nd.cy = nd.y0;
+                nd.cz = nd.z0;
+            }
+            BoundingBox();
+        }
+
 
         public void Translate(double dx, double dy, double dz)
         {

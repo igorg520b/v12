@@ -55,22 +55,22 @@
             // rbPoint2
             // 
             this.rbPoint2.AutoSize = true;
-            this.rbPoint2.Checked = true;
             this.rbPoint2.Location = new System.Drawing.Point(17, 21);
             this.rbPoint2.Name = "rbPoint2";
             this.rbPoint2.Size = new System.Drawing.Size(63, 17);
             this.rbPoint2.TabIndex = 1;
-            this.rbPoint2.TabStop = true;
             this.rbPoint2.Text = ".2 mm/s";
             this.rbPoint2.UseVisualStyleBackColor = true;
             // 
             // rb2
             // 
             this.rb2.AutoSize = true;
+            this.rb2.Checked = true;
             this.rb2.Location = new System.Drawing.Point(17, 44);
             this.rb2.Name = "rb2";
             this.rb2.Size = new System.Drawing.Size(60, 17);
             this.rb2.TabIndex = 2;
+            this.rb2.TabStop = true;
             this.rb2.Text = "2 mm/s";
             this.rb2.UseVisualStyleBackColor = true;
             // 
@@ -116,27 +116,29 @@
             // 
             // nudInner
             // 
+            this.nudInner.DecimalPlaces = 1;
             this.nudInner.Location = new System.Drawing.Point(173, 146);
             this.nudInner.Name = "nudInner";
             this.nudInner.Size = new System.Drawing.Size(73, 20);
             this.nudInner.TabIndex = 6;
             this.nudInner.Value = new decimal(new int[] {
-            15,
+            8,
             0,
             0,
             0});
             // 
             // nudOuter
             // 
+            this.nudOuter.DecimalPlaces = 2;
             this.nudOuter.Location = new System.Drawing.Point(173, 180);
             this.nudOuter.Name = "nudOuter";
             this.nudOuter.Size = new System.Drawing.Size(73, 20);
             this.nudOuter.TabIndex = 7;
             this.nudOuter.Value = new decimal(new int[] {
-            75,
+            7547,
             0,
             0,
-            0});
+            131072});
             // 
             // ShearTestSetupForm
             // 
@@ -153,7 +155,6 @@
             this.MinimizeBox = false;
             this.Name = "ShearTestSetupForm";
             this.Text = "ShearTestSetupForm";
-            this.TopMost = true;
             this.Load += new System.EventHandler(this.ShearTestSetupForm_Load);
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();

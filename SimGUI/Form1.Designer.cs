@@ -55,6 +55,8 @@
             this.setupGenerationToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItem8 = new System.Windows.Forms.ToolStripSeparator();
             this.parametricStudyToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripMenuItem9 = new System.Windows.Forms.ToolStripSeparator();
+            this.setUpShearTestToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.tssStatus = new System.Windows.Forms.ToolStripStatusLabel();
             this.tssCurrentFrame = new System.Windows.Forms.ToolStripStatusLabel();
@@ -92,8 +94,7 @@
             this.removeToolStripMenuItem2 = new System.Windows.Forms.ToolStripMenuItem();
             this.openFileDialogMeshes = new System.Windows.Forms.OpenFileDialog();
             this.timer1 = new System.Windows.Forms.Timer(this.components);
-            this.toolStripMenuItem9 = new System.Windows.Forms.ToolStripSeparator();
-            this.setUpShearTestToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.centerToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             this.statusStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.trackBar1)).BeginInit();
@@ -311,6 +312,19 @@
             this.parametricStudyToolStripMenuItem.Size = new System.Drawing.Size(216, 22);
             this.parametricStudyToolStripMenuItem.Text = "Parametric Study...";
             this.parametricStudyToolStripMenuItem.Click += new System.EventHandler(this.parametricStudyToolStripMenuItem_Click);
+            // 
+            // toolStripMenuItem9
+            // 
+            this.toolStripMenuItem9.Name = "toolStripMenuItem9";
+            this.toolStripMenuItem9.Size = new System.Drawing.Size(213, 6);
+            // 
+            // setUpShearTestToolStripMenuItem
+            // 
+            this.setUpShearTestToolStripMenuItem.Name = "setUpShearTestToolStripMenuItem";
+            this.setUpShearTestToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.R)));
+            this.setUpShearTestToolStripMenuItem.Size = new System.Drawing.Size(216, 22);
+            this.setUpShearTestToolStripMenuItem.Text = "Set up shear test...";
+            this.setUpShearTestToolStripMenuItem.Click += new System.EventHandler(this.setUpShearTestToolStripMenuItem_Click);
             // 
             // statusStrip1
             // 
@@ -569,67 +583,68 @@
             this.resizeToolStripMenuItem,
             this.rotate90DegToolStripMenuItem,
             this.rotateXToolStripMenuItem,
+            this.centerToolStripMenuItem,
             this.toolStripMenuItem7,
             this.removeToolStripMenuItem2});
             this.cmsMesh.Name = "cmsMesh";
-            this.cmsMesh.Size = new System.Drawing.Size(147, 170);
+            this.cmsMesh.Size = new System.Drawing.Size(181, 214);
             // 
             // cZsAndCapsToolStripMenuItem
             // 
             this.cZsAndCapsToolStripMenuItem.Name = "cZsAndCapsToolStripMenuItem";
-            this.cZsAndCapsToolStripMenuItem.Size = new System.Drawing.Size(146, 22);
+            this.cZsAndCapsToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.cZsAndCapsToolStripMenuItem.Text = "CZs and Caps";
             this.cZsAndCapsToolStripMenuItem.Click += new System.EventHandler(this.cZsAndCapsToolStripMenuItem_Click);
             // 
             // cZsToolStripMenuItem1
             // 
             this.cZsToolStripMenuItem1.Name = "cZsToolStripMenuItem1";
-            this.cZsToolStripMenuItem1.Size = new System.Drawing.Size(146, 22);
+            this.cZsToolStripMenuItem1.Size = new System.Drawing.Size(180, 22);
             this.cZsToolStripMenuItem1.Text = "CZs";
             this.cZsToolStripMenuItem1.Click += new System.EventHandler(this.cZsToolStripMenuItem1_Click);
             // 
             // splitToolStripMenuItem1
             // 
             this.splitToolStripMenuItem1.Name = "splitToolStripMenuItem1";
-            this.splitToolStripMenuItem1.Size = new System.Drawing.Size(146, 22);
+            this.splitToolStripMenuItem1.Size = new System.Drawing.Size(180, 22);
             this.splitToolStripMenuItem1.Text = "Split";
             this.splitToolStripMenuItem1.Click += new System.EventHandler(this.splitToolStripMenuItem1_Click);
             // 
             // toolStripMenuItem6
             // 
             this.toolStripMenuItem6.Name = "toolStripMenuItem6";
-            this.toolStripMenuItem6.Size = new System.Drawing.Size(143, 6);
+            this.toolStripMenuItem6.Size = new System.Drawing.Size(177, 6);
             // 
             // resizeToolStripMenuItem
             // 
             this.resizeToolStripMenuItem.Name = "resizeToolStripMenuItem";
-            this.resizeToolStripMenuItem.Size = new System.Drawing.Size(146, 22);
+            this.resizeToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.resizeToolStripMenuItem.Text = "Resize";
             this.resizeToolStripMenuItem.Click += new System.EventHandler(this.resizeToolStripMenuItem_Click);
             // 
             // rotate90DegToolStripMenuItem
             // 
             this.rotate90DegToolStripMenuItem.Name = "rotate90DegToolStripMenuItem";
-            this.rotate90DegToolStripMenuItem.Size = new System.Drawing.Size(146, 22);
+            this.rotate90DegToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.rotate90DegToolStripMenuItem.Text = "Rotate90Deg";
             this.rotate90DegToolStripMenuItem.Click += new System.EventHandler(this.rotate90DegToolStripMenuItem_Click);
             // 
             // rotateXToolStripMenuItem
             // 
             this.rotateXToolStripMenuItem.Name = "rotateXToolStripMenuItem";
-            this.rotateXToolStripMenuItem.Size = new System.Drawing.Size(146, 22);
+            this.rotateXToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.rotateXToolStripMenuItem.Text = "RotateX";
             this.rotateXToolStripMenuItem.Click += new System.EventHandler(this.rotateXToolStripMenuItem_Click);
             // 
             // toolStripMenuItem7
             // 
             this.toolStripMenuItem7.Name = "toolStripMenuItem7";
-            this.toolStripMenuItem7.Size = new System.Drawing.Size(143, 6);
+            this.toolStripMenuItem7.Size = new System.Drawing.Size(177, 6);
             // 
             // removeToolStripMenuItem2
             // 
             this.removeToolStripMenuItem2.Name = "removeToolStripMenuItem2";
-            this.removeToolStripMenuItem2.Size = new System.Drawing.Size(146, 22);
+            this.removeToolStripMenuItem2.Size = new System.Drawing.Size(180, 22);
             this.removeToolStripMenuItem2.Text = "Remove";
             this.removeToolStripMenuItem2.Click += new System.EventHandler(this.removeToolStripMenuItem2_Click);
             // 
@@ -637,18 +652,12 @@
             // 
             this.timer1.Tick += new System.EventHandler(this.timer1_Tick);
             // 
-            // toolStripMenuItem9
+            // centerToolStripMenuItem
             // 
-            this.toolStripMenuItem9.Name = "toolStripMenuItem9";
-            this.toolStripMenuItem9.Size = new System.Drawing.Size(213, 6);
-            // 
-            // setUpShearTestToolStripMenuItem
-            // 
-            this.setUpShearTestToolStripMenuItem.Name = "setUpShearTestToolStripMenuItem";
-            this.setUpShearTestToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.R)));
-            this.setUpShearTestToolStripMenuItem.Size = new System.Drawing.Size(216, 22);
-            this.setUpShearTestToolStripMenuItem.Text = "Set up shear test...";
-            this.setUpShearTestToolStripMenuItem.Click += new System.EventHandler(this.setUpShearTestToolStripMenuItem_Click);
+            this.centerToolStripMenuItem.Name = "centerToolStripMenuItem";
+            this.centerToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.centerToolStripMenuItem.Text = "Center";
+            this.centerToolStripMenuItem.Click += new System.EventHandler(this.centerToolStripMenuItem_Click);
             // 
             // Form1
             // 
@@ -751,6 +760,7 @@
         public System.Windows.Forms.PropertyGrid pg;
         private System.Windows.Forms.ToolStripSeparator toolStripMenuItem9;
         private System.Windows.Forms.ToolStripMenuItem setUpShearTestToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem centerToolStripMenuItem;
     }
 }
 

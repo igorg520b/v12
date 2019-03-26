@@ -850,7 +850,16 @@ namespace icFlow
             mg.Rotate90DegX();
             glControl1.Invalidate();
             pg.Refresh();
+        }
 
+        private void centerToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            object selection = treeView1.SelectedNode.Tag;
+            if (selection == null || running) return;
+            Mesh mg = (Mesh)selection;
+            mg.CenterSample();
+            glControl1.Invalidate();
+            pg.Refresh();
         }
 
         private void writeCSVToolStripMenuItem_Click(object sender, EventArgs e)
@@ -1109,6 +1118,8 @@ namespace icFlow
         StreamWriter swReport;
         double mixingCoeff, frameTime, firstFrameTime, lastFrameTime, timeSpan;
 
+
+
         private void setUpShearTestToolStripMenuItem_Click(object sender, EventArgs e)
         {
             using (ShearTestSetupForm stsf = new ShearTestSetupForm())
@@ -1121,6 +1132,66 @@ namespace icFlow
 
                     Debug.WriteLine($"setting up shear test with parameters {InnerIndenterLocation}, {OuterIndenterLocation}, {IndentationRate}");
 
+                    Mesh mgSample = model3.mc.mgs[0];
+                    if (mgSample == null) return;
+                    mgSample.CenterSampleXYZ();
+
+                    Mesh mgIndenter = new Mesh(stsf.memStrIndenter, "indenter1", ".msh");
+                    Mesh mgIndenter2 = new Mesh(mgIndenter, "indenter2");
+                    Mesh mgIndenter3 = new Mesh(mgIndenter, "indenter3");
+                    Mesh mgIndenter4 = new Mesh(mgIndenter, "indenter4");
+
+                    model3.mc.mgs.Add(mgIndenter);
+                    mgIndenter.isDeformable = false;
+                    mgIndenter.CenterSampleXYZ();
+                    mgIndenter.Translate(-InnerIndenterLocation, 0, mgSample.zmin - mgIndenter.zmax - 1e-10);
+
+                    model3.mc.mgs.Add(mgIndenter2);
+                    mgIndenter2.CenterSampleXYZ();
+                    mgIndenter2.Translate(OuterIndenterLocation, 0, mgSample.zmin - mgIndenter2.zmax - 1e-10);
+
+                    mgIndenter3.isIndenter = true;
+                    model3.mc.mgs.Add(mgIndenter3);
+                    mgIndenter3.CenterSampleXYZ();
+                    mgIndenter3.Translate(InnerIndenterLocation, 0, mgSample.zmax - mgIndenter3.zmin + 1e-10);
+
+                    mgIndenter4.isIndenter = true;
+                    model3.mc.mgs.Add(mgIndenter4);
+                    mgIndenter4.CenterSampleXYZ();
+                    mgIndenter4.Translate(-OuterIndenterLocation, 0, mgSample.zmax - mgIndenter4.zmin + 1e-10);
+
+                    Translation t0 = new Translation(0, 0, 0, 0);
+                    Translation t1 = new Translation(0, 0, -0.1, 0.1/IndentationRate);
+                    mgIndenter3.translationCollection.Add(t0);
+                    mgIndenter3.translationCollection.Add(t1);
+
+                    t0 = new Translation(0, 0, 0, 0);
+                    t1 = new Translation(0, 0, -0.1, 0.1 / IndentationRate);
+                    mgIndenter4.translationCollection.Add(t0);
+                    mgIndenter4.translationCollection.Add(t1);
+
+                    Mesh mgSide1 = new Mesh(stsf.memStrSideDisk, "disk1", ".msh");
+                    mgSide1.isDeformable = false;
+                    Mesh mgSide2 = new Mesh(mgSide1, "disk2");
+                    model3.mc.mgs.Add(mgSide1);
+                    model3.mc.mgs.Add(mgSide2);
+                    mgSide1.CenterSampleXYZ();
+                    mgSide2.CenterSampleXYZ();
+
+                    mgSide1.Translate(mgSample.xmax - mgSide1.xmin + 1e-3, 0, 0);
+                    mgSide2.Translate(mgSample.xmin - mgSide2.xmax - 1e-3, 0, 0);
+
+                    Mesh mgPin1 = new Mesh(stsf.memStrHoldingPin, "pin1", ".msh");
+                    mgPin1.isDeformable = false;
+                    model3.mc.mgs.Add(mgPin1);
+                    mgPin1.CenterSampleXYZ();
+
+
+                    RebuildTree();
+                    glControl1.Invalidate();
+
+                    model3.mc.Prepare();
+                    model3.isReady = false;
                     //
                 }
             }
