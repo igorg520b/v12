@@ -1186,13 +1186,25 @@ namespace icFlow
                     model3.mc.mgs.Add(mgPin1);
                     mgPin1.CenterSampleXYZ();
 
+                    Mesh mgPin2 = new Mesh(mgPin1, "pin2");
+                    Mesh mgPin3 = new Mesh(mgPin1, "pin3");
+                    Mesh mgPin4 = new Mesh(mgPin1, "pin4");
+                    model3.mc.mgs.Add(mgPin2);
+                    model3.mc.mgs.Add(mgPin3);
+                    model3.mc.mgs.Add(mgPin4);
+
+                    mgPin1.Translate(mgSample.xmax + mgPin1.xmin, mgSample.ymax - mgPin1.ymin + 1e-3, 0);
+                    mgPin2.Translate(mgSample.xmin + mgPin2.xmax, mgSample.ymax - mgPin2.ymin + 1e-3, 0);
+
+                    mgPin3.Translate(mgSample.xmax + mgPin3.xmin, mgSample.ymin - mgPin3.ymax - 1e-3, 0);
+                    mgPin4.Translate(mgSample.xmin + mgPin4.xmax, mgSample.ymin - mgPin4.ymax - 1e-3, 0);
+
+                    mgSample.InsertCohesiveElements();
 
                     RebuildTree();
                     glControl1.Invalidate();
-
                     model3.mc.Prepare();
                     model3.isReady = false;
-                    //
                 }
             }
 

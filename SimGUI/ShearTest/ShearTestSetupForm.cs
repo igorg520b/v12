@@ -115,7 +115,7 @@ namespace icFlow
             sw.WriteLine(@"Rotate {{1, 0, 0}, {0, 0, 0}, Pi/2} { Curve{1}; }");
             sw.WriteLine(@"Curve Loop(1) = {1};");
             sw.WriteLine(@"Plane Surface(1) = {1};");
-            sw.WriteLine(@"Extrude {0, 0.03, 0} { Surface{1}; }");
+            sw.WriteLine(@"Extrude {0, 0.05, 0} { Surface{1}; }");
             sw.WriteLine($"Mesh.CharacteristicLengthMax = {0.0025};");
             sw.Close();
 
