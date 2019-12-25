@@ -504,7 +504,7 @@ namespace icFlow
 
                 // solve with MKL
                 linearSystem.Solve(tcf0);
-
+                if (prms.SaveMatrixToFile) linearSystem.DumpMatrix();
                 // convergence analysis
                 diverges = _checkDivergence();
 

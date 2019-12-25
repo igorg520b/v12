@@ -262,7 +262,7 @@ __device__ double vertex_edge_distance_and_derivs(double(&x)[9],	// input coords
 		(x2 - u*x5 - t*x8)*(x2 - u*x5 - t*x8);
 	double edge_length = sqrt(edge_length_sq);
 	double dist = sqrt(sqrDist);
-	double ratio = sqrDist / edge_length;
+	//double ratio = sqrDist / edge_length;
 
 	double g;
 	double g_fd[9] = {};
@@ -272,10 +272,10 @@ __device__ double vertex_edge_distance_and_derivs(double(&x)[9],	// input coords
 	g = sp_dot3_squared(x, g_fd, g_sd);
 
 	// f1 = |x1-x0|^2
-	double f1;
+	//double f1;
 	double f1fd[9] = {};
 	double f1sd[9][9] = {};
-	f1 = vertex_vertex_distance_and_derivs(1, 0, x, f1fd, f1sd);
+	//f1 = vertex_vertex_distance_and_derivs(1, 0, x, f1fd, f1sd);
 
 	// f2 = |x2-x1|^2
 	double f2;
@@ -372,7 +372,7 @@ __device__ double xd(int idx1, int idx2) { return idx1 == idx2 ? 1. : 0; }
 // note: don't call this function directly
 __device__ double point_plane_distance(double(&x)[12], double(&fd)[12], double(&sd)[12][12])
 {
-	double output_s, output_t; // for testing
+	//double output_s, output_t; // for testing
 	double x0 = x[0];
 	double x1 = x[1];
 	double x2 = x[2];
@@ -391,7 +391,7 @@ __device__ double point_plane_distance(double(&x)[12], double(&fd)[12], double(&
 	double c = (x10 - x4)*(x10 - x4) + (x11 - x5)*(x11 - x5) + (-x3 + x9)*(-x3 + x9);
 	double d = (-x0 + x3)*(-x3 + x6) + (-x1 + x4)*(-x4 + x7) + (-x2 + x5)*(-x5 + x8);
 	double e = (x10 - x4)*(-x1 + x4) + (x11 - x5)*(-x2 + x5) + (-x0 + x3)*(-x3 + x9);
-	double f = (-x0 + x3)*(-x0 + x3) + (-x1 + x4)*(-x1 + x4) + (-x2 + x5)*(-x2 + x5);
+	//double f = (-x0 + x3)*(-x0 + x3) + (-x1 + x4)*(-x1 + x4) + (-x2 + x5)*(-x2 + x5);
 
 	double det = a*c - b*b;
 	double detsq = det * det;
@@ -403,8 +403,8 @@ __device__ double point_plane_distance(double(&x)[12], double(&fd)[12], double(&
 	double invDet = 1. / det;
 	s *= invDet;
 	t *= invDet;
-	output_s = s;
-	output_t = t;
+	//output_s = s;
+	//output_t = t;
 	double u = 1 - (s + t);
 
 	double sqrDistance = (-x0 + x6*s + x9*t + x3*u)*(-x0 + x6*s + x9*t + x3*u) +
@@ -422,7 +422,7 @@ __device__ double point_plane_distance(double(&x)[12], double(&fd)[12], double(&
 	double c1[12] = { 0,0,0,-2 * (-x3 + x9),-2 * (x10 - x4),-2 * (x11 - x5),0,0,0,2 * (-x3 + x9),2 * (x10 - x4),2 * (x11 - x5) };
 	double d1[12] = { x3 - x6, x4 - x7, x5 - x8, x0 - 2 * x3 + x6, x1 - 2 * x4 + x7, x2 - 2 * x5 + x8, -x0 + x3, -x1 + x4, -x2 + x5, 0, 0, 0 };
 	double e1[12] = { x3 - x9, -x10 + x4, -x11 + x5, x0 - 2 * x3 + x9, x1 + x10 - 2 * x4, x11 + x2 - 2 * x5, 0, 0, 0, -x0 + x3, -x1 + x4, -x2 + x5 };
-	double f1[12] = { -2 * (-x0 + x3),-2 * (-x1 + x4),-2 * (-x2 + x5),2 * (-x0 + x3),2 * (-x1 + x4),2 * (-x2 + x5),0,0,0,0,0,0 };
+	//double f1[12] = { -2 * (-x0 + x3),-2 * (-x1 + x4),-2 * (-x2 + x5),2 * (-x0 + x3),2 * (-x1 + x4),2 * (-x2 + x5),0,0,0,0,0,0 };
 	double s1[12], t1[12], det1[12];
 
 	// first derivatives 

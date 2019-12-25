@@ -23,16 +23,16 @@ namespace IcyGrains
         public string name { get; set; } = "default";
 
         [Category("Beam")]
-        public double beamA { get; set; } = 0.55; // a
+        public double beamA { get; set; } = 0.4; // a
 
         [Category("Beam")]
-        public double beamB { get; set; } = 0.55; // b
+        public double beamB { get; set; } = 0.4; // b
 
         [Category("Beam")]
-        public double beamL1 { get; set; } = 1.05; // l1
+        public double beamL1 { get; set; } = 0.83; // l1
 
         [Category("Beam")]
-        public double beamL2 { get; set; } = 1.95; // l2
+        public double beamL2 { get; set; } = 1.3; // l2
 
         [Category("Beam")]
         public double beamGap { get; set; } = 0.1; // c
@@ -41,7 +41,7 @@ namespace IcyGrains
         public double beamMargin { get; set; } = 0.35; // d
 
         [Category("Beam")]
-        public double beamThickness { get; set; } = 0.56; // h
+        public double beamThickness { get; set; } = 0.5; // h
 
         [Category("Beam")]
         public double CharacteristicLengthMax { get; set; } = 0.2;

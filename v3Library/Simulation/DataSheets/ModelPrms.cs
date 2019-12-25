@@ -361,6 +361,10 @@ namespace icFlow
         [Category("Matrix")]
         public bool UseGPU { get; set; } = true;
 
+        [Category("Matrix")]
+        [Description("Saves matrix at each step as binary file")]
+        public bool SaveMatrixToFile { get; set; } = true;
+
         #endregion
 
         #region Beam information (if the model is beam)

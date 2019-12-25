@@ -3,6 +3,7 @@ using System.Linq;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Collections.Generic;
+using System.IO;
 
 namespace icFlow
 {
@@ -55,6 +56,7 @@ namespace icFlow
         [DllImport("PardisoLoader2.dll", CallingConvention = CallingConvention.Cdecl)]
         static extern int SolveDouble3(int[] ja, int[] ia, double[] a, int n, double[] b, double[] x, int matrixType, int iparam4, int dim, int msglvl, int check);
 
+        long refTime;
         public void Solve(FrameInfo cf)
         {
             bool symmetric = true;
@@ -73,6 +75,7 @@ namespace icFlow
 
             sw.Stop();
             cf.MKLSolve += sw.ElapsedMilliseconds;
+            refTime = sw.ElapsedMilliseconds;
         }
 
 
@@ -84,6 +87,49 @@ namespace icFlow
             return result;
         }
 
+
+        #region save to file
+
+        static int saves = 0;
+
+        byte[] snapshot;
+        public void DumpMatrix()
+        {
+            string dir = "LSs";
+            if (!Directory.Exists(dir)) Directory.CreateDirectory(dir);
+            saves++;
+            Stream str = File.Create($"{dir}/ls{saves}.bin");
+            BinaryWriter bw = new BinaryWriter(str);
+
+
+            int byteSizeDVals = dvalsSize * sizeof(double);
+            int byteSizeDx = dxSize * sizeof(double);
+            int byteSizeCSRCols = csrd.nnz*sizeof(int);
+            int byteSizeCSRRows = (csrd.N + 1) * sizeof(int);
+
+            int bufferSize = byteSizeCSRCols + byteSizeCSRRows+ byteSizeDVals + 2 * byteSizeDx;
+            if (snapshot == null || snapshot.Length < bufferSize) snapshot = new byte[bufferSize * 2];
+
+            int offset = 0;
+            Buffer.BlockCopy(csrd.csr_cols, 0, snapshot, offset, byteSizeCSRCols);
+            offset += byteSizeCSRCols;
+            Buffer.BlockCopy(csrd.csr_rows, 0, snapshot, offset, byteSizeCSRRows);
+            offset += byteSizeCSRRows;
+            Buffer.BlockCopy(vals, 0, snapshot, offset, byteSizeDVals);
+            offset += byteSizeDVals;
+            Buffer.BlockCopy(rhs, 0, snapshot, offset, byteSizeDx);
+            offset += byteSizeDx;
+            Buffer.BlockCopy(dx, 0, snapshot, offset, byteSizeDx);
+            offset += byteSizeDx;
+            Assert(offset == bufferSize);
+            bw.Write(csrd.nnz);
+            bw.Write(csrd.N);
+            bw.Write(snapshot, 0, bufferSize);
+            bw.Write(refTime);
+            bw.Close();
+        }
+
+        #endregion
 
         #region working with values directly
 
